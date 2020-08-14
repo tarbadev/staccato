@@ -4,7 +4,10 @@
   "private": true,
   "workspaces": ["server", "client"],
   "scripts": {
-    "build": "cd client && yarn build && mv ./build ../server",
+    "build": "yarn build-modules && yarn move-modules",
+    "build-modules": "concurrently \"cd server && yarn build\" \"cd client && yarn build\"",
+    "move-modules": "mv -f server/build build && mv -f client/build build/frontend",
+    "clean": "rm -rf build",
     "test": "cd client && yarn test",
     "start": "concurrently \"cd server && yarn start\" \"cd client && yarn start\" --kill-others"
   },

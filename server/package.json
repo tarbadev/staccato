@@ -2,8 +2,12 @@
   "name": "staccato-server",
   "version": "0.1.0",
   "private": true,
+  "main": "dist/index.js",
   "scripts": {
-    "start": "cross-env NODE_ENV=development nodemon src/server.js --watch server/*"
+    "prebuild": "tslint -c tslint.json -p tsconfig.json --fix",
+    "build": "tsc",
+    "clean": "rm -rf ./build",
+    "start": "cross-env NODE_ENV=development nodemon src/server.ts --watch server/*"
   },
   "dependencies": {
     "@types/node": "^12.0.0",
@@ -12,11 +16,17 @@
     "cookie-parser": "^1.4.5",
     "cors": "^2.8.5",
     "express": "^4.17.1",
+    "express-csp-header": "^4.0.0",
     "helmet": "^4.0.0",
     "typescript": "~3.7.2"
   },
   "devDependencies": {
+    "@types/compression": "^1.7.0",
+    "@types/cookie-parser": "^1.4.2",
+    "@types/cors": "^2.8.7",
+    "@types/express": "^4.17.7",
     "concurrently": "^5.3.0",
-    "nodemon": "^2.0.4"
+    "nodemon": "^2.0.4",
+    "tslint": "^6.1.3"
   }
 }

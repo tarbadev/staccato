@@ -1,24 +1,17 @@
 {
-  "name": "staccato",
+  "name": "staccato-client",
   "version": "0.1.0",
   "private": true,
-  "workspaces": ["server", "client"],
   "scripts": {
-    "build": "cd client && yarn build && mv ./build ../server",
-    "test": "cd client && yarn test",
-    "start": "concurrently \"cd server && yarn start\" \"cd client && yarn start\" --kill-others"
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test --env=jsdom-fourteen",
+    "eject": "react-scripts eject"
   },
   "proxy": "http://localhost:4000",
   "dependencies": {
-    "@types/node": "^12.0.0",
     "@types/react": "^16.9.0",
     "@types/react-dom": "^16.9.0",
-    "body-parser": "^1.19.0",
-    "compression": "^1.7.4",
-    "cookie-parser": "^1.4.5",
-    "cors": "^2.8.5",
-    "express": "^4.17.1",
-    "helmet": "^4.0.0",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "typescript": "~3.7.2"
@@ -28,11 +21,7 @@
     "@testing-library/react": "^10.4.8",
     "@testing-library/user-event": "^12.1.1",
     "@types/jest": "^24.0.0",
-    "concurrently": "^5.3.0",
-    "cross-env": "^7.0.2",
-    "fs-extra": "^9.0.1",
     "jest-fetch-mock": "^3.0.3",
-    "nodemon": "^2.0.4",
     "react-scripts": "3.4.3"
   },
   "eslintConfig": {

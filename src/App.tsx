@@ -1,21 +1,22 @@
-import React, {useEffect, useState} from 'react'
+import React, { useEffect, useState } from 'react'
+import Bundle from "./Bundle";
 
 function App() {
-    const [welcomeMessage, setWelcomeMessage] = useState('')
+  const [bundles, setBundles] = useState([])
 
-    useEffect(() => {
-        fetch('/api')
-            .then(response => response.text())
-            .then(data => setWelcomeMessage(data))
-    }, [])
+  useEffect(() => {
+    fetch('/api')
+      .then(response => response.json())
+      .then(data => setBundles(data))
+  }, [])
 
-    return (
-        <div className="App">
-            <p>
-                {welcomeMessage}
-            </p>
-        </div>
-    )
+  const welcomeMessagesToDisplay = bundles.map((bundle: Bundle, index) => <p
+    key={`welcome-${index}`}>{bundle.name}</p>)
+  return (
+    <div className="App">
+      {welcomeMessagesToDisplay}
+    </div>
+  )
 }
 
 export default App

@@ -10,10 +10,10 @@ function App() {
       .then(data => setBundles(data))
   }, [])
 
-  const welcomeMessagesToDisplay = bundles.map((bundle: Bundle, index) => <p
-    key={`welcome-${index}`}>{bundle.name}</p>)
+  const welcomeMessagesToDisplay = bundles.map((bundle: Bundle, index) =>
+    <p key={`welcome-${index}`} data-bundle-name="">{bundle.name}</p>)
   return (
-    <div className="App">
+    <div id="home">
       {welcomeMessagesToDisplay}
     </div>
   )

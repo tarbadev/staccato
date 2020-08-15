@@ -2,55 +2,18 @@
   "name": "staccato",
   "version": "0.1.0",
   "private": true,
-  "workspaces": ["server", "client"],
+  "workspaces": [
+    "server",
+    "client",
+    "e2e"
+  ],
   "scripts": {
     "build": "yarn build-modules && yarn move-modules",
     "build-modules": "concurrently \"cd server && yarn build\" \"cd client && yarn build\"",
     "move-modules": "mv -f server/build build && mv -f client/build build/frontend",
     "clean": "rm -rf build",
     "test": "cd client && yarn test",
+    "test-e2e": "cd e2e && yarn test",
     "start": "concurrently \"cd server && yarn start\" \"cd client && yarn start\" --kill-others"
-  },
-  "proxy": "http://localhost:4000",
-  "dependencies": {
-    "@types/node": "^12.0.0",
-    "@types/react": "^16.9.0",
-    "@types/react-dom": "^16.9.0",
-    "body-parser": "^1.19.0",
-    "compression": "^1.7.4",
-    "cookie-parser": "^1.4.5",
-    "cors": "^2.8.5",
-    "express": "^4.17.1",
-    "helmet": "^4.0.0",
-    "react": "^16.13.1",
-    "react-dom": "^16.13.1",
-    "typescript": "~3.7.2"
-  },
-  "devDependencies": {
-    "@testing-library/jest-dom": "^5.11.3",
-    "@testing-library/react": "^10.4.8",
-    "@testing-library/user-event": "^12.1.1",
-    "@types/jest": "^24.0.0",
-    "concurrently": "^5.3.0",
-    "cross-env": "^7.0.2",
-    "fs-extra": "^9.0.1",
-    "jest-fetch-mock": "^3.0.3",
-    "nodemon": "^2.0.4",
-    "react-scripts": "3.4.3"
-  },
-  "eslintConfig": {
-    "extends": "react-app"
-  },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
   }
 }

@@ -1,8 +1,24 @@
 import React, { useEffect, useState } from 'react'
-import Bundle from "./Bundle";
+import Bundle from './Bundle'
+import makeStyles from '@material-ui/core/styles/makeStyles'
+import Container from '@material-ui/core/Container'
+import { Typography } from '@material-ui/core'
 
-function App() {
+const useStyles = makeStyles(theme => ({
+  content: {
+    flexGrow: 1,
+    height: '100vh',
+    overflow: 'auto',
+  },
+  container: {
+    paddingTop: theme.spacing(4),
+    paddingBottom: theme.spacing(4),
+  },
+}))
+
+export const App = () => {
   const [bundles, setBundles] = useState([])
+  const classes = useStyles()
 
   useEffect(() => {
     fetch('/api')
@@ -11,12 +27,14 @@ function App() {
   }, [])
 
   const welcomeMessagesToDisplay = bundles.map((bundle: Bundle, index) =>
-    <p key={`welcome-${index}`} data-bundle-name="">{bundle.name}</p>)
+    <Typography key={`welcome-${index}`} variant='h4' data-bundle-name=''>{bundle.name}</Typography>)
   return (
-    <div id="home">
-      {welcomeMessagesToDisplay}
-    </div>
+    <main className={classes.content}>
+      <Container maxWidth='xl' className={classes.container}>
+        <div id="home">
+          {welcomeMessagesToDisplay}
+        </div>
+      </Container>
+    </main>
   )
 }
-
-export default App

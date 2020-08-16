@@ -9,7 +9,7 @@ export const HomePage = () => {
   const history = useHistory()
 
   useEffect(() => {
-    fetch('/api')
+    fetch('/api/bundles')
       .then(response => response.json())
       .then(data => setBundles(data))
   }, [])

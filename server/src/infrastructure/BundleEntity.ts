@@ -8,6 +8,11 @@ export class BundleEntity {
   @Column()
   name: string
 
+  constructor(id: number, name: string) {
+    this.id = id
+    this.name = name
+  }
+
   toDomain(): Bundle {
     return {
       id: this.id,

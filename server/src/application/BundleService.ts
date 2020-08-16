@@ -5,4 +5,8 @@ export default class BundleService {
   list(): Promise<Bundle[]> {
     return BundleRepository.findAll()
   }
+
+  get(id: number): Promise<Bundle> {
+    return BundleRepository.findOne(id)
+  }
 }

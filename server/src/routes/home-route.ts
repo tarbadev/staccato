@@ -9,4 +9,8 @@ homeRouter.get('/', async (req: Request, res: Response) => {
   res.json(await bundleService.list())
 })
 
+homeRouter.get('/:id', async (req: Request, res: Response) => {
+  res.json(await bundleService.get(Number(req.params.id)))
+})
+
 export default homeRouter

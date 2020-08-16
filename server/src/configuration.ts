@@ -31,7 +31,7 @@ export const configureApp = (app: Express) => {
     app.use(express.static(path.join(__dirname, 'frontend')))
   }
 
-  app.use('/api', homeRouter)
+  app.use('/api/bundles', homeRouter)
 
   app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
     // tslint:disable-next-line:no-console

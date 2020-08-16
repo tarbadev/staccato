@@ -29,7 +29,7 @@ describe('HomePage', () => {
     ]
 
     fetchMock.mockResponseOnce(request => {
-      expect(request.url === '/api/bundles')
+      expect(request.url).toBe('/api/bundles')
 
       return Promise.resolve(JSON.stringify(response))
     })
@@ -46,7 +46,7 @@ describe('HomePage', () => {
     const bundleId = 2
 
     fetchMock.mockResponseOnce(request => {
-      expect(request.url === '/api/bundles')
+      expect(request.url).toBe('/api/bundles')
 
       return Promise.resolve(JSON.stringify([{ name: bundleName, id: bundleId }]))
     })

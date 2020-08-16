@@ -11,7 +11,7 @@ describe('Home', () => {
 
   beforeEach(() => {
     homePage = new HomePage()
-    bundlePage = new BundlePage()
+    bundlePage = new BundlePage(0)
     return connection.clear()
   })
 

@@ -27,6 +27,10 @@ export default abstract class BasePage {
     }
   }
 
+  protected getTextContentBySelector(selector: string): Promise<string> {
+    return page.$eval(selector, element => element.textContent)
+  }
+
   getCurrentPageUrl(): string {
     return page.url()
   }

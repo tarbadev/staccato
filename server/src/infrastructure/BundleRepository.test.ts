@@ -12,4 +12,10 @@ describe('BundleRepository', () => {
 
     expect(await BundleRepository.findAll()).toEqual([bundle])
   })
+
+  it('should load the saved Bundle', async () => {
+    const bundle = await connection.store('BundleEntity', { name: 'Some New Bundle' })
+
+    expect(await BundleRepository.findOne(bundle.id)).toEqual(bundle)
+  })
 })

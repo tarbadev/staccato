@@ -7,4 +7,8 @@ export default class BundleRepository {
     const bundleEntities = await getManager().getRepository(BundleEntity).find()
     return bundleEntities.map(bundleEntity => bundleEntity.toDomain())
   }
+  static async findOne(id: number): Promise<Bundle> {
+    const bundleEntity = await getManager().getRepository(BundleEntity).findOne(id)
+    return bundleEntity.toDomain()
+  }
 }

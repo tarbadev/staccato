@@ -8,8 +8,26 @@ export default abstract class BasePage {
     this.pageLoadedSelector = pageLoadedSelector
   }
 
+  async waitForPageLoaded() {
+    await page.waitForSelector(this.pageLoadedSelector)
+  }
+
   async goTo() {
     await page.goto(`${this.appUrl}${this.url}`, { waitUntil: 'networkidle2' })
-    await page.waitForSelector(this.pageLoadedSelector)
+    await this.waitForPageLoaded()
+  }
+
+  async clickOnBundle(bundleName: string) {
+    const bundle = await page.$(`[data-bundle-name='${bundleName}']`)
+
+    if (bundle) {
+      await bundle.click()
+    } else {
+      throw new Error(`Bundle not found: ${bundle}`)
+    }
+  }
+
+  getCurrentPageUrl(): string {
+    return page.url()
   }
 }

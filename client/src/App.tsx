@@ -1,8 +1,7 @@
-import React, { useEffect, useState } from 'react'
-import Bundle from './Bundle'
+import React from 'react'
 import makeStyles from '@material-ui/core/styles/makeStyles'
 import Container from '@material-ui/core/Container'
-import { Typography } from '@material-ui/core'
+import { Content } from './Content'
 
 const useStyles = makeStyles(theme => ({
   content: {
@@ -17,23 +16,12 @@ const useStyles = makeStyles(theme => ({
 }))
 
 export const App = () => {
-  const [bundles, setBundles] = useState([])
   const classes = useStyles()
 
-  useEffect(() => {
-    fetch('/api')
-      .then(response => response.json())
-      .then(data => setBundles(data))
-  }, [])
-
-  const welcomeMessagesToDisplay = bundles.map((bundle: Bundle, index) =>
-    <Typography key={`welcome-${index}`} variant='h4' data-bundle-name=''>{bundle.name}</Typography>)
   return (
     <main className={classes.content}>
       <Container maxWidth='xl' className={classes.container}>
-        <div id="home">
-          {welcomeMessagesToDisplay}
-        </div>
+        <Content/>
       </Container>
     </main>
   )

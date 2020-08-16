@@ -22,6 +22,7 @@
     "noImplicitThis": true,
     "strictNullChecks": true
   },
+  "extends": "../base-tsconfig.json",
   "include": [
     "src"
   ]

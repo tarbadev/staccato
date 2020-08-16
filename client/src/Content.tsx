@@ -5,7 +5,7 @@ import { BundleDetailPage } from './BundleDetailPage'
 
 export const Content = () => {
   return <Switch>
-    <Route exact path="/" component={HomePage}/>
-    <Route exact path="/bundles/:id" component={BundleDetailPage}/>
+    <Route exact path='/' component={HomePage}/>
+    <Route exact path='/bundles/:id' component={BundleDetailPage}/>
   </Switch>
 }

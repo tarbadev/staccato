@@ -1,7 +1,12 @@
-import express from 'express'
-import * as homeControllers from '../controllers/home-controller'
+import express, { Request, Response } from 'express'
+import BundleService from '../application/BundleService'
 
-const router = express.Router()
-router.get('/', homeControllers.homeGet)
+const homeRouter = express.Router()
 
-export default router
+const bundleService = new BundleService()
+
+homeRouter.get('/', async (req: Request, res: Response) => {
+  res.json(await bundleService.list())
+})
+
+export default homeRouter

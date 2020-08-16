@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { Typography } from '@material-ui/core'
 import { useHistory } from 'react-router-dom'
 
-import Bundle from './Bundle'
+import Bundle from '@shared/Bundle'
 
 export const HomePage = () => {
   const [bundles, setBundles] = useState([])
@@ -22,7 +22,7 @@ export const HomePage = () => {
       {bundle.name}
     </Typography>)
   return (
-    <div id="home">
+    <div id='home'>
       {welcomeMessagesToDisplay}
     </div>
   )

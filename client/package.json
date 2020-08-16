@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "start": "react-scripts start",
+    "prebuild": "tslint -c ../tslint.json -p tsconfig.json --fix",
     "build": "react-scripts build",
     "clean": "rm -rf ./build",
     "test": "react-scripts test --ci --env=jsdom-fourteen",

@@ -7,8 +7,11 @@
     "moduleResolution": "node",
     "sourceMap": true,
     "outDir": "build",
-    "baseUrl": "."
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "resolveJsonModule": true
   },
+  "extends": "../base-tsconfig.json",
   "include": [
     "src"
   ]

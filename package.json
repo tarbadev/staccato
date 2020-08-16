@@ -12,7 +12,7 @@
     "build-modules": "concurrently \"cd server && yarn build\" \"cd client && yarn build\"",
     "move-modules": "mv -f server/build build && mv -f client/build build/frontend",
     "clean": "rm -rf build",
-    "test": "cd client && yarn test",
+    "test": "(cd client && yarn test) && (cd server && yarn test)",
     "test-e2e": "cd e2e && yarn test",
     "start": "concurrently \"cd server && yarn start\" \"cd client && yarn start\" --kill-others"
   }

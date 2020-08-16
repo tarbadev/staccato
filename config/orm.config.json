@@ -7,9 +7,9 @@
   "database": "staccato",
   "synchronize": true,
   "entities": [
-    "src/infrastructure/**/*Entity.ts"
+    "../server/src/infrastructure/**/*Entity.ts"
   ],
   "cli": {
-    "entitiesDir": "src/infrastructure/**/*Entity.ts"
+    "entitiesDir": "../server/src/infrastructure/**/*Entity.ts"
   }
 }

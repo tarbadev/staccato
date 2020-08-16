@@ -4,6 +4,7 @@ module.exports = {
     "displayName": "Server Tests",
     "errorOnDeprecated": true,
     "moduleNameMapper": {
-        '^@config/(.*)$': '<rootDir>../config/$1'
+        '^@config/(.*)$': '<rootDir>../config/$1',
+        '^@shared/(.*)$': '<rootDir>../shared/$1'
     }
 };

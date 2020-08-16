@@ -1,6 +1,6 @@
 import BundleRepository from './BundleRepository'
 import { BundleEntity } from './BundleEntity'
-import connection from '../DbHelper'
+import connection from '@shared/DbHelperUnit'
 
 describe('BundleRepository', () => {
   beforeAll(() => connection.create())

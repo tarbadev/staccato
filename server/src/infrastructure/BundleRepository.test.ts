@@ -18,4 +18,8 @@ describe('BundleRepository', () => {
 
     expect(await BundleRepository.findOne(bundle.id)).toEqual(bundle)
   })
+
+  it('should throw if not found', async () => {
+    await expect(BundleRepository.findOne(90)).rejects.toThrow(new Error('Bundle with id 90 was not found'))
+  })
 })

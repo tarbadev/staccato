@@ -4,6 +4,8 @@
     "paths": {
       "@config/*": ["config/*"],
       "@shared/*": ["shared/*"]
-    }
-  }
+    },
+    "removeComments": true
+  },
+  "extends": "@tsconfig/recommended/tsconfig.json"
 }

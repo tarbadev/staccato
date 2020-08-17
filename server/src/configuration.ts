@@ -20,7 +20,7 @@ export const configureApp = (app: Express) => {
     directives: {
       'default-src': [SELF],
       'script-src': [SELF, INLINE],
-      'style-src': [SELF],
+      'style-src': [SELF, INLINE],
       'img-src': ['data:', SELF],
       'worker-src': [NONE],
       'block-all-mixed-content': true,
@@ -28,7 +28,7 @@ export const configureApp = (app: Express) => {
   }))
 
   if (process.env.NODE_ENV && process.env.NODE_ENV !== 'development') {
-    app.use(express.static(path.join(__dirname, 'frontend')))
+    app.use(express.static(path.join(__dirname, '../../frontend')))
   }
 
   app.use('/api/bundles', homeRouter)

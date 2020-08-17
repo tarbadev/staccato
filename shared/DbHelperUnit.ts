@@ -1,5 +1,5 @@
 import { createConnection, getConnection } from 'typeorm'
-import ormAppConfig from '@config/orm.config.json'
+import ormAppConfig from '@config/orm.config'
 import ormTestConfig from '@config/orm.config.test.json'
 import { ConnectionOptions } from 'typeorm/connection/ConnectionOptions'
 

@@ -2,7 +2,7 @@
   "name": "staccato-server",
   "version": "0.1.0",
   "private": true,
-  "main": "dist/index.js",
+  "main": "build/server/src/server.js",
   "scripts": {
     "prebuild": "tslint -c ../tslint.json -p tsconfig.json --fix",
     "build": "tsc",
@@ -53,6 +53,6 @@
       "src"
     ],
     "exec": "node -r tsconfig-paths/register -r ts-node/register ./src/server.ts",
-    "ext": "ts, json"
+    "ext": "ts"
   }
 }

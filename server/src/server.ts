@@ -1,9 +1,10 @@
+import 'module-alias/register'
 import 'reflect-metadata'
 import express from 'express'
 import { createConnection } from 'typeorm'
 import { ConnectionOptions } from 'typeorm/connection/ConnectionOptions'
 import { configureApp } from './configuration'
-import ormConfig from '@config/orm.config.json'
+import ormConfig from '@config/orm.config'
 
 const PORT = process.env.PORT || 4000
 

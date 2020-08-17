@@ -1,0 +1,12 @@
+applications:
+  - name: staccato-dev
+    path: build
+    buildpacks:
+      - https://github.com/cloudfoundry/nodejs-buildpack
+    instances: 1
+    memory: 64M
+    stack: cflinuxfs3
+    routes:
+      - route: staccato-dev.cfapps.io
+    env:
+      FORCE_HTTPS: true

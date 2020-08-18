@@ -25,3 +25,5 @@ yarn-error.log*
 .idea
 
 server/build
+
+e2e_key.json

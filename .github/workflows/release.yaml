@@ -101,10 +101,12 @@ jobs:
         with:
           name: "build"
           path: build
-      - name: "Deploy to dev environment"
+      - name: "Deploy to Production environment"
         uses: d3sandoval/cloud-foundry-action@1.1.1
         env:
           CF_TARGET_ORG: ${{ secrets.CF_ORG }}
           CF_TARGET_SPACE: "production"
+          CF_USERNAME: ${{ secrets.CF_USERNAME }}
+          CF_PASSWORD: ${{ secrets.CF_PASSWORD }}
         with:
           args: "push -f manifest-production.yml"

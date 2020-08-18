@@ -10,4 +10,5 @@ module.exports = {
         '^@shared/(.*)$': '<rootDir>../shared/$1',
         '^@config/(.*)$': '<rootDir>../config/$1'
     },
+    testTimeout: 15000,
 };

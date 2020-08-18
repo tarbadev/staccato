@@ -7,8 +7,11 @@ import bodyParser from 'body-parser'
 import { expressCspHeader, INLINE, NONE, SELF } from 'express-csp-header'
 import path from 'path'
 import homeRouter from './routes/home-route'
+import history from 'connect-history-api-fallback'
 
 export const configureApp = (app: Express) => {
+  app.use('/api/bundles', homeRouter)
+
   app.use(cors())
   app.use(helmet())
   app.use(compression())
@@ -16,6 +19,7 @@ export const configureApp = (app: Express) => {
   app.use(express.urlencoded({ extended: false }))
   app.use(cookieParser())
   app.use(bodyParser.json())
+  app.use(history({ verbose: false }))
   app.use(expressCspHeader({
     directives: {
       'default-src': [SELF, INLINE],
@@ -28,10 +32,9 @@ export const configureApp = (app: Express) => {
   }))
 
   if (process.env.NODE_ENV && process.env.NODE_ENV !== 'development') {
-    app.use(express.static(path.join(__dirname, '../../frontend')))
+    const root = path.join(__dirname, '../../frontend')
+    app.use(express.static(root))
   }
-
-  app.use('/api/bundles', homeRouter)
 
   app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
     // tslint:disable-next-line:no-console

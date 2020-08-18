@@ -8,22 +8,25 @@
     "e2e"
   ],
   "scripts": {
-    "build": "yarn build-modules && yarn move-modules && cp package.json ./build/package.json",
+    "build": "yarn build-modules && yarn move-modules && cp package.json ./build/ && cp ./yarn.lock ./build/",
     "build-modules": "concurrently \"cd server && yarn build\" \"cd client && yarn build\"",
     "move-modules": "mv -f server/build build && mv -f client/build build/frontend",
     "clean": "rm -rf build",
     "test": "(cd client && yarn test) && (cd server && yarn test)",
     "test-e2e": "cd e2e && yarn test",
-    "start": "cross-env NODE_ENV=production node server/src/server.js",
+    "start": "node server/src/server.js",
     "start-dev": "concurrently \"cd server && yarn start\" \"cd client && yarn start\" --kill-others"
   },
   "devDependencies": {
     "@tsconfig/recommended": "^1.0.1",
-    "cross-env": "^7.0.2",
     "module-alias": "^2.2.2"
   },
   "_moduleAliases": {
     "@config": "./config",
     "@shared": "./shared"
+  },
+  "engines": {
+    "node": "^14.8.0",
+    "yarn": "^1.22.4"
   }
 }

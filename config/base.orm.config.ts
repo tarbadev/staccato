@@ -4,11 +4,6 @@ const entitiesPath = path.join(__dirname, '../server/src/infrastructure/**/*Enti
 
 export default {
   'type': 'mysql',
-  'host': 'localhost',
-  'port': 3306,
-  'username': 'staccato',
-  'password': '',
-  'database': 'staccato',
   'synchronize': true,
   'entities': [
     entitiesPath,

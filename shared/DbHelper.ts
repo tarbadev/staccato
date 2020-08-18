@@ -1,10 +1,18 @@
 import { createConnection, getConnection } from 'typeorm'
-import ormAppConfig from '@config/orm.config'
+import baseOrmConfig from '@config/base.orm.config'
+import localDbCredentials from '@config/local.database.config'
 import { ConnectionOptions } from 'typeorm/connection/ConnectionOptions'
 
 const connection = {
   async create() {
-    await createConnection(ormAppConfig as ConnectionOptions)
+    const dbConfig = {
+      ...baseOrmConfig,
+      ...localDbCredentials,
+      database: localDbCredentials.name,
+      name: 'default',
+    }
+
+    await createConnection(dbConfig as ConnectionOptions)
   },
 
   async close() {

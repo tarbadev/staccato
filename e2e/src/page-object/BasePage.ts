@@ -27,7 +27,7 @@ export default abstract class BasePage {
     }
   }
 
-  protected getTextContentBySelector(selector: string): Promise<string> {
+  protected getTextContentBySelector(selector: string): Promise<string | null> {
     return page.$eval(selector, element => element.textContent)
   }
 

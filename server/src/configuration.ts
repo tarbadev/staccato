@@ -18,7 +18,7 @@ export const configureApp = (app: Express) => {
   app.use(bodyParser.json())
   app.use(expressCspHeader({
     directives: {
-      'default-src': [SELF],
+      'default-src': [SELF, INLINE],
       'script-src': [SELF, INLINE],
       'style-src': [SELF, INLINE],
       'img-src': ['data:', SELF],

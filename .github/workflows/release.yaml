@@ -1,0 +1,110 @@
+name: Release
+on:
+  push:
+    branches: [ 'master' ]
+
+jobs:
+  unit:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: mirromutth/mysql-action@v1.1
+        with:
+          mysql database: 'staccato_test'
+          mysql user: 'staccato'
+          mysql password: 'staccato'
+      - name: "Install Node.js 14.8.0"
+        uses: actions/setup-node@v1
+        with:
+          node-version: 14.8.0
+      - name: "Install dependencies"
+        run: yarn --frozen-lockfile
+      - name: "Run Unit Tests"
+        run: yarn test
+
+  build:
+    name: Build Artifacts
+    runs-on: ubuntu-latest
+    needs: unit
+    steps:
+      - uses: actions/checkout@v2
+      - name: "Install Node.js 14.8.0"
+        uses: actions/setup-node@v1
+        with:
+          node-version: 14.8.0
+      - name: "Install dependencies"
+        run: yarn --frozen-lockfile
+      - name: "Build artifacts"
+        run: yarn build
+      - name: "Upload build folder"
+        uses: actions/upload-artifact@v1
+        with:
+          name: "build"
+          path: build
+
+  dev-deploy:
+    name: Deploy - Development
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/download-artifact@v2
+        with:
+          name: "build"
+          path: build
+      - name: "Deploy to dev environment"
+        uses: d3sandoval/cloud-foundry-action@1.1.1
+        env:
+          CF_TARGET_ORG: ${{ secrets.CF_ORG }}
+          CF_TARGET_SPACE: "development"
+          CF_USERNAME: ${{ secrets.CF_USERNAME }}
+          CF_PASSWORD: ${{ secrets.CF_PASSWORD }}
+        with:
+          args: "push -f manifest-development.yml"
+
+  e2e:
+    name: E2E Tests
+    runs-on: ubuntu-latest
+    needs: dev-deploy
+    steps:
+    - uses: actions/checkout@v2
+    - name: "Install Node.js 14.8.0"
+      uses: actions/setup-node@v1
+      with:
+        node-version: 14.8.0
+    - name: "Install dependencies"
+      run: yarn --frozen-lockfile
+    - name: "Retrieve DB service key"
+      uses: d3sandoval/cloud-foundry-action@1.1.1
+      env:
+        CF_TARGET_ORG: ${{ secrets.CF_ORG }}
+        CF_TARGET_SPACE: "development"
+        CF_USERNAME: ${{ secrets.CF_USERNAME }}
+        CF_PASSWORD: ${{ secrets.CF_PASSWORD }}
+      with:
+        args: "service-key staccato-db e2e_key > /github/workspace/e2e_key.json"
+    - name: "Run E2E Tests"
+      run: |
+        DB_CREDENTIALS=$(cat e2e_key.json) \
+        yarn test-e2e
+      env:
+        APP_URL: https://staccato-dev.cfapps.io
+
+  prod-deploy:
+    name: Deploy - Production
+    runs-on: ubuntu-latest
+    needs: e2e
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/download-artifact@v2
+        with:
+          name: "build"
+          path: build
+      - name: "Deploy to dev environment"
+        uses: d3sandoval/cloud-foundry-action@1.1.1
+        env:
+          CF_TARGET_ORG: ${{ secrets.CF_ORG }}
+          CF_TARGET_SPACE: "production"
+        with:
+          args: "push -f manifest-production.yml"

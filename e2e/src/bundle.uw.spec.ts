@@ -1,5 +1,5 @@
 import BundlePage from './page-object/BundlePage'
-import connection from '@shared/DbHelper'
+import connection from '@shared/DbHelperE2e'
 
 describe('Bundle', () => {
   let bundlePage: BundlePage

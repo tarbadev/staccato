@@ -2,6 +2,6 @@ export default {
   'hostname': 'localhost',
   'port': '3306',
   'username': 'staccato',
-  'password': '',
+  'password': 'staccato',
   'name': 'staccato',
 }

@@ -3,7 +3,7 @@ import express, { Express } from 'express'
 import { configureApp } from '../configuration'
 import BundleService from '../application/BundleService'
 
-describe('HomeRouter', () => {
+describe('BundleRouter', () => {
   let app: Express
 
   beforeAll(() => {

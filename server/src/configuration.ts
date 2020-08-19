@@ -6,7 +6,7 @@ import cookieParser from 'cookie-parser'
 import bodyParser from 'body-parser'
 import { expressCspHeader, INLINE, NONE, SELF } from 'express-csp-header'
 import path from 'path'
-import homeRouter from './routes/home-route'
+import bundleRouter from './routes/bundle-route'
 import history from 'connect-history-api-fallback'
 
 export const configureApp = (app: Express) => {
@@ -29,7 +29,7 @@ export const configureApp = (app: Express) => {
     },
   }))
 
-  app.use('/api/bundles', homeRouter)
+  app.use('/api/bundles', bundleRouter)
 
   if (process.env.NODE_ENV && process.env.NODE_ENV !== 'development') {
     const root = path.join(__dirname, '../../frontend')

@@ -8,6 +8,7 @@ import Tooltip from '@material-ui/core/Tooltip'
 import Fab from '@material-ui/core/Fab'
 import TextField from '@material-ui/core/TextField'
 import Button from '@material-ui/core/Button'
+import { request } from './Utils'
 
 export const HomePage = () => {
   const [bundles, setBundles] = useState([])
@@ -16,22 +17,12 @@ export const HomePage = () => {
   const history = useHistory()
 
   const loadBundles = () => {
-    const headers = {
-      'Content-Type': 'application/json',
-      Accept: 'application/json',
-    }
-    fetch('/api/bundles', {headers})
-      .then(response => response.json())
+    request({ url: '/api/bundles' })
       .then(data => setBundles(data))
   }
 
   const addBundle = () => {
-    const body = { name: newBundleName }
-    const headers = {
-      'Content-Type': 'application/json',
-      Accept: 'application/json',
-    }
-    fetch('/api/bundles', { method: 'POST', body: JSON.stringify(body), headers })
+    request({ url: '/api/bundles', method: 'POST', body: { name: newBundleName } })
       .then(loadBundles)
   }
 
@@ -58,7 +49,7 @@ export const HomePage = () => {
           label='Name'
           value={newBundleName}
           onChange={({ target }) => setNewBundleName(target.value)}
-          data-new-bundle-name />
+          data-new-bundle-name/>
         <Button variant='contained' color='primary' onClick={addBundle} data-submit-bundle>
           Submit
         </Button>

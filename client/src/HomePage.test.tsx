@@ -1,6 +1,8 @@
 import React from 'react'
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { HomePage } from './HomePage'
+import * as Utils from './Utils'
+import { request } from './Utils'
 
 const mockPush = jest.fn()
 
@@ -9,6 +11,8 @@ jest.mock('react-router-dom', () => ({
     push: mockPush,
   }),
 }))
+
+const requestSpy = jest.spyOn(Utils, 'request')
 
 describe('HomePage', () => {
   const verifyBundleIsInDoc = async (bundleName: string) => {
@@ -30,7 +34,10 @@ describe('HomePage', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Submit' }))
   }
 
-  beforeEach(() => fetchMock.resetMocks())
+  beforeEach(() => {
+    requestSpy.mockReset()
+    requestSpy.mockClear()
+  })
 
   it('Displays the list of bundles', async () => {
     const bundle1 = 'Bundle 1'
@@ -42,13 +49,11 @@ describe('HomePage', () => {
       { name: bundle3 },
     ]
 
-    fetchMock.mockResponseOnce(request => {
-      expect(request.url).toBe('/api/bundles')
-
-      return Promise.resolve(JSON.stringify(response))
-    })
+    requestSpy.mockResolvedValue(response)
 
     render(<HomePage/>)
+
+    expect(request).toHaveBeenCalledWith({ url: '/api/bundles' })
 
     await verifyBundleIsInDoc(bundle1)
     await verifyBundleIsInDoc(bundle3)
@@ -59,11 +64,7 @@ describe('HomePage', () => {
     const bundleName = 'Some Bundle Name'
     const bundleId = 2
 
-    fetchMock.mockResponseOnce(request => {
-      expect(request.url).toBe('/api/bundles')
-
-      return Promise.resolve(JSON.stringify([{ name: bundleName, id: bundleId }]))
-    })
+    requestSpy.mockResolvedValue([{ name: bundleName, id: bundleId }])
 
     render(<HomePage/>)
 
@@ -75,47 +76,30 @@ describe('HomePage', () => {
 
   it('should post the new bundle', async () => {
     const bundleName = 'Some Bundle Name'
-    fetchMock.mockResponse(request => {
-      if (request.method === 'GET') {
-        return Promise.resolve(JSON.stringify([]))
-      }
-      return Promise.resolve('')
-    })
+
+    requestSpy.mockResolvedValue([])
 
     render(<HomePage/>)
 
     await addBundle(bundleName)
 
     await waitFor(() => {
-      const body = JSON.stringify({ name: bundleName })
-      const headers = {
-        'Content-Type': 'application/json',
-        Accept: 'application/json',
-      }
-      expect(fetch).toHaveBeenCalledWith('/api/bundles', { method: 'POST', body, headers })
+      expect(request).toHaveBeenCalledWith({ url: '/api/bundles', method: 'POST', body: { name: bundleName } })
     })
   })
 
   it('should load the bundles once the new bundle is added', async () => {
     const bundleName = 'Some Bundle Name'
-    fetchMock.mockResponse(request => {
-      if (request.method === 'GET') {
-        return Promise.resolve(JSON.stringify([]))
-      }
-      return Promise.resolve('')
-    })
+
+    requestSpy.mockResolvedValue([])
 
     render(<HomePage/>)
 
     await addBundle(bundleName)
 
     await waitFor(() => {
-      const headers = {
-        'Content-Type': 'application/json',
-        Accept: 'application/json',
-      }
-      expect(fetch).toHaveBeenCalledTimes(3)
-      expect(fetch).toHaveBeenLastCalledWith('/api/bundles', { headers })
+      expect(request).toHaveBeenCalledTimes(3)
+      expect(request).toHaveBeenLastCalledWith({ url: '/api/bundles' })
     })
   })
 })

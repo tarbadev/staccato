@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { Typography } from '@material-ui/core'
 import { RouteComponentProps } from 'react-router'
 import Bundle from '@shared/Bundle'
+import { request } from './Utils'
 
 interface RouteInfo {
   id: string;
@@ -11,12 +12,7 @@ export const BundleDetailPage = (routeInfo: RouteComponentProps<RouteInfo>) => {
   const [bundle, setBundle] = useState<Bundle>({ id: 0, name: '' })
 
   useEffect(() => {
-    const headers = {
-      'Content-Type': 'application/json',
-      Accept: 'application/json',
-    }
-    fetch(`/api/bundles/${routeInfo.match.params.id}`, { headers })
-      .then(response => response.json())
+    request({ url: `/api/bundles/${routeInfo.match.params.id}` })
       .then(data => setBundle(data))
   }, [routeInfo.match.params.id])
 

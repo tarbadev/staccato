@@ -12,18 +12,18 @@ interface RouteInfo {
   id: string;
 }
 
-export const BundleDetailPage = (routeInfo: RouteComponentProps<RouteInfo>) => {
+export const BundleDetailPage = ({ match }: RouteComponentProps<RouteInfo>) => {
   const [bundle, setBundle] = useState<Bundle>({ id: 0, name: '' })
   const [editMode, setEditMode] = useState(false)
   const [editBundleName, setEditBundleName] = useState('')
 
   useEffect(() => {
-    request({ url: `/api/bundles/${routeInfo.match.params.id}` })
+    request({ url: `/api/bundles/${match.params.id}` })
       .then(data => {
         setBundle(data)
         setEditBundleName(data.name)
       })
-  }, [routeInfo.match.params.id])
+  }, [match.params.id])
 
   const editBundle = () => {
     request({ url: `/api/bundles/${bundle.id}`, method: 'POST', body: { name: editBundleName } })
@@ -33,13 +33,32 @@ export const BundleDetailPage = (routeInfo: RouteComponentProps<RouteInfo>) => {
       })
   }
 
+  return <BundleDetailPageDisplay
+    bundle={bundle}
+    editMode={editMode}
+    editBundle={editBundle}
+    toggleEditMode={() => setEditMode(true)}
+    editBundleName={editBundleName}
+    onBundleNameChange={setEditBundleName}
+  />
+}
+
+type BundleDetailPageProps = {
+  bundle: Bundle,
+  editMode: boolean,
+  editBundle: () => void,
+  toggleEditMode: () => void,
+  editBundleName: string,
+  onBundleNameChange: (newName: string) => void,
+}
+const BundleDetailPageDisplay = ({ bundle, editMode, editBundle, editBundleName, onBundleNameChange, toggleEditMode }: BundleDetailPageProps) => {
   let title
   if (editMode) {
     title = (<form onSubmit={editBundle}>
       <TextField
         label='Name'
         value={editBundleName}
-        onChange={({ target }) => setEditBundleName(target.value)}
+        onChange={({ target }) => onBundleNameChange(target.value)}
         data-new-bundle-name/>
       <Button variant='contained' color='primary' onClick={editBundle} data-submit-bundle>
         Submit
@@ -48,7 +67,7 @@ export const BundleDetailPage = (routeInfo: RouteComponentProps<RouteInfo>) => {
   } else {
     title = (<div>
       <Typography variant='h3' data-bundle-name={bundle.name}>{bundle.name}</Typography>
-      <IconButton color='primary' aria-label='edit' onClick={() => setEditMode(true)} data-edit-bundle-name>
+      <IconButton color='primary' aria-label='edit' onClick={toggleEditMode} data-edit-bundle-name>
         <EditIcon/>
       </IconButton>
     </div>)

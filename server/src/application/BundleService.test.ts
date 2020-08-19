@@ -19,4 +19,13 @@ describe('BundleService', () => {
 
     expect(await bundleService.get(bundle.id)).toEqual(bundle)
   })
+
+  it('should return the bundle', async () => {
+    const name = 'Some super bundle'
+    const bundle = { id: 32, name }
+
+    BundleRepository.save = jest.fn(() => Promise.resolve(bundle))
+
+    expect(await bundleService.add(name)).toEqual(bundle)
+  })
 })

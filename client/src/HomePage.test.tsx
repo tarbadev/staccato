@@ -1,13 +1,13 @@
 import React from 'react'
-import { render, waitFor, screen, fireEvent } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { HomePage } from './HomePage'
 
 const mockPush = jest.fn()
 
 jest.mock('react-router-dom', () => ({
   useHistory: () => ({
-    push: mockPush
-  })
+    push: mockPush,
+  }),
 }))
 
 describe('HomePage', () => {
@@ -17,6 +17,20 @@ describe('HomePage', () => {
       expect(text).toBeInTheDocument()
     })
   }
+
+  async function addBundle(bundleName: string) {
+    fireEvent.click(screen.getByRole('button', { name: 'add' }))
+
+    await waitFor(() => {
+      const input = screen.getByRole('textbox') as HTMLInputElement
+      expect(input).toBeInTheDocument()
+
+      fireEvent.change(input, { target: { value: bundleName } })
+    })
+    fireEvent.click(screen.getByRole('button', { name: 'Submit' }))
+  }
+
+  beforeEach(() => fetchMock.resetMocks())
 
   it('Displays the list of bundles', async () => {
     const bundle1 = 'Bundle 1'
@@ -57,5 +71,51 @@ describe('HomePage', () => {
     fireEvent.click(screen.getByText(bundleName))
 
     expect(mockPush).toHaveBeenCalledWith(`/bundles/${bundleId}`)
+  })
+
+  it('should post the new bundle', async () => {
+    const bundleName = 'Some Bundle Name'
+    fetchMock.mockResponse(request => {
+      if (request.method === 'GET') {
+        return Promise.resolve(JSON.stringify([]))
+      }
+      return Promise.resolve('')
+    })
+
+    render(<HomePage/>)
+
+    await addBundle(bundleName)
+
+    await waitFor(() => {
+      const body = JSON.stringify({ name: bundleName })
+      const headers = {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+      }
+      expect(fetch).toHaveBeenCalledWith('/api/bundles', { method: 'POST', body, headers })
+    })
+  })
+
+  it('should load the bundles once the new bundle is added', async () => {
+    const bundleName = 'Some Bundle Name'
+    fetchMock.mockResponse(request => {
+      if (request.method === 'GET') {
+        return Promise.resolve(JSON.stringify([]))
+      }
+      return Promise.resolve('')
+    })
+
+    render(<HomePage/>)
+
+    await addBundle(bundleName)
+
+    await waitFor(() => {
+      const headers = {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+      }
+      expect(fetch).toHaveBeenCalledTimes(3)
+      expect(fetch).toHaveBeenLastCalledWith('/api/bundles', { headers })
+    })
   })
 })

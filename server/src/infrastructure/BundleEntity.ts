@@ -1,5 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm'
-import Bundle from '@shared/Bundle'
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm'
 
 @Entity()
 export class BundleEntity {
@@ -11,12 +10,5 @@ export class BundleEntity {
   constructor(id: number, name: string) {
     this.id = id
     this.name = name
-  }
-
-  toDomain(): Bundle {
-    return {
-      id: this.id,
-      name: this.name,
-    }
   }
 }

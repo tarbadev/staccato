@@ -1,5 +1,6 @@
 import { BundleEntity } from './BundleEntity'
 import Bundle from '@shared/Bundle'
+import { mapBundleEntity } from './EntityMapper'
 
 describe('BundleEntity', () => {
   describe('toDomain', () => {
@@ -7,7 +8,7 @@ describe('BundleEntity', () => {
       const expectedBundle: Bundle = { id: 32, name: 'Some Super Bundle' }
       const bundleEntity = new BundleEntity(expectedBundle.id, expectedBundle.name)
 
-      expect(bundleEntity.toDomain()).toEqual(expectedBundle)
+      expect(mapBundleEntity(bundleEntity)).toEqual(expectedBundle)
     })
   })
 })

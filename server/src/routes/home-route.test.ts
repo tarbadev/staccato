@@ -11,7 +11,7 @@ describe('HomeRouter', () => {
     configureApp(app)
   })
 
-  it('should call the application bundle on get all', async () => {
+  it('should call the BundleService on get all', async () => {
     const bundles = [{ id: 32, name: 'Some super bundle' }]
 
     jest
@@ -24,7 +24,7 @@ describe('HomeRouter', () => {
     expect(res.body).toEqual(bundles)
   })
 
-  it('should call the application bundle on get one', async () => {
+  it('should call the BundleService on get one', async () => {
     const bundle = { id: 32, name: 'Some super bundle' }
 
     jest
@@ -36,6 +36,26 @@ describe('HomeRouter', () => {
       })
 
     const res = await request(app).get(`/api/bundles/${bundle.id}`)
+
+    expect(res.status).toEqual(200)
+    expect(res.body).toEqual(bundle)
+  })
+
+  it('should call the BundleService on add', async () => {
+    const bundleName = 'Some super bundle'
+    const bundle = { id: 32, name: bundleName }
+
+    jest
+      .spyOn(BundleService.prototype, 'add')
+      .mockImplementation((name) => {
+        expect(name).toBe(bundleName)
+
+        return Promise.resolve(bundle)
+      })
+
+    const res = await request(app)
+      .post('/api/bundles')
+      .send({name: bundle.name})
 
     expect(res.status).toEqual(200)
     expect(res.body).toEqual(bundle)

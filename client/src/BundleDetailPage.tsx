@@ -11,7 +11,11 @@ export const BundleDetailPage = (routeInfo: RouteComponentProps<RouteInfo>) => {
   const [bundle, setBundle] = useState<Bundle>({ id: 0, name: '' })
 
   useEffect(() => {
-    fetch(`/api/bundles/${routeInfo.match.params.id}`)
+    const headers = {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+    }
+    fetch(`/api/bundles/${routeInfo.match.params.id}`, { headers })
       .then(response => response.json())
       .then(data => setBundle(data))
   }, [routeInfo.match.params.id])

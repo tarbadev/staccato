@@ -10,8 +10,6 @@ import homeRouter from './routes/home-route'
 import history from 'connect-history-api-fallback'
 
 export const configureApp = (app: Express) => {
-  app.use('/api/bundles', homeRouter)
-
   app.use(cors())
   app.use(helmet())
   app.use(compression())
@@ -30,6 +28,8 @@ export const configureApp = (app: Express) => {
       'block-all-mixed-content': true,
     },
   }))
+
+  app.use('/api/bundles', homeRouter)
 
   if (process.env.NODE_ENV && process.env.NODE_ENV !== 'development') {
     const root = path.join(__dirname, '../../frontend')

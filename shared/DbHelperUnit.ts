@@ -32,5 +32,9 @@ const connection = {
   store(entity: string, object: any) {
     return getConnection().getRepository(entity).save(object)
   },
+
+  get(entity: string, id: number) {
+    return getConnection().getRepository(entity).findOne(id)
+  },
 }
 export default connection

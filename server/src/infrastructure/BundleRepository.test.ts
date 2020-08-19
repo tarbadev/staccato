@@ -22,4 +22,12 @@ describe('BundleRepository', () => {
   it('should throw if not found', async () => {
     await expect(BundleRepository.findOne(90)).rejects.toThrow(new Error('Bundle with id 90 was not found'))
   })
+
+  it('should save the new Bundle', async () => {
+    const bundleToSave = { id: 0, name: 'Some New Bundle' }
+
+    const storedBundle = await BundleRepository.save(bundleToSave)
+    expect(storedBundle.name).toEqual(bundleToSave.name)
+    expect(await connection.get('BundleEntity', storedBundle.id)).toEqual(storedBundle)
+  })
 })

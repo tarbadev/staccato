@@ -33,6 +33,18 @@ describe('Home', () => {
     expect(bundles[2].name).toBe('Bundle 3')
   })
 
+  it('should display the newly created bundle', async () => {
+    const bundleName = 'Some Super New Bundle'
+
+    await homePage.goTo()
+
+    await homePage.addBundle(bundleName)
+    const bundles = await homePage.getBundles()
+
+    expect(bundles).toHaveLength(1)
+    expect(bundles[0].name).toBe(bundleName)
+  })
+
   it('should redirect to Bundle detail page', async () => {
     const bundleToStore = { name: 'Bundle 2' }
     const storedBundle = await connection.store('BundleEntity', bundleToStore)

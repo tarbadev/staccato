@@ -17,21 +17,19 @@ export default abstract class BasePage {
     await this.waitForPageLoaded()
   }
 
-  async clickOnBundle(bundleName: string) {
-    const bundle = await page.$(`[data-bundle-name='${bundleName}']`)
-
-    if (bundle) {
-      await bundle.click()
-    } else {
-      throw new Error(`Bundle not found: ${bundle}`)
-    }
-  }
-
   protected getTextContentBySelector(selector: string): Promise<string | null> {
     return page.$eval(selector, element => element.textContent)
   }
 
   getCurrentPageUrl(): string {
     return page.url()
+  }
+
+  clickOnElement(selector: string): Promise<void> {
+    return page.click(selector)
+  }
+
+  typeText(selector: string, text: string): Promise<void> {
+    return page.type(selector, text)
   }
 }

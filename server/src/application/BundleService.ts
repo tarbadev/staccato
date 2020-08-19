@@ -9,4 +9,8 @@ export default class BundleService {
   get(id: number): Promise<Bundle> {
     return BundleRepository.findOne(id)
   }
+
+  add(name: string) {
+    return BundleRepository.save({ id: 0, name })
+  }
 }

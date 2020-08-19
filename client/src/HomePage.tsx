@@ -28,27 +28,48 @@ export const HomePage = () => {
 
   useEffect(loadBundles, [])
 
-  const bundlesToDisplay = bundles.map((bundle: Bundle, index) =>
+  return <HomePageDisplay
+    bundles={bundles}
+    displayBundleDetails={id => history.push(`/bundles/${id}`)}
+    displayAddBundleForm={() => setDisplayAddBundleForm(true)}
+    addBundle={addBundle}
+    newBundleName={newBundleName}
+    onNewBundleNameChange={setNewBundleName}
+    isEditMode={displayAddBundleForm}
+  />
+}
+
+type HomePageProps = {
+  bundles: Bundle[],
+  displayBundleDetails: (id: number) => void,
+  displayAddBundleForm: () => void,
+  isEditMode: boolean,
+  addBundle: () => void,
+  newBundleName: string,
+  onNewBundleNameChange: (newName: string) => void,
+}
+const HomePageDisplay = ({ bundles, displayBundleDetails, displayAddBundleForm, addBundle, newBundleName, onNewBundleNameChange, isEditMode }: HomePageProps) => {
+  const bundlesToDisplay = bundles.map((bundle, index) =>
     <Typography key={`bundle-${index}`}
                 variant='h4'
                 data-bundle-name={bundle.name}
-                onClick={() => history.push(`/bundles/${bundle.id}`)}>
+                onClick={() => displayBundleDetails(bundle.id)}>
       {bundle.name}
     </Typography>)
 
   return (
     <div id='home'>
       <Tooltip title='Add' aria-label='add'>
-        <Fab color='primary' onClick={() => setDisplayAddBundleForm(true)} data-add-bundle>
+        <Fab color='primary' onClick={displayAddBundleForm} data-add-bundle>
           <AddIcon/>
         </Fab>
       </Tooltip>
-      {displayAddBundleForm &&
+      {isEditMode &&
       <form onSubmit={addBundle}>
         <TextField
           label='Name'
           value={newBundleName}
-          onChange={({ target }) => setNewBundleName(target.value)}
+          onChange={({ target }) => onNewBundleNameChange(target.value)}
           data-new-bundle-name/>
         <Button variant='contained' color='primary' onClick={addBundle} data-submit-bundle>
           Submit

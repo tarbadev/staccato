@@ -20,4 +20,18 @@ describe('Bundle', () => {
 
     expect(await bundlePage.getTitle()).toEqual(storedBundle.name)
   })
+
+  it('should rename the bundle', async () => {
+    const bundleToStore = { name: 'Bundle 2' }
+    const newName = 'My super new name'
+    const storedBundle = await connection.store('BundleEntity', bundleToStore)
+
+    bundlePage = new BundlePage(storedBundle.id)
+    await bundlePage.goTo()
+
+    expect(await bundlePage.getTitle()).toEqual(storedBundle.name)
+
+    await bundlePage.editName(newName)
+    expect(await bundlePage.getTitle()).toEqual(newName)
+  })
 })

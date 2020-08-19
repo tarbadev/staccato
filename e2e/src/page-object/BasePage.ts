@@ -29,7 +29,9 @@ export default abstract class BasePage {
     return page.click(selector)
   }
 
-  typeText(selector: string, text: string): Promise<void> {
+  async typeText(selector: string, text: string): Promise<void> {
+    await page.click(selector, { clickCount: 3 })
+    await page.keyboard.press('Backspace')
     return page.type(selector, text)
   }
 }

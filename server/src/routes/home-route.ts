@@ -18,4 +18,8 @@ homeRouter.get('/:id', async (req: Request, res: Response) => {
   res.json(await bundleService.get(Number(req.params.id)))
 })
 
+homeRouter.post('/:id', async (req: Request, res: Response) => {
+  res.json(await bundleService.edit(Number(req.params.id), req.body.name))
+})
+
 export default homeRouter

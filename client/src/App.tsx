@@ -20,7 +20,7 @@ export const App = () => {
 
   return (
     <main className={classes.content}>
-      <Container maxWidth='xl' className={classes.container}>
+      <Container maxWidth='md' className={classes.container}>
         <Content/>
       </Container>
     </main>

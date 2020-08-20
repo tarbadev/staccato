@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react'
-import { Typography } from '@material-ui/core'
 import { useHistory } from 'react-router-dom'
 
 import Bundle from '@shared/Bundle'
@@ -9,6 +8,9 @@ import Fab from '@material-ui/core/Fab'
 import TextField from '@material-ui/core/TextField'
 import Button from '@material-ui/core/Button'
 import { request } from './Utils'
+import List from '@material-ui/core/List'
+import ListItem from '@material-ui/core/ListItem'
+import ListItemText from '@material-ui/core/ListItemText'
 
 export const HomePage = () => {
   const [bundles, setBundles] = useState([])
@@ -50,33 +52,32 @@ type HomePageProps = {
 }
 const HomePageDisplay = ({ bundles, displayBundleDetails, displayAddBundleForm, addBundle, newBundleName, onNewBundleNameChange, isEditMode }: HomePageProps) => {
   const bundlesToDisplay = bundles.map((bundle, index) =>
-    <Typography key={`bundle-${index}`}
-                variant='h4'
-                data-bundle-name={bundle.name}
-                onClick={() => displayBundleDetails(bundle.id)}>
-      {bundle.name}
-    </Typography>)
+    <ListItem button key={`bundle-${index}`} onClick={() => displayBundleDetails(bundle.id)}>
+      <ListItemText primary={bundle.name} data-bundle-name={bundle.name} primaryTypographyProps={{ variant: 'h6' }} />
+    </ListItem>)
 
   return (
     <div id='home'>
       <Tooltip title='Add' aria-label='add'>
         <Fab color='primary' onClick={displayAddBundleForm} data-add-bundle>
-          <AddIcon/>
+          <AddIcon />
         </Fab>
       </Tooltip>
       {isEditMode &&
       <form onSubmit={addBundle}>
         <TextField
-          label='Name'
-          value={newBundleName}
-          onChange={({ target }) => onNewBundleNameChange(target.value)}
-          data-new-bundle-name/>
+            label='Name'
+            value={newBundleName}
+            onChange={({ target }) => onNewBundleNameChange(target.value)}
+            data-new-bundle-name />
         <Button variant='contained' color='primary' onClick={addBundle} data-submit-bundle>
           Submit
         </Button>
       </form>
       }
-      {bundlesToDisplay}
+      <List>
+        {bundlesToDisplay}
+      </List>
     </div>
   )
 }

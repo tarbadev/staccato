@@ -1,5 +1,5 @@
 import React from 'react'
-import { fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor, waitForElementToBeRemoved } from '@testing-library/react'
 import { HomePage } from './HomePage'
 import * as Utils from './Utils'
 import { request } from './Utils'
@@ -32,6 +32,8 @@ describe('HomePage', () => {
       fireEvent.change(input, { target: { value: bundleName } })
     })
     fireEvent.click(screen.getByRole('button', { name: 'Submit' }))
+
+    await waitForElementToBeRemoved(() => screen.getByRole('textbox'))
   }
 
   beforeEach(() => {
@@ -51,7 +53,7 @@ describe('HomePage', () => {
 
     requestSpy.mockResolvedValue(response)
 
-    render(<HomePage/>)
+    render(<HomePage />)
 
     expect(request).toHaveBeenCalledWith({ url: '/api/bundles' })
 
@@ -66,7 +68,7 @@ describe('HomePage', () => {
 
     requestSpy.mockResolvedValue([{ name: bundleName, id: bundleId }])
 
-    render(<HomePage/>)
+    render(<HomePage />)
 
     await verifyBundleIsInDoc(bundleName)
     fireEvent.click(screen.getByText(bundleName))
@@ -79,7 +81,7 @@ describe('HomePage', () => {
 
     requestSpy.mockResolvedValue([])
 
-    render(<HomePage/>)
+    render(<HomePage />)
 
     await addBundle(bundleName)
 
@@ -93,7 +95,7 @@ describe('HomePage', () => {
 
     requestSpy.mockResolvedValue([])
 
-    render(<HomePage/>)
+    render(<HomePage />)
 
     await addBundle(bundleName)
 

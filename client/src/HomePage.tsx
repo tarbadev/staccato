@@ -25,7 +25,10 @@ export const HomePage = () => {
 
   const addBundle = () => {
     request({ url: '/api/bundles', method: 'POST', body: { name: newBundleName } })
-      .then(loadBundles)
+      .then(() => {
+        setDisplayAddBundleForm(false)
+        loadBundles()
+      })
   }
 
   useEffect(loadBundles, [])
@@ -64,7 +67,10 @@ const HomePageDisplay = ({ bundles, displayBundleDetails, displayAddBundleForm, 
         </Fab>
       </Tooltip>
       {isEditMode &&
-      <form onSubmit={addBundle}>
+      <form onSubmit={event => {
+        event.preventDefault()
+        addBundle()
+      }}>
         <TextField
             label='Name'
             value={newBundleName}

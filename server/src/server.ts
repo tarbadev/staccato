@@ -1,17 +1,14 @@
 import 'module-alias/register'
 import 'reflect-metadata'
 import express from 'express'
-import { configureApp, configureDb } from './configuration'
-import GoogleDrive from './infrastructure/GoogleDrive'
-import path from 'path'
+import { configureApp, configureDb, configureDrive } from './configuration'
 
 const app = express()
-const driveCredentialsPath = path.join(__dirname, '../../config/drive-credentials.json')
 
 configureDb()
-  .then(() => GoogleDrive.initialize(driveCredentialsPath))
+  .then(configureDrive)
   .then(() => configureApp(app))
-  .then(([port, address]) => {
+  .then(({ port, address }) => {
     app.listen(port, address, () => {
       // eslint-disable-next-line no-console
       console.log(`Server is running on: ${port}`)

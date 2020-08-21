@@ -8,15 +8,16 @@ import { expressCspHeader, INLINE, NONE, SELF } from 'express-csp-header'
 import path from 'path'
 import bundleRouter from './routes/bundle-route'
 import history from 'connect-history-api-fallback'
-import { Connection, createConnection, ConnectionOptions } from 'typeorm'
+import { Connection, ConnectionOptions, createConnection } from 'typeorm'
 import ormConfig from '@config/base.orm.config'
 import DbCredentials from '@shared/DbCredentials'
 import localDbCredentials from '@config/local.database.config'
 import cfEnv from 'cfenv'
+import GoogleDrive from './infrastructure/GoogleDrive'
 
 const appEnv = cfEnv.getAppEnv()
 
-export const configureApp = (app: Express): [number, string] => {
+export const configureApp = (app: Express): { port: number; address: string } => {
   const port = process.env.PORT || 4000
   if (appEnv.isLocal) {
     appEnv.port = Number(port)
@@ -54,10 +55,10 @@ export const configureApp = (app: Express): [number, string] => {
     res.status(500).send('Something broke!')
   })
 
-  return [appEnv.port, appEnv.bind]
+  return { port: appEnv.port, address: appEnv.bind }
 }
 
-export const configureDb = (): Promise<Connection|void> => {
+export const configureDb = (): Promise<Connection | void> => {
   let dbCredentials: DbCredentials
   if (appEnv.isLocal) {
     dbCredentials = localDbCredentials as DbCredentials
@@ -77,4 +78,12 @@ export const configureDb = (): Promise<Connection|void> => {
   return createConnection(dbOptions as ConnectionOptions)
     // eslint-disable-next-line no-console
     .catch(err => console.error(`Error while initializing Database: ${err}`))
+}
+
+export const configureDrive = (): Promise<void> => {
+  const driveCredentialsPath = path.join(__dirname, '../../config/drive-credentials.json')
+
+  return GoogleDrive.initialize(driveCredentialsPath)
+    // eslint-disable-next-line no-console
+    .catch(err => console.error(`Error while initializing Google Drive: ${err}`))
 }

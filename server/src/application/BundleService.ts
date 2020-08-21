@@ -1,5 +1,6 @@
-import Bundle from '@shared/Bundle'
 import BundleRepository from '../infrastructure/BundleRepository'
+import Bundle from './Bundle'
+import GoogleDrive from '../infrastructure/GoogleDrive'
 
 export default class BundleService {
   list(): Promise<Bundle[]> {
@@ -10,12 +11,14 @@ export default class BundleService {
     return BundleRepository.findOne(id)
   }
 
-  add(name: string): Promise<Bundle> {
-    return BundleRepository.save({ id: 0, name })
+  async add(name: string): Promise<Bundle> {
+    const googleDriveId = await GoogleDrive.getInstance().createFolder(name)
+    return BundleRepository.save({ id: 0, name, googleDriveId })
   }
 
   async edit(id: number, name: string): Promise<Bundle> {
     const bundle = await BundleRepository.findOne(id)
+    await GoogleDrive.getInstance().renameFile(bundle.googleDriveId, name)
     bundle.name = name
 
     return BundleRepository.save(bundle)

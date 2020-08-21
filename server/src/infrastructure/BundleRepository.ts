@@ -1,7 +1,7 @@
-import Bundle from '@shared/Bundle'
 import { getManager } from 'typeorm'
 import { BundleEntity } from './BundleEntity'
 import { mapBundleEntity } from './EntityMapper'
+import Bundle from '../application/Bundle'
 
 export default class BundleRepository {
   static async findAll(): Promise<Bundle[]> {

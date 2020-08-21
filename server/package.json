@@ -19,6 +19,7 @@
     "cors": "^2.8.5",
     "express": "^4.17.1",
     "express-csp-header": "^4.0.0",
+    "googleapis": "^59.0.0",
     "helmet": "^4.0.0",
     "module-alias": "^2.2.2",
     "mysql2": "^2.1.0",

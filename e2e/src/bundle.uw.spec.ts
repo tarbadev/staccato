@@ -12,7 +12,7 @@ describe('Bundle', () => {
   })
 
   it('should display the bundle details', async () => {
-    const bundleToStore = { name: 'Bundle 2' }
+    const bundleToStore = { name: 'Bundle 2', googleDriveId: '' }
     const storedBundle = await connection.store('BundleEntity', bundleToStore)
 
     bundlePage = new BundlePage(storedBundle.id)
@@ -22,7 +22,7 @@ describe('Bundle', () => {
   })
 
   it('should rename the bundle', async () => {
-    const bundleToStore = { name: 'Bundle 2' }
+    const bundleToStore = { name: 'Bundle 2', googleDriveId: '1tfzFm6NJ-f7icA4zlNEmamd5cNPuIbTI' }
     const newName = 'My super new name'
     const storedBundle = await connection.store('BundleEntity', bundleToStore)
 

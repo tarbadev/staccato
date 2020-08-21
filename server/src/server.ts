@@ -8,6 +8,7 @@ import { configureApp } from './configuration'
 import ormConfig from '@config/base.orm.config'
 import localDbCredentials from '@config/local.database.config'
 import DbCredentials from '@shared/DbCredentials'
+import GoogleDrive from './infrastructure/GoogleDrive'
 
 const PORT = process.env.PORT || 4000
 
@@ -33,9 +34,10 @@ const dbOptions = {
 }
 
 createConnection(dbOptions as ConnectionOptions)
+  .then(() => GoogleDrive.initialize('../config/drive-credentials.json'))
   .then(() => configureApp(app))
   // tslint:disable-next-line:no-console
-  .catch(error => console.log(`Error while connecting to DB: ${error}`))
+  .catch(error => console.log(`Error while initializing server: ${error}`))
 
 app.listen(appEnv.port, appEnv.bind, () => {
   // tslint:disable-next-line:no-console

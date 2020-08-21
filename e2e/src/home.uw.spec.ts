@@ -17,9 +17,9 @@ describe('Home', () => {
 
   it('should display the list of bundles', async () => {
     const bundlesToStore = [
-      { name: 'Bundle 1' },
-      { name: 'Bundle 2' },
-      { name: 'Bundle 3' },
+      { name: 'Bundle 1', googleDriveId: '' },
+      { name: 'Bundle 2', googleDriveId: '' },
+      { name: 'Bundle 3', googleDriveId: '' },
     ]
     await connection.store('BundleEntity', bundlesToStore)
 
@@ -46,7 +46,7 @@ describe('Home', () => {
   })
 
   it('should redirect to Bundle detail page', async () => {
-    const bundleToStore = { name: 'Bundle 2' }
+    const bundleToStore = { name: 'Bundle 2', googleDriveId: '' }
     const storedBundle = await connection.store('BundleEntity', bundleToStore)
 
     await homePage.goTo()

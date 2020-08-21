@@ -4,6 +4,7 @@ import { configureApp } from '../configuration'
 import BundleService from '../application/BundleService'
 
 describe('BundleRouter', () => {
+  const bundle = { id: 32, name: 'Some super bundle', googleDriveId: 'SuperDriveId' }
   let app: Express
 
   beforeAll(() => {
@@ -12,7 +13,7 @@ describe('BundleRouter', () => {
   })
 
   it('should call the BundleService on get all', async () => {
-    const bundles = [{ id: 32, name: 'Some super bundle' }]
+    const bundles = [bundle]
 
     jest
       .spyOn(BundleService.prototype, 'list')
@@ -25,8 +26,6 @@ describe('BundleRouter', () => {
   })
 
   it('should call the BundleService on get one', async () => {
-    const bundle = { id: 32, name: 'Some super bundle' }
-
     jest
       .spyOn(BundleService.prototype, 'get')
       .mockImplementation((id) => {
@@ -42,13 +41,10 @@ describe('BundleRouter', () => {
   })
 
   it('should call the BundleService on add', async () => {
-    const bundleName = 'Some super bundle'
-    const bundle = { id: 32, name: bundleName }
-
     jest
       .spyOn(BundleService.prototype, 'add')
       .mockImplementation((name) => {
-        expect(name).toBe(bundleName)
+        expect(name).toBe(bundle.name)
 
         return Promise.resolve(bundle)
       })
@@ -62,8 +58,6 @@ describe('BundleRouter', () => {
   })
 
   it('should call the BundleService on edit', async () => {
-    const bundle = { id: 32, name: 'Some super bundle' }
-
     jest
       .spyOn(BundleService.prototype, 'edit')
       .mockImplementation((id, name) => {

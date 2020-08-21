@@ -6,9 +6,12 @@ export class BundleEntity {
   id: number
   @Column()
   name: string
+  @Column()
+  googleDriveId: string
 
-  constructor(id: number, name: string) {
+  constructor(id: number, name: string, googleDriveId: string) {
     this.id = id
     this.name = name
+    this.googleDriveId = googleDriveId
   }
 }

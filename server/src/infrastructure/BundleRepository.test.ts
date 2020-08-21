@@ -8,13 +8,13 @@ describe('BundleRepository', () => {
   beforeEach(() => connection.clear())
 
   it('should load the saved Bundles', async () => {
-    const bundle = await connection.store('BundleEntity', { name: 'Some New Bundle' })
+    const bundle = await connection.store('BundleEntity', { name: 'Some New Bundle', googleDriveId: 'SuperId' })
 
     expect(await BundleRepository.findAll()).toEqual([bundle])
   })
 
   it('should load the saved Bundle', async () => {
-    const bundle = await connection.store('BundleEntity', { name: 'Some New Bundle' })
+    const bundle = await connection.store('BundleEntity', { name: 'Some New Bundle', googleDriveId: 'SuperId' })
 
     expect(await BundleRepository.findOne(bundle.id)).toEqual(bundle)
   })
@@ -24,7 +24,7 @@ describe('BundleRepository', () => {
   })
 
   it('should save the new Bundle', async () => {
-    const bundleToSave = { id: 0, name: 'Some New Bundle' }
+    const bundleToSave = { id: 0, name: 'Some New Bundle', googleDriveId: 'SomeId' }
 
     const storedBundle = await BundleRepository.save(bundleToSave)
     expect(storedBundle.name).toEqual(bundleToSave.name)

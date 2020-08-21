@@ -1,6 +1,6 @@
-import BasePage from './BasePage'
+import BasePageHelper from './BasePageHelper'
 
-export default class HomePage extends BasePage {
+export default class HomePageHelper extends BasePageHelper {
   constructor() {
     super('/', 'div#home')
   }

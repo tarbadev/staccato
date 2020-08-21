@@ -1,8 +1,8 @@
-import BundlePage from './page-object/BundlePage'
+import BundlePageHelper from './page-object/BundlePageHelper'
 import connection from '@shared/DbHelperE2e'
 
 describe('Bundle', () => {
-  let bundlePage: BundlePage
+  let bundlePageHelper: BundlePageHelper
 
   beforeAll(() => connection.create())
   afterAll(() => connection.close())
@@ -15,10 +15,10 @@ describe('Bundle', () => {
     const bundleToStore = { name: 'Bundle 2', googleDriveId: '' }
     const storedBundle = await connection.store('BundleEntity', bundleToStore)
 
-    bundlePage = new BundlePage(storedBundle.id)
-    await bundlePage.goTo()
+    bundlePageHelper = new BundlePageHelper(storedBundle.id)
+    await bundlePageHelper.goTo()
 
-    expect(await bundlePage.getTitle()).toEqual(storedBundle.name)
+    expect(await bundlePageHelper.getTitle()).toEqual(storedBundle.name)
   })
 
   it('should rename the bundle', async () => {
@@ -26,12 +26,12 @@ describe('Bundle', () => {
     const newName = 'My super new name'
     const storedBundle = await connection.store('BundleEntity', bundleToStore)
 
-    bundlePage = new BundlePage(storedBundle.id)
-    await bundlePage.goTo()
+    bundlePageHelper = new BundlePageHelper(storedBundle.id)
+    await bundlePageHelper.goTo()
 
-    expect(await bundlePage.getTitle()).toEqual(storedBundle.name)
+    expect(await bundlePageHelper.getTitle()).toEqual(storedBundle.name)
 
-    await bundlePage.editName(newName)
-    expect(await bundlePage.getTitle()).toEqual(newName)
+    await bundlePageHelper.editName(newName)
+    expect(await bundlePageHelper.getTitle()).toEqual(newName)
   })
 })

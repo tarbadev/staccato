@@ -1,17 +1,17 @@
-import HomePage from './page-object/HomePage'
-import BundlePage from './page-object/BundlePage'
+import HomePageHelper from './page-object/HomePageHelper'
+import BundlePageHelper from './page-object/BundlePageHelper'
 import connection from '@shared/DbHelperE2e'
 
 describe('Home', () => {
-  let homePage: HomePage
-  let bundlePage: BundlePage
+  let homePageHelper: HomePageHelper
+  let bundlePageHelper: BundlePageHelper
 
   beforeAll(() => connection.create())
   afterAll(() => connection.close())
 
   beforeEach(() => {
-    homePage = new HomePage()
-    bundlePage = new BundlePage(0)
+    homePageHelper = new HomePageHelper()
+    bundlePageHelper = new BundlePageHelper(0)
     return connection.clear()
   })
 
@@ -23,9 +23,9 @@ describe('Home', () => {
     ]
     await connection.store('BundleEntity', bundlesToStore)
 
-    await homePage.goTo()
+    await homePageHelper.goTo()
 
-    const bundles = await homePage.getBundles()
+    const bundles = await homePageHelper.getBundles()
 
     expect(bundles).toHaveLength(3)
     expect(bundles[0].name).toBe('Bundle 1')
@@ -36,10 +36,10 @@ describe('Home', () => {
   it('should display the newly created bundle', async () => {
     const bundleName = 'Some Super New Bundle'
 
-    await homePage.goTo()
+    await homePageHelper.goTo()
 
-    await homePage.addBundle(bundleName)
-    const bundles = await homePage.getBundles()
+    await homePageHelper.addBundle(bundleName)
+    const bundles = await homePageHelper.getBundles()
 
     expect(bundles).toHaveLength(1)
     expect(bundles[0].name).toBe(bundleName)
@@ -49,11 +49,11 @@ describe('Home', () => {
     const bundleToStore = { name: 'Bundle 2', googleDriveId: '' }
     const storedBundle = await connection.store('BundleEntity', bundleToStore)
 
-    await homePage.goTo()
+    await homePageHelper.goTo()
 
-    await homePage.clickOnBundle('Bundle 2')
+    await homePageHelper.clickOnBundle('Bundle 2')
 
-    await bundlePage.waitForPageLoaded()
-    expect(bundlePage.getCurrentPageUrl()).toContain(`/bundles/${storedBundle.id}`)
+    await bundlePageHelper.waitForPageLoaded()
+    expect(bundlePageHelper.getCurrentPageUrl()).toContain(`/bundles/${storedBundle.id}`)
   })
 })

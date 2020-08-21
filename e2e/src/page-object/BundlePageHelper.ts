@@ -1,6 +1,6 @@
-import BasePage from './BasePage'
+import BasePageHelper from './BasePageHelper'
 
-export default class BundlePage extends BasePage {
+export default class BundlePageHelper extends BasePageHelper {
   constructor(id: number | string) {
     super(`/bundles/${id}`, 'div#bundle-detail')
   }

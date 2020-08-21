@@ -1,4 +1,4 @@
-export default abstract class BasePage {
+export default abstract class BasePageHelper {
   protected url: string
   protected pageLoadedSelector: string
   private appUrl: string = process.env.APP_URL ? process.env.APP_URL : 'http://localhost:3000'

@@ -22,7 +22,6 @@ if (appEnv.isLocal) {
   appEnv.port = Number(PORT)
   dbCredentials = localDbCredentials as DbCredentials
 } else {
-
   dbCredentials = appEnv.getServiceCreds('staccato-db') as DbCredentials
 }
 const dbOptions = {
@@ -39,10 +38,11 @@ const driveCredentialsPath = path.join(__dirname, '../../config/drive-credential
 createConnection(dbOptions as ConnectionOptions)
   .then(() => GoogleDrive.initialize(driveCredentialsPath))
   .then(() => configureApp(app))
+  .then(() => {
+    app.listen(appEnv.port, appEnv.bind, () => {
+      // eslint-disable-next-line no-console
+      console.log(`Server is running on: ${appEnv.port}`)
+    })
+  })
   // eslint-disable-next-line no-console
   .catch(error => console.log(`Error while initializing server: ${error}`))
-
-app.listen(appEnv.port, appEnv.bind, () => {
-  // eslint-disable-next-line no-console
-  console.log(`Server is running on: ${appEnv.port}`)
-})

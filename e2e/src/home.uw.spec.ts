@@ -1,9 +1,11 @@
 import HomePageHelper from './page-object/HomePageHelper'
 import BundlePageHelper from './page-object/BundlePageHelper'
 import connection from '@shared/DbHelperE2e'
+import SettingsPageHelper from './page-object/SettingsPageHelper'
 
 describe('Home', () => {
   let homePageHelper: HomePageHelper
+  let settingsPageHelper: SettingsPageHelper
   let bundlePageHelper: BundlePageHelper
 
   beforeAll(() => connection.create())
@@ -11,6 +13,7 @@ describe('Home', () => {
 
   beforeEach(() => {
     homePageHelper = new HomePageHelper()
+    settingsPageHelper = new SettingsPageHelper()
     bundlePageHelper = new BundlePageHelper(0)
     return connection.clear()
   })
@@ -55,5 +58,14 @@ describe('Home', () => {
 
     await bundlePageHelper.waitForPageLoaded()
     expect(bundlePageHelper.getCurrentPageUrl()).toContain(`/bundles/${storedBundle.id}`)
+  })
+
+  it('should redirect to Settings page', async () => {
+    await homePageHelper.goTo()
+
+    await homePageHelper.clickOnSettingsButton()
+
+    await settingsPageHelper.waitForPageLoaded()
+    expect(settingsPageHelper.getCurrentPageUrl()).toContain('/settings')
   })
 })

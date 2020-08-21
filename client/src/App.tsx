@@ -2,6 +2,7 @@ import React from 'react'
 import makeStyles from '@material-ui/core/styles/makeStyles'
 import Container from '@material-ui/core/Container'
 import { Content } from './Content'
+import { Header } from './Header'
 
 const useStyles = makeStyles(theme => ({
   content: {
@@ -20,8 +21,9 @@ export const App = () => {
 
   return (
     <main className={classes.content}>
+      <Header />
       <Container maxWidth='md' className={classes.container}>
-        <Content/>
+        <Content />
       </Container>
     </main>
   )

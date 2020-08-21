@@ -1,3 +1,5 @@
+import { ElementHandle } from 'puppeteer'
+
 export default abstract class BasePageHelper {
   protected url: string
   protected pageLoadedSelector: string
@@ -8,28 +10,32 @@ export default abstract class BasePageHelper {
     this.pageLoadedSelector = pageLoadedSelector
   }
 
-  async waitForPageLoaded() {
-    await page.waitForSelector(this.pageLoadedSelector)
+  public waitForPageLoaded(): Promise<ElementHandle> {
+    return page.waitForSelector(this.pageLoadedSelector)
   }
 
-  async goTo() {
+  public async goTo(): Promise<ElementHandle> {
     await page.goto(`${this.appUrl}${this.url}`, { waitUntil: 'networkidle2' })
-    await this.waitForPageLoaded()
+    return this.waitForPageLoaded()
+  }
+
+  public getCurrentPageUrl(): string {
+    return page.url()
+  }
+
+  public clickOnSettingsButton(): Promise<void> {
+    return this.clickOnElement('[data-menu-settings]')
   }
 
   protected getTextContentBySelector(selector: string): Promise<string | null> {
     return page.$eval(selector, element => element.textContent)
   }
 
-  getCurrentPageUrl(): string {
-    return page.url()
-  }
-
-  clickOnElement(selector: string): Promise<void> {
+  protected clickOnElement(selector: string): Promise<void> {
     return page.click(selector)
   }
 
-  async typeText(selector: string, text: string): Promise<void> {
+  protected async typeText(selector: string, text: string): Promise<void> {
     await page.click(selector, { clickCount: 3 })
     await page.keyboard.press('Backspace')
     return page.type(selector, text)

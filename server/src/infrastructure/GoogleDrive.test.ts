@@ -12,9 +12,9 @@ jest.mock(
   }),
 )
 
-import { drive_v3 } from 'googleapis'
+import { drive_v3 as driveV3 } from 'googleapis'
 import GoogleDrive from './GoogleDrive'
-import Params$Resource$Files$Update = drive_v3.Params$Resource$Files$Update
+import Params$Resource$Files$Update = driveV3.Params$Resource$Files$Update
 
 
 describe('GoogleDrive', () => {
@@ -178,6 +178,16 @@ describe('GoogleDrive', () => {
       expect(mockDrive).toHaveBeenCalledWith(expectedDriveOptions)
       expect(initializeStaccatoFolderSpy).toHaveBeenCalled()
       expect(GoogleDrive.getInstance().drive).toEqual(driveObject)
+    })
+  })
+
+  describe('getInstance', () => {
+    beforeAll(() => {
+      GoogleDrive.destroyInstance()
+    })
+
+    it('should throw if initialize has not been called before', () => {
+      expect(() => GoogleDrive.getInstance()).toThrowError('Initialize has not been called')
     })
   })
 })

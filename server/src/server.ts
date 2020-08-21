@@ -9,6 +9,7 @@ import ormConfig from '@config/base.orm.config'
 import localDbCredentials from '@config/local.database.config'
 import DbCredentials from '@shared/DbCredentials'
 import GoogleDrive from './infrastructure/GoogleDrive'
+import path from 'path'
 
 const PORT = process.env.PORT || 4000
 
@@ -33,13 +34,15 @@ const dbOptions = {
   'database': dbCredentials.name,
 }
 
+const driveCredentialsPath = path.join(__dirname, '../../config/drive-credentials.json')
+
 createConnection(dbOptions as ConnectionOptions)
-  .then(() => GoogleDrive.initialize('../config/drive-credentials.json'))
+  .then(() => GoogleDrive.initialize(driveCredentialsPath))
   .then(() => configureApp(app))
-  // tslint:disable-next-line:no-console
+  // eslint-disable-next-line no-console
   .catch(error => console.log(`Error while initializing server: ${error}`))
 
 app.listen(appEnv.port, appEnv.bind, () => {
-  // tslint:disable-next-line:no-console
+  // eslint-disable-next-line no-console
   console.log(`Server is running on: ${appEnv.port}`)
 })

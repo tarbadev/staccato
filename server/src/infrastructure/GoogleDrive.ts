@@ -1,9 +1,9 @@
 import { GaxiosResponse } from 'gaxios'
-import { drive_v3, google } from 'googleapis'
+import { drive_v3 as driveV3, google } from 'googleapis'
 
 export default class GoogleDrive {
-  drive: drive_v3.Drive
-  private static instance: GoogleDrive
+  drive: driveV3.Drive
+  private static instance?: GoogleDrive | undefined
   private static mainFolderName = 'Staccato'
   private mainFolderId: string | undefined
 
@@ -19,14 +19,18 @@ export default class GoogleDrive {
   }
 
   static getInstance(): GoogleDrive {
+    if (!GoogleDrive.instance) {
+      throw new Error('Initialize has not been called')
+    }
+
     return GoogleDrive.instance
   }
 
-  static destroyInstance() {
+  static destroyInstance(): void {
     delete GoogleDrive.instance
   }
 
-  static initialize(keyFile: string) {
+  static initialize(keyFile: string): Promise<void> {
     if (!GoogleDrive.instance) {
       GoogleDrive.instance = new GoogleDrive(keyFile)
     }
@@ -64,14 +68,14 @@ export default class GoogleDrive {
     }).then((response: GaxiosResponse) => response.data.id)
   }
 
-  async initializeStaccatoFolder() {
+  async initializeStaccatoFolder(): Promise<void> {
     this.mainFolderId = await this.findFolder(GoogleDrive.mainFolderName)
       .catch(() => {
-        // tslint:disable-next-line:no-console
+        // eslint-disable-next-line no-console
         console.info('Initializing Staccato folder on Google Drive')
         return this.createFolder(GoogleDrive.mainFolderName)
       })
-    // tslint:disable-next-line:no-console
+    // eslint-disable-next-line no-console
     console.debug(`Staccato folder ID: ${this.mainFolderId}`)
   }
 }

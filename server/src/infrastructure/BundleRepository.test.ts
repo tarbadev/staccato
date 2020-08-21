@@ -1,5 +1,4 @@
 import BundleRepository from './BundleRepository'
-import { BundleEntity } from './BundleEntity'
 import connection from '@shared/DbHelperUnit'
 
 describe('BundleRepository', () => {

@@ -15,13 +15,14 @@ describe('BundleService', () => {
   })
 
   it('should return the bundle on get', async () => {
-    BundleRepository.findOne = jest.fn((id) => Promise.resolve(bundle))
+    BundleRepository.findOne = jest.fn(() => Promise.resolve(bundle))
 
     expect(await bundleService.get(bundle.id)).toEqual(bundle)
   })
 
   it('should create a Google Drive folder and save it', async () => {
     const mockCreateFolder = jest.fn()
+    // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
     // @ts-ignore
     jest.spyOn(GoogleDrive, 'getInstance').mockReturnValueOnce({
       createFolder: mockCreateFolder,
@@ -38,6 +39,7 @@ describe('BundleService', () => {
   it('should return the bundle on edit', async () => {
     const editedBundle = { ...bundle, name: 'New Bundle Name' }
     const mockRenameFile = jest.fn()
+    // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
     // @ts-ignore
     jest.spyOn(GoogleDrive, 'getInstance').mockReturnValueOnce({
       renameFile: mockRenameFile,

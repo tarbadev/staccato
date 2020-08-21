@@ -54,7 +54,9 @@ jobs:
           name: "build"
           path: build
       - name: "Create Google Drive credentials file"
-        run: ${{ secrets.GOOGLE_DRIVE_CREDENTIALS_DEV }} > build/config/drive-credentials.json
+        run: echo "$GOOGLE_DRIVE_SERVICE_ACCOUNT" > build/config/drive-credentials.json
+        env:
+          GOOGLE_DRIVE_SERVICE_ACCOUNT: ${{ secrets.GOOGLE_DRIVE_CREDENTIALS_DEV }}
       - name: "Deploy to dev environment"
         uses: d3sandoval/cloud-foundry-action@1.1.1
         env:
@@ -104,7 +106,9 @@ jobs:
           name: "build"
           path: build
       - name: "Create Google Drive credentials file"
-        run: ${{ secrets.GOOGLE_DRIVE_CREDENTIALS_PROD }} > build/config/drive-credentials.json
+        run: echo "$GOOGLE_DRIVE_SERVICE_ACCOUNT" > build/config/drive-credentials.json
+        env:
+          GOOGLE_DRIVE_SERVICE_ACCOUNT: ${{ secrets.GOOGLE_DRIVE_CREDENTIALS_PROD }}
       - name: "Deploy to Production environment"
         uses: d3sandoval/cloud-foundry-action@1.1.1
         env:

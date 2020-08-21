@@ -1,4 +1,4 @@
-import express, { Express, NextFunction, Request, Response } from 'express'
+import express, { Express, Request, Response } from 'express'
 import cors from 'cors'
 import helmet from 'helmet'
 import compression from 'compression'
@@ -9,7 +9,7 @@ import path from 'path'
 import bundleRouter from './routes/bundle-route'
 import history from 'connect-history-api-fallback'
 
-export const configureApp = (app: Express) => {
+export const configureApp = (app: Express): void => {
   app.use(cors())
   app.use(helmet())
   app.use(compression())
@@ -36,8 +36,8 @@ export const configureApp = (app: Express) => {
     app.use(express.static(root))
   }
 
-  app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
-    // tslint:disable-next-line:no-console
+  app.use((err: Error, req: Request, res: Response) => {
+    // eslint-disable-next-line no-console
     console.error(err.stack)
     res.status(500).send('Something broke!')
   })

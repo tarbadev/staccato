@@ -8,8 +8,20 @@ import { expressCspHeader, INLINE, NONE, SELF } from 'express-csp-header'
 import path from 'path'
 import bundleRouter from './routes/bundle-route'
 import history from 'connect-history-api-fallback'
+import { Connection, createConnection, ConnectionOptions } from 'typeorm'
+import ormConfig from '@config/base.orm.config'
+import DbCredentials from '@shared/DbCredentials'
+import localDbCredentials from '@config/local.database.config'
+import cfEnv from 'cfenv'
 
-export const configureApp = (app: Express): void => {
+const appEnv = cfEnv.getAppEnv()
+
+export const configureApp = (app: Express): [number, string] => {
+  const port = process.env.PORT || 4000
+  if (appEnv.isLocal) {
+    appEnv.port = Number(port)
+  }
+
   app.use(cors())
   app.use(helmet())
   app.use(compression())
@@ -41,4 +53,28 @@ export const configureApp = (app: Express): void => {
     console.error(err.stack)
     res.status(500).send('Something broke!')
   })
+
+  return [appEnv.port, appEnv.bind]
+}
+
+export const configureDb = (): Promise<Connection|void> => {
+  let dbCredentials: DbCredentials
+  if (appEnv.isLocal) {
+    dbCredentials = localDbCredentials as DbCredentials
+  } else {
+    dbCredentials = appEnv.getServiceCreds('staccato-db') as DbCredentials
+  }
+
+  const dbOptions = {
+    ...ormConfig,
+    'host': dbCredentials.hostname,
+    'port': dbCredentials.port,
+    'username': dbCredentials.username,
+    'password': dbCredentials.password,
+    'database': dbCredentials.name,
+  }
+
+  return createConnection(dbOptions as ConnectionOptions)
+    // eslint-disable-next-line no-console
+    .catch(err => console.error(`Error while initializing Database: ${err}`))
 }

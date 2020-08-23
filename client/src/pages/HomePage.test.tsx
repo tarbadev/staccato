@@ -1,8 +1,8 @@
 import React from 'react'
 import { fireEvent, render, screen, waitFor, waitForElementToBeRemoved } from '@testing-library/react'
 import { HomePage } from './HomePage'
-import * as Utils from './Utils'
-import { request } from './Utils'
+import * as Utils from '../Utils'
+import { request } from '../Utils'
 
 const mockPush = jest.fn()
 

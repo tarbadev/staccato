@@ -1,8 +1,8 @@
 import React from 'react'
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { BundleDetailPage } from './BundleDetailPage'
-import * as Utils from './Utils'
-import { request } from './Utils'
+import * as Utils from '../Utils'
+import { request } from '../Utils'
 
 const requestSpy = jest.spyOn(Utils, 'request')
 

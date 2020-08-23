@@ -1,8 +1,8 @@
 import { Switch, Route } from 'react-router-dom'
 import React from 'react'
-import { HomePage } from './HomePage'
-import { BundleDetailPage } from './BundleDetailPage'
-import { SettingsPage } from './SettingsPage'
+import { HomePage } from '../pages/HomePage'
+import { BundleDetailPage } from '../pages/BundleDetailPage'
+import { SettingsPage } from '../pages/SettingsPage'
 
 export const Content = () => {
   return <Switch>

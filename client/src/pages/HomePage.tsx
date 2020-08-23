@@ -2,11 +2,11 @@ import React, { useEffect, useState } from 'react'
 import { useHistory } from 'react-router-dom'
 
 import Bundle from '@shared/Bundle'
-import { request } from './Utils'
+import { request } from '../Utils'
 import List from '@material-ui/core/List'
 import ListItem from '@material-ui/core/ListItem'
 import ListItemText from '@material-ui/core/ListItemText'
-import { ExpressAdd } from './ExpressAdd'
+import { ExpressAdd } from '../components/ExpressAdd'
 
 export const HomePage = () => {
   const [bundles, setBundles] = useState([])

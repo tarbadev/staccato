@@ -2,7 +2,7 @@ import HomePageHelper from './page-object/HomePageHelper'
 import BundlePageHelper from './page-object/BundlePageHelper'
 import connection from '@shared/DbHelperE2e'
 import SettingsPageHelper from './page-object/SettingsPageHelper'
-import { deleteFolder } from './GoogleDriveHelper'
+import { deleteFolder } from './page-object/GoogleDriveHelper'
 
 describe('Home', () => {
   let homePageHelper: HomePageHelper

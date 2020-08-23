@@ -1,6 +1,6 @@
 import connection from '@shared/DbHelperE2e'
 import SettingsPageHelper from './page-object/SettingsPageHelper'
-import { deletePermission } from './GoogleDriveHelper'
+import { deletePermission } from './page-object/GoogleDriveHelper'
 
 describe('Settings', () => {
   let settingsPageHelper: SettingsPageHelper

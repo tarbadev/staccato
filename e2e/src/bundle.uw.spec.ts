@@ -1,6 +1,6 @@
 import BundlePageHelper from './page-object/BundlePageHelper'
 import connection from '@shared/DbHelperE2e'
-import { createFolder } from './GoogleDriveHelper'
+import { createFolder } from './page-object/GoogleDriveHelper'
 
 describe('Bundle', () => {
   let bundlePageHelper: BundlePageHelper

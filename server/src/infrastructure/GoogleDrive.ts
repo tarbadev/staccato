@@ -1,6 +1,7 @@
 import { GaxiosResponse } from 'gaxios'
 import { drive_v3 as driveV3, google } from 'googleapis'
 
+type UserPermission = { id: string; emailAddress: string; role: string }
 export default class GoogleDrive {
   drive: driveV3.Drive
   private static instance?: GoogleDrive | undefined
@@ -77,5 +78,26 @@ export default class GoogleDrive {
       })
     // eslint-disable-next-line no-console
     console.debug(`Staccato folder ID: ${this.mainFolderId}`)
+  }
+
+  listMainFolderPermissions(): Promise<UserPermission[]> {
+    return this.drive.permissions.list({
+      fileId: this.mainFolderId,
+      fields: 'permissions(id, emailAddress, role)',
+    })
+      .then(response => response.data.permissions as UserPermission[])
+  }
+
+  addPermissionToMainFolder(email: string): Promise<UserPermission> {
+    return this.drive.permissions.create({
+        fileId: this.mainFolderId,
+        fields: 'id, emailAddress, role',
+        requestBody: {
+          role: 'reader',
+          type: 'user',
+          emailAddress: email,
+        },
+      })
+      .then(response => response.data as UserPermission)
   }
 }

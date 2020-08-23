@@ -40,4 +40,11 @@ export default abstract class BasePageHelper {
     await page.keyboard.press('Backspace')
     return page.type(selector, text)
   }
+
+  protected getAllSelectorTextContent(selector: string): Promise<{ name: string | null }[]> {
+    return page.$$eval(
+      selector,
+      elements => elements.map(el => ({ name: el.textContent })),
+    )
+  }
 }

@@ -1,5 +1,6 @@
 import BundlePageHelper from './page-object/BundlePageHelper'
 import connection from '@shared/DbHelperE2e'
+import { createFolder } from './GoogleDriveHelper'
 
 describe('Bundle', () => {
   let bundlePageHelper: BundlePageHelper
@@ -22,7 +23,8 @@ describe('Bundle', () => {
   })
 
   it('should rename the bundle', async () => {
-    const bundleToStore = { name: 'Bundle 2', googleDriveId: '1tfzFm6NJ-f7icA4zlNEmamd5cNPuIbTI' }
+    const folderId = await createFolder('Bundle 2')
+    const bundleToStore = { name: 'Bundle 2', googleDriveId: folderId }
     const newName = 'My super new name'
     const storedBundle = await connection.store('BundleEntity', bundleToStore)
 

@@ -5,11 +5,8 @@ export default class HomePageHelper extends BasePageHelper {
     super('/', 'div#home')
   }
 
-  async getBundles(): Promise<{ name: string | null }[]> {
-    return await page.$$eval(
-      '[data-bundle-name]',
-      elements => elements.map(el => ({ name: el.textContent })),
-    )
+  getBundles(): Promise<{ name: string | null }[]> {
+    return this.getAllSelectorTextContent('[data-bundle-name]')
   }
 
   async clickOnBundle(bundleName: string): Promise<void> {
@@ -17,9 +14,9 @@ export default class HomePageHelper extends BasePageHelper {
   }
 
   async addBundle(bundleName: string): Promise<void> {
-    const addButtonSelector = '[data-add-bundle]'
-    const bundleNameSelector = '[data-new-bundle-name] input'
-    const submitBundleSelector = '[data-submit-bundle]'
+    const addButtonSelector = '[data-add-express]'
+    const bundleNameSelector = '[data-new-express-name] input'
+    const submitBundleSelector = '[data-submit-express]'
 
     await this.clickOnElement(addButtonSelector)
     await this.typeText(bundleNameSelector, bundleName)

@@ -2,6 +2,7 @@ import HomePageHelper from './page-object/HomePageHelper'
 import BundlePageHelper from './page-object/BundlePageHelper'
 import connection from '@shared/DbHelperE2e'
 import SettingsPageHelper from './page-object/SettingsPageHelper'
+import { deleteFolder } from './GoogleDriveHelper'
 
 describe('Home', () => {
   let homePageHelper: HomePageHelper
@@ -46,6 +47,8 @@ describe('Home', () => {
 
     expect(bundles).toHaveLength(1)
     expect(bundles[0].name).toBe(bundleName)
+
+    await deleteFolder(bundleName)
   })
 
   it('should redirect to Bundle detail page', async () => {

@@ -14,6 +14,8 @@ jest.mock(
 
 import { drive_v3 as driveV3 } from 'googleapis'
 import GoogleDrive from './GoogleDrive'
+import Params$Resource$Permissions$List = driveV3.Params$Resource$Permissions$List
+import Params$Resource$Permissions$Create = driveV3.Params$Resource$Permissions$Create
 import Params$Resource$Files$Update = driveV3.Params$Resource$Files$Update
 
 
@@ -22,11 +24,17 @@ describe('GoogleDrive', () => {
   const mockCreateFile = jest.fn()
   const mockListFile = jest.fn()
   const mockUpdateFile = jest.fn()
+  const mockListPermissions = jest.fn()
+  const mockCreatePermissions = jest.fn()
   const driveObject = {
     files: {
       create: mockCreateFile,
       list: mockListFile,
       update: mockUpdateFile,
+    },
+    permissions: {
+      list: mockListPermissions,
+      create: mockCreatePermissions,
     },
   }
 
@@ -145,6 +153,45 @@ describe('GoogleDrive', () => {
 
         expect(findFolderSpy).toHaveBeenCalledWith(folderName)
         expect(createFolderSpy).not.toHaveBeenCalled()
+      })
+    })
+
+    describe('listMainFolderPermissions', () => {
+      it('should update the file given an id', async () => {
+        const permission = { id: 'SomeId', emailAddress: 'test@example.com', role: 'reader' }
+        const expectedOptions: Params$Resource$Permissions$List = {
+          fileId: staccatoFolderId,
+          fields: 'permissions(id, emailAddress, role)',
+        }
+
+        mockListPermissions.mockResolvedValueOnce({ data: { permissions: [permission] } })
+
+        const returnedPermissions = await googleDriveInstance.listMainFolderPermissions()
+
+        expect(returnedPermissions).toEqual([permission])
+        expect(mockListPermissions).toHaveBeenCalledWith(expectedOptions)
+      })
+    })
+
+    describe('addPermissionToMainFolder', () => {
+      it('should update the file given an id', async () => {
+        const permission = { id: 'SomeId', emailAddress: 'test@example.com', role: 'reader' }
+        const expectedOptions: Params$Resource$Permissions$Create = {
+          fileId: staccatoFolderId,
+          fields: 'id, emailAddress, role',
+          requestBody: {
+            role: 'reader',
+            type: 'user',
+            emailAddress: permission.emailAddress,
+          },
+        }
+
+        mockCreatePermissions.mockResolvedValueOnce({ data: permission })
+
+        const returnedPermission = await googleDriveInstance.addPermissionToMainFolder(permission.emailAddress)
+
+        expect(returnedPermission).toEqual(permission)
+        expect(mockCreatePermissions).toHaveBeenCalledWith(expectedOptions)
       })
     })
   })

@@ -88,6 +88,10 @@ jobs:
         CF_PASSWORD: ${{ secrets.CF_PASSWORD }}
       with:
         args: "service-key staccato-db e2e_key > /github/workspace/e2e_key.json"
+    - name: "Create Google Drive credentials file"
+      run: echo "$GOOGLE_DRIVE_SERVICE_ACCOUNT" > config/drive-credentials.json
+      env:
+        GOOGLE_DRIVE_SERVICE_ACCOUNT: ${{ secrets.GOOGLE_DRIVE_CREDENTIALS_DEV }}
     - name: "Run E2E Tests"
       run: |
         DB_CREDENTIALS=$(cat e2e_key.json) \

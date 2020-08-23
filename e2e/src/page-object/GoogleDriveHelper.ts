@@ -2,7 +2,7 @@ import { google } from 'googleapis'
 import * as path from 'path'
 import { GaxiosPromise, GaxiosResponse } from 'gaxios'
 
-const keyFile = path.join(__dirname, '../../config/drive-credentials.json')
+const keyFile = path.join(__dirname, '../../../config/drive-credentials.json')
 
 const drive = google.drive({
   version: 'v3',

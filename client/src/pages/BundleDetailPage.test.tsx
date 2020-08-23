@@ -57,4 +57,19 @@ describe('BundleDetailPage', () => {
       expect(text).toBeInTheDocument()
     })
   })
+
+  it('should display a menu to add resources', async () => {
+    const bundleId = 2
+
+    requestSpy.mockResolvedValue({ name: 'Some Name', id: bundleId })
+
+    render(<BundleDetailPage match={{ params: { id: bundleId.toString() } }}/>)
+
+    fireEvent.click(screen.getByRole('button', { name: 'Add Resource' }))
+
+    await waitFor(() => {
+      const text = screen.getByRole('menuitem', { name: 'Image' })
+      expect(text).toBeInTheDocument()
+    })
+  })
 })

@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm'
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm'
+import { ResourceEntity } from './ResourceEntity'
 
 @Entity()
 export class BundleEntity {
@@ -8,10 +9,13 @@ export class BundleEntity {
   name: string
   @Column()
   googleDriveId: string
+  @OneToMany(() => ResourceEntity, resource => resource.bundle, { cascade: true })
+  resources?: ResourceEntity[]
 
-  constructor(id: number, name: string, googleDriveId: string) {
+  constructor(id: number, name: string, googleDriveId: string, resources?: ResourceEntity[]) {
     this.id = id
     this.name = name
     this.googleDriveId = googleDriveId
+    this.resources = resources
   }
 }

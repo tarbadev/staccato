@@ -1,3 +1,5 @@
+import fs from 'fs'
+
 const mockGoogleAuth = jest.fn()
 const mockDrive = jest.fn()
 jest.mock(
@@ -17,7 +19,7 @@ import GoogleDrive from './GoogleDrive'
 import Params$Resource$Permissions$List = driveV3.Params$Resource$Permissions$List
 import Params$Resource$Permissions$Create = driveV3.Params$Resource$Permissions$Create
 import Params$Resource$Files$Update = driveV3.Params$Resource$Files$Update
-
+import { Readable } from 'stream'
 
 describe('GoogleDrive', () => {
   const mockAccessToken = jest.fn()
@@ -75,6 +77,45 @@ describe('GoogleDrive', () => {
 
         expect(returnedId).toEqual(expectedId)
         expect(mockCreateFile).toHaveBeenCalledWith(expectedOptions)
+      })
+    })
+
+    describe('uploadFile', () => {
+      it('should create a file', async () => {
+        const filePath = '/path/to/temp/file'
+        const bundleId = 'My Bundle id'
+        const name = 'My Image Name.png'
+        const expectedId = 'SuperSecretId'
+        const mimeType = 'image/png'
+        const mockedBody = new Readable() as fs.ReadStream
+        const expectedOptions = {
+          requestBody: {
+            name,
+            mimeType: mimeType,
+            originalFilename: name,
+            parents: [bundleId],
+          },
+          media: {
+            mimeType: mimeType,
+            body: mockedBody,
+          },
+          fields: 'id',
+        }
+
+        const createReadStreamSpy = jest.spyOn(fs, 'createReadStream')
+        createReadStreamSpy.mockReturnValueOnce(mockedBody)
+
+        mockCreateFile.mockResolvedValueOnce({
+          data: {
+            id: expectedId,
+          },
+        })
+
+        const returnedId = await googleDriveInstance.uploadFile(bundleId, name, mimeType, filePath)
+
+        expect(returnedId).toEqual(expectedId)
+        expect(mockCreateFile).toHaveBeenCalledWith(expectedOptions)
+        expect(createReadStreamSpy).toHaveBeenCalledWith(filePath)
       })
     })
 

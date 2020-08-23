@@ -9,6 +9,7 @@ import TextField from '@material-ui/core/TextField'
 import Button from '@material-ui/core/Button'
 import Menu from '@material-ui/core/Menu'
 import MenuItem from '@material-ui/core/MenuItem'
+import { DropzoneArea, FileObject } from 'material-ui-dropzone'
 
 interface RouteInfo {
   id: string;
@@ -36,6 +37,18 @@ export const BundleDetailPage = ({ match }: RouteComponentProps<RouteInfo>) => {
       })
   }
 
+  const closeAddMenu = () => setIsAddMenuDisplayed(false)
+
+  const uploadFiles = (fileObject: FileObject, title: string) => {
+    request({
+      url: `/api/bundles/${match.params.id}/resources`,
+      method: 'POST',
+      body: { name: fileObject.file.name, type: fileObject.file.type, data: fileObject.data, title },
+    })
+      .then(bundle => setBundle(bundle))
+      .catch(err => console.error('An error happened while uploading resources', err))
+  }
+
   return <BundleDetailPageDisplay
     bundle={bundle}
     editMode={editMode}
@@ -45,7 +58,8 @@ export const BundleDetailPage = ({ match }: RouteComponentProps<RouteInfo>) => {
     onBundleNameChange={setEditBundleName}
     isAddMenuDisplayed={isAddMenuDisplayed}
     openAddMenu={() => setIsAddMenuDisplayed(true)}
-    closeAddMenu={() => setIsAddMenuDisplayed(false)}
+    closeAddMenu={closeAddMenu}
+    uploadFiles={uploadFiles}
   />
 }
 
@@ -59,6 +73,7 @@ type BundleDetailPageProps = {
   isAddMenuDisplayed: boolean,
   openAddMenu: () => void,
   closeAddMenu: () => void,
+  uploadFiles: (file: FileObject, title: string) => void,
 }
 const BundleDetailPageDisplay = ({
                                    bundle,
@@ -70,8 +85,13 @@ const BundleDetailPageDisplay = ({
                                    isAddMenuDisplayed,
                                    closeAddMenu,
                                    openAddMenu,
+                                   uploadFiles,
                                  }: BundleDetailPageProps) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
+  const [isAddImageDisplayed, setIsAddImageDisplayed] = useState(false)
+  const [fileUpload, setFileUpload] = useState<FileObject>()
+  const [submitEnabled, setSubmitEnabled] = useState(false)
+  const [imageTitle, setImageTitle] = useState('')
   let title
   if (editMode) {
     title = (<form onSubmit={editBundle}>
@@ -98,9 +118,57 @@ const BundleDetailPageDisplay = ({
     openAddMenu()
   }
 
+  const displayAddImage = () => {
+    closeAddMenu()
+    setIsAddImageDisplayed(true)
+  }
+
+  const maxFileSize = 1024 * 1024 * 10
+
+  const closeEditMode = () => setIsAddImageDisplayed(false)
+  const dropAreaImage = isAddImageDisplayed && <div>
+    <TextField
+        fullWidth={true}
+        value={imageTitle}
+        onChange={({ target }) => setImageTitle(target.value)}
+        label='Title'
+    />
+    <DropzoneArea
+        acceptedFiles={['image/*']}
+        maxFileSize={maxFileSize}
+        showPreviews={false}
+        showPreviewsInDropzone={true}
+        showFileNamesInPreview={true}
+        onChange={(files) => {
+          if (files[0]) {
+            const reader = new FileReader()
+
+            reader.addEventListener('load', function () {
+              // convert image file to base64 string
+              setFileUpload({ data: reader.result, file: files[0] })
+              setSubmitEnabled(true)
+            }, false)
+
+            reader.readAsDataURL(files[0])
+          } else {
+            setSubmitEnabled(false)
+          }
+        }}
+        inputProps={{ role: 'input' }}
+        filesLimit={1}
+    />
+    <Button variant='outlined' onClick={closeEditMode}>Cancel</Button>
+    <Button variant='outlined' color='primary' disabled={!submitEnabled} onClick={() => {
+      if (fileUpload) {
+        uploadFiles(fileUpload, imageTitle)
+      }
+      closeEditMode()
+    }}>Submit</Button>
+  </div>
+
   return <div id='bundle-detail'>
     {title}
-    <Button aria-controls="add" aria-haspopup="true" onClick={onAddClick}>
+    <Button aria-controls="add" aria-haspopup="true" color='primary' onClick={onAddClick}>
       Add Resource
     </Button>
     <Menu
@@ -109,7 +177,8 @@ const BundleDetailPageDisplay = ({
       open={isAddMenuDisplayed}
       onClose={closeAddMenu}
     >
-      <MenuItem onClick={closeAddMenu}>Image</MenuItem>
+      <MenuItem onClick={displayAddImage}>Image</MenuItem>
     </Menu>
+    {dropAreaImage}
   </div>
 }

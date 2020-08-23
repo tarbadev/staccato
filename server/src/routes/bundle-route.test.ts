@@ -2,9 +2,11 @@ import request from 'supertest'
 import express, { Express } from 'express'
 import { configureApp } from '../configuration'
 import BundleService from '../application/BundleService'
+import * as Utils from '../utils'
+import Bundle from '../application/Bundle'
 
 describe('BundleRouter', () => {
-  const bundle = { id: 32, name: 'Some super bundle', googleDriveId: 'SuperDriveId' }
+  const bundle = new Bundle(32, 'Some super bundle', 'SuperDriveId')
   let app: Express
 
   beforeAll(() => {
@@ -51,7 +53,7 @@ describe('BundleRouter', () => {
 
     const res = await request(app)
       .post('/api/bundles')
-      .send({name: bundle.name})
+      .send({ name: bundle.name })
 
     expect(res.status).toEqual(200)
     expect(res.body).toEqual(bundle)
@@ -69,9 +71,29 @@ describe('BundleRouter', () => {
 
     const res = await request(app)
       .post(`/api/bundles/${bundle.id}`)
-      .send({name: bundle.name})
+      .send({ name: bundle.name })
 
     expect(res.status).toEqual(200)
     expect(res.body).toEqual(bundle)
+  })
+
+  it('should call the BundleService on upload', async () => {
+    const filePath = '/path/to/temp/file'
+    const someImageContent = 'Some Image Content'
+    const uploadSpy = jest.spyOn(BundleService.prototype, 'upload')
+    uploadSpy.mockResolvedValueOnce(bundle)
+
+    const createTempFileFromBase64Spy = jest.spyOn(Utils, 'createTempFileFromBase64')
+    createTempFileFromBase64Spy.mockReturnValueOnce(filePath)
+
+    const base64Data = `data:image/png;base64,${btoa(someImageContent)}`
+    const res = await request(app)
+      .post(`/api/bundles/${bundle.id}/resources`)
+      .send({ name: 'example.png', type: 'image/png', title: 'Super Title', data: base64Data })
+
+    expect(res.status).toEqual(200)
+    expect(res.body).toEqual(bundle)
+    expect(createTempFileFromBase64Spy).toHaveBeenCalledWith(base64Data, 'example.png')
+    expect(uploadSpy).toHaveBeenCalledWith(bundle.id, { name: 'example.png', title: 'Super Title', type: 'image/png', filePath })
   })
 })

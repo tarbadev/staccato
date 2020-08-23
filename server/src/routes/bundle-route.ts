@@ -1,5 +1,6 @@
 import express, { Request, Response } from 'express'
 import BundleService from '../application/BundleService'
+import { createTempFileFromBase64 } from '../utils'
 
 const bundleRouter = express.Router()
 
@@ -20,6 +21,16 @@ bundleRouter.get('/:id', async (req: Request, res: Response) => {
 
 bundleRouter.post('/:id', async (req: Request, res: Response) => {
   res.json(await bundleService.edit(Number(req.params.id), req.body.name))
+})
+
+bundleRouter.post('/:id/resources', async (req: Request, res: Response) => {
+  const filePath = createTempFileFromBase64(req.body.data, req.body.name)
+  res.json(
+    await bundleService.upload(
+      Number(req.params.id),
+      { name: req.body.name, title: req.body.title, type: req.body.type, filePath },
+    ),
+  )
 })
 
 export default bundleRouter

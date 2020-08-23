@@ -1,5 +1,8 @@
 import BundleRepository from './BundleRepository'
 import connection from '@shared/DbHelperUnit'
+import Bundle from '../application/Bundle'
+import { BundleEntity } from './BundleEntity'
+import Resource from '../application/Resource'
 
 describe('BundleRepository', () => {
   beforeAll(() => connection.create())
@@ -8,12 +11,14 @@ describe('BundleRepository', () => {
 
   it('should load the saved Bundles', async () => {
     const bundle = await connection.store('BundleEntity', { name: 'Some New Bundle', googleDriveId: 'SuperId' })
+    bundle.resources = []
 
     expect(await BundleRepository.findAll()).toEqual([bundle])
   })
 
   it('should load the saved Bundle', async () => {
     const bundle = await connection.store('BundleEntity', { name: 'Some New Bundle', googleDriveId: 'SuperId' })
+    bundle.resources = []
 
     expect(await BundleRepository.findOne(bundle.id)).toEqual(bundle)
   })
@@ -23,10 +28,27 @@ describe('BundleRepository', () => {
   })
 
   it('should save the new Bundle', async () => {
-    const bundleToSave = { id: 0, name: 'Some New Bundle', googleDriveId: 'SomeId' }
+    const bundleToSave = new Bundle(0, 'Some New Bundle', 'SomeId')
 
     const storedBundle = await BundleRepository.save(bundleToSave)
+
+    const actualStored = await connection.get('BundleEntity', storedBundle.id) as BundleEntity
+    actualStored.resources = []
+
     expect(storedBundle.name).toEqual(bundleToSave.name)
-    expect(await connection.get('BundleEntity', storedBundle.id)).toEqual(storedBundle)
+    expect(actualStored).toEqual(storedBundle)
+  })
+
+  it('should save the resources with the bundle', async () => {
+    const bundle = await connection.store('BundleEntity', { name: 'Some New Bundle', googleDriveId: 'SuperId' })
+    bundle.resources = []
+
+    const storedBundle = await BundleRepository.save(bundle)
+    const resource = new Resource(0, 'SomeResource', 'someResourceDriveId')
+    const updatedBundle = new Bundle(storedBundle.id, storedBundle.name, storedBundle.googleDriveId, [resource])
+
+    const storedBundleWithResource = await BundleRepository.save(updatedBundle)
+
+    expect(storedBundleWithResource.resources[0]).toEqual(resource)
   })
 })

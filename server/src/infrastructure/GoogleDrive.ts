@@ -1,5 +1,6 @@
 import { GaxiosResponse } from 'gaxios'
 import { drive_v3 as driveV3, google } from 'googleapis'
+import * as fs from 'fs'
 
 type UserPermission = { id: string; emailAddress: string; role: string }
 export default class GoogleDrive {
@@ -90,14 +91,30 @@ export default class GoogleDrive {
 
   addPermissionToMainFolder(email: string): Promise<UserPermission> {
     return this.drive.permissions.create({
-        fileId: this.mainFolderId,
-        fields: 'id, emailAddress, role',
-        requestBody: {
-          role: 'reader',
-          type: 'user',
-          emailAddress: email,
-        },
-      })
+      fileId: this.mainFolderId,
+      fields: 'id, emailAddress, role',
+      requestBody: {
+        role: 'reader',
+        type: 'user',
+        emailAddress: email,
+      },
+    })
       .then(response => response.data as UserPermission)
+  }
+
+  uploadFile(parentFolderId: string, name: string, type: string, filePath: string): Promise<string> {
+    return this.drive.files.create({
+      requestBody: {
+        name,
+        mimeType: type,
+        originalFilename: name,
+        parents: [parentFolderId],
+      },
+      media: {
+        mimeType: type,
+        body: fs.createReadStream(filePath),
+      },
+      fields: 'id',
+    }).then((response: GaxiosResponse) => response.data.id)
   }
 }

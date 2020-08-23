@@ -1,9 +1,10 @@
 import BundleService from './BundleService'
 import BundleRepository from '../infrastructure/BundleRepository'
 import GoogleDrive from '../infrastructure/GoogleDrive'
+import Bundle from './Bundle'
 
 describe('BundleService', () => {
-  const bundle = { id: 32, name: 'Some super bundle', googleDriveId: 'SuperDriveId' }
+  const bundle = new Bundle(32, 'Some super bundle', 'SuperDriveId')
   const bundleService = new BundleService()
 
   it('should return the list of bundles', async () => {
@@ -36,8 +37,49 @@ describe('BundleService', () => {
     expect(returnedBundle).toEqual(bundle)
   })
 
+  it('should create a Google Drive file and save it', async () => {
+    const filePath = '/path/to/temp/file'
+    const mockUploadFile = jest.fn()
+    const resourceId = 'SomeSuperId'
+    const bundleWithResource = new Bundle(
+      bundle.id,
+      bundle.name,
+      bundle.googleDriveId,
+      [
+        {
+          id: 0,
+          title: 'Some Title',
+          googleDriveId: resourceId,
+        },
+      ],
+    )
+
+    // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+    // @ts-ignore
+    jest.spyOn(GoogleDrive, 'getInstance').mockReturnValueOnce({
+      uploadFile: mockUploadFile,
+    })
+    mockUploadFile.mockImplementationOnce(() => Promise.resolve(resourceId))
+    BundleRepository.findOne = jest.fn(() => Promise.resolve(bundle))
+    BundleRepository.save = jest.fn(() => Promise.resolve(bundleWithResource))
+
+    const returnedBundle = await bundleService.upload(
+      bundle.id,
+      { name: 'example.png', type: 'image/png', filePath, title: 'Some Title' },
+    )
+
+    expect(mockUploadFile).toHaveBeenCalledWith(bundle.googleDriveId, 'example.png', 'image/png', filePath)
+    expect(BundleRepository.save).toHaveBeenCalledWith(bundleWithResource)
+    expect(returnedBundle).toEqual(bundleWithResource)
+  })
+
   it('should return the bundle on edit', async () => {
-    const editedBundle = { ...bundle, name: 'New Bundle Name' }
+    const editedBundle = new Bundle(
+      bundle.id,
+      'New Bundle Name',
+      bundle.googleDriveId,
+      bundle.resources,
+    )
     const mockRenameFile = jest.fn()
     // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
     // @ts-ignore

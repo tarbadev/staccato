@@ -4,7 +4,7 @@ import helmet from 'helmet'
 import compression from 'compression'
 import cookieParser from 'cookie-parser'
 import bodyParser from 'body-parser'
-import { expressCspHeader, INLINE, NONE, SELF } from 'express-csp-header'
+import { expressCspHeader, INLINE, NONE, SELF, DATA } from 'express-csp-header'
 import path from 'path'
 import bundleRouter from './routes/bundle-route'
 import settingsRouter from './routes/settings-route'
@@ -24,20 +24,22 @@ export const configureApp = (app: Express): { port: number; address: string } =>
     appEnv.port = Number(port)
   }
 
+  const uploadLimit = '10mb'
+
   app.use(cors())
   app.use(helmet())
   app.use(compression())
-  app.use(express.json())
+  app.use(express.json({ limit: uploadLimit }))
   app.use(express.urlencoded({ extended: false }))
   app.use(cookieParser())
-  app.use(bodyParser.json())
+  app.use(bodyParser.json({ limit: uploadLimit }))
   app.use(history({ verbose: false }))
   app.use(expressCspHeader({
     directives: {
-      'default-src': [SELF, INLINE],
+      'default-src': [SELF, INLINE, DATA],
       'script-src': [SELF, INLINE],
       'style-src': [SELF, INLINE],
-      'img-src': ['data:', SELF],
+      'img-src': [DATA, SELF],
       'worker-src': [NONE],
       'block-all-mixed-content': true,
     },

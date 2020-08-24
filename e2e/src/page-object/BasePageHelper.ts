@@ -47,4 +47,12 @@ export default abstract class BasePageHelper {
       elements => elements.map(el => ({ name: el.textContent })),
     )
   }
+
+  protected async getBySelector(selector: string): Promise<ElementHandle> {
+    const element = await page.$(selector)
+    if (!element) {
+      throw new Error(`Element "${selector}" is not present`)
+    }
+    return element
+  }
 }

@@ -10,6 +10,7 @@ import Button from '@material-ui/core/Button'
 import Menu from '@material-ui/core/Menu'
 import MenuItem from '@material-ui/core/MenuItem'
 import { DropzoneArea, FileObject } from 'material-ui-dropzone'
+import Grid from '@material-ui/core/Grid'
 
 interface RouteInfo {
   id: string;
@@ -126,7 +127,13 @@ const BundleDetailPageDisplay = ({
   const maxFileSize = 1024 * 1024 * 10
 
   const closeEditMode = () => setIsAddImageDisplayed(false)
-  const dropAreaImage = isAddImageDisplayed && <div>
+  const onSubmit = () => {
+    if (fileUpload) {
+      uploadFiles(fileUpload, imageTitle)
+    }
+    closeEditMode()
+  }
+  const dropAreaImage = isAddImageDisplayed && <div data-add-image-container>
     <TextField
         fullWidth={true}
         value={imageTitle}
@@ -157,18 +164,21 @@ const BundleDetailPageDisplay = ({
         inputProps={{ role: 'input' }}
         filesLimit={1}
     />
-    <Button variant='outlined' onClick={closeEditMode}>Cancel</Button>
-    <Button variant='outlined' color='primary' disabled={!submitEnabled} onClick={() => {
-      if (fileUpload) {
-        uploadFiles(fileUpload, imageTitle)
-      }
-      closeEditMode()
-    }}>Submit</Button>
+    <Grid
+        container
+        direction='row'
+        justify='flex-end'
+        alignItems='center'
+    >
+      <Button variant='outlined' onClick={closeEditMode}>Cancel</Button>
+      <Button variant='outlined' color='primary' disabled={!submitEnabled} onClick={onSubmit}
+              data-button-submit>Submit</Button>
+    </Grid>
   </div>
 
   return <div id='bundle-detail'>
     {title}
-    <Button aria-controls="add" aria-haspopup="true" color='primary' onClick={onAddClick}>
+    <Button aria-controls="add" aria-haspopup="true" color='primary' onClick={onAddClick} data-add-resource>
       Add Resource
     </Button>
     <Menu
@@ -177,7 +187,7 @@ const BundleDetailPageDisplay = ({
       open={isAddMenuDisplayed}
       onClose={closeAddMenu}
     >
-      <MenuItem onClick={displayAddImage}>Image</MenuItem>
+      <MenuItem onClick={displayAddImage} data-add-image-resource>Image</MenuItem>
     </Menu>
     {dropAreaImage}
   </div>

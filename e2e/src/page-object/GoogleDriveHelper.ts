@@ -22,20 +22,21 @@ const findFolder = (name: string): Promise<string> => {
 }
 
 const getMainFolderId = async (): Promise<string> => {
-  if (mainFolderId){
+  if (mainFolderId) {
     return mainFolderId
   } else {
     return await findFolder('Staccato')
   }
 }
 
-export const listFiles = () => drive.files.list({ fields: 'files(id, name)' }).then(response => console.log(response.data))
+export const listFiles = () => drive.files.list({ fields: 'files(id, name, parents)' })
+  .then(response => response.data.files)
 export const listPermissions = async () => drive.permissions.list({
   fileId: await getMainFolderId(),
   fields: 'permissions(id, emailAddress)',
-}).then(response => console.log(response.data))
+}).then(response => response.data.permissions)
 
-export const createFolder = async (name: string): Promise<string | null | undefined> => {
+export const createFolder = async (name: string): Promise<string> => {
   const folderId = await getMainFolderId()
   return drive.files.create({
     requestBody: {
@@ -48,12 +49,23 @@ export const createFolder = async (name: string): Promise<string | null | undefi
     },
   })
     .then(response => response.data)
-    .then(file => file.id)
+    .then(file => file.id as string)
+}
+
+export const findFileByNameAndParent = (name: string, parent: string): Promise<boolean> => {
+  return drive.files.list({
+    q: `name = '${name}' and '${parent}' in parents`,
+  })
+    .then(response => !!(response.data.files && response.data.files.length === 1))
+}
+
+export const deleteFolderById = async (folderId: string): GaxiosPromise<void> => {
+  return drive.files.delete({ fileId: folderId })
 }
 
 export const deleteFolder = async (name: string): GaxiosPromise<void> => {
   const folderId = await findFolder(name)
-  return drive.files.delete({ fileId: folderId })
+  return deleteFolderById(folderId)
 }
 
 export const deletePermission = async (email: string, failOnError = false): Promise<void> => {

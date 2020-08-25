@@ -9,13 +9,22 @@ export class ResourceEntity {
   title?: string
   @Column()
   googleDriveId: string
+  @Column()
+  googleDriveLink: string
   @ManyToOne(() => BundleEntity, bundle => bundle.resources)
   bundle: BundleEntity
 
-  constructor(id: number, title: string | undefined, googleDriveId: string, bundle: BundleEntity) {
+  constructor(
+    id: number,
+    title: string | undefined,
+    googleDriveId: string,
+    googleDriveLink: string,
+    bundle: BundleEntity,
+  ) {
     this.id = id
     this.title = title
     this.googleDriveId = googleDriveId
+    this.googleDriveLink = googleDriveLink
     this.bundle = bundle
   }
 }

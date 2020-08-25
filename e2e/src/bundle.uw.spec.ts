@@ -1,6 +1,6 @@
 import BundlePageHelper from './page-object/BundlePageHelper'
 import connection from '@shared/DbHelperE2e'
-import { createFolder, deleteFolderById, findFileByNameAndParent } from './page-object/GoogleDriveHelper'
+import { createFolder, deleteFolderById } from './page-object/GoogleDriveHelper'
 import * as path from 'path'
 
 describe('Bundle', () => {
@@ -41,17 +41,16 @@ describe('Bundle', () => {
   })
 
   it('should add an image', async () => {
+    const imageTitle = 'Super cute kitty'
     const folderId = await createFolder('Bundle 2')
     const bundleToStore = { name: 'Bundle 2', googleDriveId: folderId }
     const storedBundle = await connection.store('BundleEntity', bundleToStore)
 
     bundlePageHelper = new BundlePageHelper(storedBundle.id)
     await bundlePageHelper.goTo()
-    await bundlePageHelper.addImage(path.join(__dirname, '../assets/kitty.jpg'))
+    await bundlePageHelper.addImage(path.join(__dirname, '../assets/kitty.jpg'), imageTitle)
 
-    await page.waitFor(2000)
-    expect(await findFileByNameAndParent('kitty.jpg', folderId)).toBeTruthy()
-    // expect(await bundlePageHelper.getResources()).toEqual([{ type: 'image', name: 'kitty' }])
+    expect(await bundlePageHelper.getResources()).toEqual([{ type: 'image', title: imageTitle }])
 
     await deleteFolderById(folderId)
   })

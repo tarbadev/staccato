@@ -4,9 +4,15 @@ import { configureApp } from '../configuration'
 import BundleService from '../application/BundleService'
 import * as Utils from '../utils'
 import Bundle from '../application/Bundle'
+import Resource from '../application/Resource'
+import BundleResponse from '@shared/Bundle'
+import ResourceResponse from '@shared/Resource'
 
 describe('BundleRouter', () => {
-  const bundle = new Bundle(32, 'Some super bundle', 'SuperDriveId')
+  const resource = new Resource(89, 'My title rocks!', 'DriveId', '/path/to/resource/file')
+  const resourceResponse: ResourceResponse = { id: 89, title: 'My title rocks!', url: '/path/to/resource/file' }
+  const bundle = new Bundle(32, 'Some super bundle', 'SuperDriveId', [resource])
+  const bundleResponse: BundleResponse = { id: 32, name: 'Some super bundle', resources: [resourceResponse] }
   let app: Express
 
   beforeAll(() => {
@@ -24,7 +30,7 @@ describe('BundleRouter', () => {
     const res = await request(app).get('/api/bundles')
 
     expect(res.status).toEqual(200)
-    expect(res.body).toEqual(bundles)
+    expect(res.body).toEqual([bundleResponse])
   })
 
   it('should call the BundleService on get one', async () => {
@@ -39,7 +45,7 @@ describe('BundleRouter', () => {
     const res = await request(app).get(`/api/bundles/${bundle.id}`)
 
     expect(res.status).toEqual(200)
-    expect(res.body).toEqual(bundle)
+    expect(res.body).toEqual(bundleResponse)
   })
 
   it('should call the BundleService on add', async () => {
@@ -56,7 +62,7 @@ describe('BundleRouter', () => {
       .send({ name: bundle.name })
 
     expect(res.status).toEqual(200)
-    expect(res.body).toEqual(bundle)
+    expect(res.body).toEqual(bundleResponse)
   })
 
   it('should call the BundleService on edit', async () => {
@@ -74,7 +80,7 @@ describe('BundleRouter', () => {
       .send({ name: bundle.name })
 
     expect(res.status).toEqual(200)
-    expect(res.body).toEqual(bundle)
+    expect(res.body).toEqual(bundleResponse)
   })
 
   it('should call the BundleService on upload', async () => {
@@ -92,8 +98,9 @@ describe('BundleRouter', () => {
       .send({ name: 'example.png', type: 'image/png', title: 'Super Title', data: base64Data })
 
     expect(res.status).toEqual(200)
-    expect(res.body).toEqual(bundle)
+    expect(res.body).toEqual(bundleResponse)
     expect(createTempFileFromBase64Spy).toHaveBeenCalledWith(base64Data, 'example.png')
-    expect(uploadSpy).toHaveBeenCalledWith(bundle.id, { name: 'example.png', title: 'Super Title', type: 'image/png', filePath })
+    expect(uploadSpy)
+      .toHaveBeenCalledWith(bundle.id, { name: 'example.png', title: 'Super Title', type: 'image/png', filePath })
   })
 })

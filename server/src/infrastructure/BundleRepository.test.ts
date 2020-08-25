@@ -44,7 +44,7 @@ describe('BundleRepository', () => {
     bundle.resources = []
 
     const storedBundle = await BundleRepository.save(bundle)
-    const resource = new Resource(0, 'SomeResource', 'someResourceDriveId')
+    const resource = new Resource(0, 'SomeResource', 'someResourceDriveId', '/path/to/resource')
     const updatedBundle = new Bundle(storedBundle.id, storedBundle.name, storedBundle.googleDriveId, [resource])
 
     const storedBundleWithResource = await BundleRepository.save(updatedBundle)

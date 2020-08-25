@@ -11,13 +11,16 @@ import Menu from '@material-ui/core/Menu'
 import MenuItem from '@material-ui/core/MenuItem'
 import { DropzoneArea, FileObject } from 'material-ui-dropzone'
 import Grid from '@material-ui/core/Grid'
+import Card from '@material-ui/core/Card'
+import CardMedia from '@material-ui/core/CardMedia'
+import CardHeader from '@material-ui/core/CardHeader'
 
 interface RouteInfo {
   id: string;
 }
 
 export const BundleDetailPage = ({ match }: RouteComponentProps<RouteInfo>) => {
-  const [bundle, setBundle] = useState<Bundle>({ id: 0, name: '' })
+  const [bundle, setBundle] = useState<Bundle>({ id: 0, name: '', resources: [] })
   const [editMode, setEditMode] = useState(false)
   const [editBundleName, setEditBundleName] = useState('')
   const [isAddMenuDisplayed, setIsAddMenuDisplayed] = useState(false)
@@ -46,7 +49,7 @@ export const BundleDetailPage = ({ match }: RouteComponentProps<RouteInfo>) => {
       method: 'POST',
       body: { name: fileObject.file.name, type: fileObject.file.type, data: fileObject.data, title },
     })
-      .then(bundle => setBundle(bundle))
+      .then((bundle: Bundle) => setBundle(bundle))
       .catch(err => console.error('An error happened while uploading resources', err))
   }
 
@@ -106,12 +109,18 @@ const BundleDetailPageDisplay = ({
       </Button>
     </form>)
   } else {
-    title = (<div>
-      <Typography variant='h3' data-bundle-name={bundle.name}>{bundle.name}</Typography>
-      <IconButton color='primary' aria-label='edit' onClick={toggleEditMode} data-edit-bundle-name>
-        <EditIcon />
-      </IconButton>
-    </div>)
+    title = (
+      <Grid
+        container
+        direction='row'
+        justify='flex-start'
+        alignItems='center'
+      >
+        <Typography variant='h3' data-bundle-name={bundle.name}>{bundle.name}</Typography>
+        <IconButton color='primary' aria-label='edit' onClick={toggleEditMode} data-edit-bundle-name>
+          <EditIcon />
+        </IconButton>
+      </Grid>)
   }
 
   const onAddClick = (event: React.MouseEvent<HTMLElement>) => {
@@ -139,6 +148,7 @@ const BundleDetailPageDisplay = ({
         value={imageTitle}
         onChange={({ target }) => setImageTitle(target.value)}
         label='Title'
+        data-add-image-title
     />
     <DropzoneArea
         acceptedFiles={['image/*']}
@@ -176,7 +186,19 @@ const BundleDetailPageDisplay = ({
     </Grid>
   </div>
 
-  return <div id='bundle-detail'>
+  const resources = bundle.resources.map(resource => <Grid item key={resource.id}>
+      <Card>
+        {resource.title && <CardHeader title={resource.title} data-image-resource-title />}
+        <CardMedia
+          component='img'
+          image={resource.url}
+          title={resource.title}
+        />
+      </Card>
+    </Grid>,
+  )
+
+  return (<div id='bundle-detail'>
     {title}
     <Button aria-controls="add" aria-haspopup="true" color='primary' onClick={onAddClick} data-add-resource>
       Add Resource
@@ -190,5 +212,8 @@ const BundleDetailPageDisplay = ({
       <MenuItem onClick={displayAddImage} data-add-image-resource>Image</MenuItem>
     </Menu>
     {dropAreaImage}
-  </div>
+    <Grid container spacing={2} alignItems='stretch' direction='row' data-resource-container>
+      {resources}
+    </Grid>
+  </div>)
 }

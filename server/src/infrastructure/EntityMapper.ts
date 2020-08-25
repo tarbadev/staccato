@@ -4,7 +4,7 @@ import { ResourceEntity } from './ResourceEntity'
 import Resource from '../application/Resource'
 
 const mapResourceEntity = (resourceEntity: ResourceEntity): Resource => {
-  return new Resource(resourceEntity.id, resourceEntity.title, resourceEntity.googleDriveId)
+  return new Resource(resourceEntity.id, resourceEntity.title, resourceEntity.googleDriveId, resourceEntity.googleDriveLink)
 }
 
 export const mapBundleEntity = (bundleEntity: BundleEntity): Bundle => {

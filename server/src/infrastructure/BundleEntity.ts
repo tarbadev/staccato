@@ -9,7 +9,7 @@ export class BundleEntity {
   name: string
   @Column()
   googleDriveId: string
-  @OneToMany(() => ResourceEntity, resource => resource.bundle, { cascade: true })
+  @OneToMany(() => ResourceEntity, resource => resource.bundle, { cascade: true, eager: true })
   resources?: ResourceEntity[]
 
   constructor(id: number, name: string, googleDriveId: string, resources?: ResourceEntity[]) {

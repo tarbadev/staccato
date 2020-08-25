@@ -27,9 +27,9 @@ export default class BundleService {
 
   async upload(id: number, file: { name: string; title: string; type: string; filePath: string }): Promise<Bundle> {
     const bundle = await BundleRepository.findOne(id)
-    const driveId = await GoogleDrive.getInstance()
+    const driveResource = await GoogleDrive.getInstance()
       .uploadFile(bundle.googleDriveId, file.name, file.type, file.filePath)
-    const newBundle = bundle.addResource(file.title, driveId)
+    const newBundle = bundle.addResource(file.title, driveResource.id, driveResource.link)
     return BundleRepository.save(newBundle)
   }
 }

@@ -41,6 +41,7 @@ describe('BundleService', () => {
     const filePath = '/path/to/temp/file'
     const mockUploadFile = jest.fn()
     const resourceId = 'SomeSuperId'
+    const resourceLink = '/path/to/resource'
     const bundleWithResource = new Bundle(
       bundle.id,
       bundle.name,
@@ -50,6 +51,7 @@ describe('BundleService', () => {
           id: 0,
           title: 'Some Title',
           googleDriveId: resourceId,
+          googleDriveLink: resourceLink,
         },
       ],
     )
@@ -59,7 +61,7 @@ describe('BundleService', () => {
     jest.spyOn(GoogleDrive, 'getInstance').mockReturnValueOnce({
       uploadFile: mockUploadFile,
     })
-    mockUploadFile.mockImplementationOnce(() => Promise.resolve(resourceId))
+    mockUploadFile.mockImplementationOnce(() => Promise.resolve({ id: resourceId, link: resourceLink }))
     BundleRepository.findOne = jest.fn(() => Promise.resolve(bundle))
     BundleRepository.save = jest.fn(() => Promise.resolve(bundleWithResource))
 

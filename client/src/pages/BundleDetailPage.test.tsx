@@ -4,6 +4,7 @@ import user from '@testing-library/user-event'
 import { BundleDetailPage } from './BundleDetailPage'
 import * as Utils from '../Utils'
 import { request } from '../Utils'
+import Bundle from '@shared/Bundle'
 
 const requestSpy = jest.spyOn(Utils, 'request')
 
@@ -11,8 +12,10 @@ describe('BundleDetailPage', () => {
   it('should retrieve the bundle and display it', async () => {
     const bundleName = 'Some Bundle Name'
     const bundleId = 2
+    const resource = { id: 31, title: 'Such a pretty picture', url: 'path/to/img' }
+    const bundle: Bundle = { name: bundleName, id: bundleId, resources: [resource] }
 
-    requestSpy.mockResolvedValue({ name: bundleName, id: bundleId })
+    requestSpy.mockResolvedValue(bundle)
 
     render(<BundleDetailPage match={{ params: { id: bundleId.toString() } }} />)
 
@@ -21,6 +24,12 @@ describe('BundleDetailPage', () => {
     await waitFor(() => {
       const text = screen.getByText(bundleName)
       expect(text).toBeInTheDocument()
+
+      const resourceTitle = screen.getByText(resource.title)
+      expect(resourceTitle).toBeInTheDocument()
+
+      const image = screen.getByTitle(resource.title)
+      expect(image).toBeInTheDocument()
     })
   })
 
@@ -29,7 +38,7 @@ describe('BundleDetailPage', () => {
     const newName = 'New Name'
     const bundleId = 2
 
-    requestSpy.mockResolvedValue({ name: bundleName, id: bundleId })
+    requestSpy.mockResolvedValue({ name: bundleName, id: bundleId, resources: [] })
 
     render(<BundleDetailPage match={{ params: { id: bundleId.toString() } }} />)
 
@@ -43,7 +52,7 @@ describe('BundleDetailPage', () => {
       fireEvent.change(input, { target: { value: newName } })
     })
 
-    requestSpy.mockResolvedValue({ name: newName, id: bundleId })
+    requestSpy.mockResolvedValue({ name: newName, id: bundleId, resources: [] })
 
     fireEvent.click(screen.getByRole('button', { name: 'Submit' }))
 
@@ -62,7 +71,7 @@ describe('BundleDetailPage', () => {
   it('should display a menu to add resources', async () => {
     const bundleId = 2
 
-    requestSpy.mockResolvedValue({ name: 'Some Name', id: bundleId })
+    requestSpy.mockResolvedValue({ name: 'Some Name', id: bundleId, resources: [] })
 
     render(<BundleDetailPage match={{ params: { id: bundleId.toString() } }} />)
 
@@ -77,7 +86,7 @@ describe('BundleDetailPage', () => {
   it('should send an upload request with the file', async () => {
     const bundleId = 2
     const title = 'My image title'
-    const bundle = { name: 'Some Name', id: bundleId }
+    const bundle = { name: 'Some Name', id: bundleId, resources: [] }
 
     requestSpy.mockResolvedValue(bundle)
 
@@ -115,7 +124,12 @@ describe('BundleDetailPage', () => {
         {
           url: `/api/bundles/${bundleId}/resources`,
           method: 'POST',
-          body: { name: 'example.png', title, type: 'image/png', data: `data:image/png;base64,${btoa(someImageContent)}` },
+          body: {
+            name: 'example.png',
+            title,
+            type: 'image/png',
+            data: `data:image/png;base64,${btoa(someImageContent)}`,
+          },
         },
       )
     })

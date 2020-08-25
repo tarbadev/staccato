@@ -13,8 +13,8 @@ export default class Bundle {
     this.resources = resources
   }
 
-  addResource(title: string | undefined, driveId: string): Bundle {
-    const resource = new Resource(0, title, driveId)
+  addResource(title: string | undefined, driveId: string, driveLink: string): Bundle {
+    const resource = new Resource(0, title, driveId, driveLink)
     return new Bundle(this.id, this.name, this.googleDriveId, this.resources.concat(resource))
   }
 }

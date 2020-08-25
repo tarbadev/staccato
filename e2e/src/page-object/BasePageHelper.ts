@@ -55,4 +55,18 @@ export default abstract class BasePageHelper {
     }
     return element
   }
+
+  protected async waitForTextByCss(cssSelector: string, text: string): Promise<void> {
+    await page.waitForFunction(
+      (selector, textToSearch) => {
+        const element = document.querySelector(selector)
+        if (element && element.innerText) {
+          return element.innerText.toLowerCase().includes(textToSearch)
+        }
+      },
+      {},
+      cssSelector.replace(/"/g, '\\"'),
+      text.toLowerCase(),
+    )
+  }
 }

@@ -20,23 +20,31 @@ export default class BundlePageHelper extends BasePageHelper {
     await page.waitForSelector(`[data-bundle-name='${newName}']`)
   }
 
-  async addImage(path: string) {
+  async addImage(path: string, title: string) {
     await this.clickOnElement('[data-add-resource]')
     await this.clickOnElement('[data-add-image-resource]')
+
+    await this.typeText('[data-add-image-title] input', title)
 
     const input = await this.getBySelector('[data-add-image-container] input[type="file"]')
     await input.uploadFile(path)
 
-    await page.waitFor(1000)
+    await page.waitFor(500)
     await this.clickOnElement('[data-button-submit]')
+
+    await this.waitForTextByCss('[data-image-resource-title]', title)
   }
 
   async getResources() {
-    const resources = await page.$$('[data-resource-container]')
-    resources.map(resource => {
-      const type = resource.$eval('[data-resource-type]', element => element.textContent)
-      const name = resource.$eval('[data-resource-name]', element => element.textContent)
-      return { type, name }
-    })
+    const resources = []
+    const resourceElements = await page.$$('[data-resource-container]')
+
+    for (const resource of resourceElements) {
+      const type = 'image'
+      const title = await resource.$eval('[data-image-resource-title]', element => element.textContent)
+      resources.push({ type, title })
+    }
+
+    return resources
   }
 }

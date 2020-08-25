@@ -1,5 +1,3 @@
-import fs from 'fs'
-
 const mockGoogleAuth = jest.fn()
 const mockDrive = jest.fn()
 jest.mock(
@@ -14,12 +12,13 @@ jest.mock(
   }),
 )
 
+import fs from 'fs'
 import { drive_v3 as driveV3 } from 'googleapis'
 import GoogleDrive from './GoogleDrive'
+import { Readable } from 'stream'
 import Params$Resource$Permissions$List = driveV3.Params$Resource$Permissions$List
 import Params$Resource$Permissions$Create = driveV3.Params$Resource$Permissions$Create
 import Params$Resource$Files$Update = driveV3.Params$Resource$Files$Update
-import { Readable } from 'stream'
 
 describe('GoogleDrive', () => {
   const mockAccessToken = jest.fn()
@@ -85,8 +84,11 @@ describe('GoogleDrive', () => {
         const filePath = '/path/to/temp/file'
         const bundleId = 'My Bundle id'
         const name = 'My Image Name.png'
-        const expectedId = 'SuperSecretId'
         const mimeType = 'image/png'
+        const driveId = 'SuperSecretId'
+        const driveLink = 'https://drive.google.com/uc?id=' + driveId
+        const permission = { id: 'SomeId', role: 'reader' }
+        const expectedResource = { id: driveId, link: driveLink }
         const mockedBody = new Readable() as fs.ReadStream
         const expectedOptions = {
           requestBody: {
@@ -101,20 +103,32 @@ describe('GoogleDrive', () => {
           },
           fields: 'id',
         }
+        const expectedPermissionOptions: Params$Resource$Permissions$Create = {
+          fileId: staccatoFolderId,
+          fields: 'id, role',
+          requestBody: {
+            role: 'reader',
+            type: 'anyone',
+          },
+        }
+
+        mockCreatePermissions.mockResolvedValueOnce({ data: permission })
 
         const createReadStreamSpy = jest.spyOn(fs, 'createReadStream')
         createReadStreamSpy.mockReturnValueOnce(mockedBody)
 
         mockCreateFile.mockResolvedValueOnce({
           data: {
-            id: expectedId,
+            id: driveId,
+            webViewLink: driveLink,
           },
         })
 
-        const returnedId = await googleDriveInstance.uploadFile(bundleId, name, mimeType, filePath)
+        const returnedResource = await googleDriveInstance.uploadFile(bundleId, name, mimeType, filePath)
 
-        expect(returnedId).toEqual(expectedId)
+        expect(returnedResource).toEqual(expectedResource)
         expect(mockCreateFile).toHaveBeenCalledWith(expectedOptions)
+        expect(mockCreatePermissions).toHaveBeenCalledWith(expectedPermissionOptions)
         expect(createReadStreamSpy).toHaveBeenCalledWith(filePath)
       })
     })

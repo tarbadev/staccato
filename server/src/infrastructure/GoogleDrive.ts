@@ -102,7 +102,7 @@ export default class GoogleDrive {
       .then(response => response.data as UserPermission)
   }
 
-  uploadFile(parentFolderId: string, name: string, type: string, filePath: string): Promise<string> {
+  uploadFile(parentFolderId: string, name: string, type: string, filePath: string): Promise<{ id: string; link: string }> {
     return this.drive.files.create({
       requestBody: {
         name,
@@ -115,6 +115,18 @@ export default class GoogleDrive {
         body: fs.createReadStream(filePath),
       },
       fields: 'id',
-    }).then((response: GaxiosResponse) => response.data.id)
+    }).then((response: GaxiosResponse) => {
+      const fileId = response.data.id
+      return this.drive.permissions.create({
+        fileId: this.mainFolderId,
+        fields: 'id, role',
+        requestBody: {
+          role: 'reader',
+          type: 'anyone',
+        },
+      })
+        .then(response => response.data as UserPermission)
+        .then(() => ({ id: fileId, link: `https://drive.google.com/uc?id=${fileId}` }))
+    })
   }
 }

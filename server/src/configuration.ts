@@ -81,7 +81,9 @@ export const configureDb = (): Promise<Connection | void> => {
 
   return createConnection(dbOptions as ConnectionOptions)
     // eslint-disable-next-line no-console
-    .catch(err => console.error(`Error while initializing Database: ${err}`))
+    .catch(err => {
+      throw new Error(`A problem happened while initializing Database: \n${err}`)
+    })
 }
 
 export const configureDrive = (): Promise<void> => {
@@ -89,5 +91,7 @@ export const configureDrive = (): Promise<void> => {
 
   return GoogleDrive.initialize(driveCredentialsPath)
     // eslint-disable-next-line no-console
-    .catch(err => console.error(`Error while initializing Google Drive: ${err}`))
+    .catch(err => {
+      throw new Error(`A problem happened while initializing Google Drive: \n${err}`)
+    })
 }

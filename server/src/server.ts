@@ -15,4 +15,4 @@ configureDb()
     })
   })
   // eslint-disable-next-line no-console
-  .catch(error => console.log(`Error while initializing server: ${error}`))
+  .catch(error => console.log(`A problem happened while initializing server: \n${error}`))

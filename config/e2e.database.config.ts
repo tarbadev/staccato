@@ -1,16 +1,18 @@
 import localDbCredentials from './local.database.config'
-import DbCredentials from '@shared/DbCredentials'
 
-let credentials: DbCredentials
+const config = localDbCredentials
+
 if (process.env.DB_CREDENTIALS) {
   const lines = process.env.DB_CREDENTIALS.split('\n')
   if (!lines[0].includes('{')) {
     lines.splice(0, 1)
   }
-  credentials = JSON.parse(lines.join('\n'))
-} else {
-  credentials = localDbCredentials
+  const credentials = JSON.parse(lines.join('\n'))
+  config.host = credentials.hostname
+  config.port = Number(credentials.port)
+  config.username = credentials.username
+  config.password = credentials.password
+  config.database = credentials.name
 }
 
-
-export default credentials
+export default config

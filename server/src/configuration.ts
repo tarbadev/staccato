@@ -4,14 +4,12 @@ import helmet from 'helmet'
 import compression from 'compression'
 import cookieParser from 'cookie-parser'
 import bodyParser from 'body-parser'
-import { expressCspHeader, INLINE, NONE, SELF, DATA } from 'express-csp-header'
+import { DATA, expressCspHeader, INLINE, NONE, SELF } from 'express-csp-header'
 import path from 'path'
 import bundleRouter from './routes/bundle-route'
 import settingsRouter from './routes/settings-route'
 import history from 'connect-history-api-fallback'
 import { Connection, ConnectionOptions, createConnection } from 'typeorm'
-import ormConfig from '@config/base.orm.config'
-import DbCredentials from '@shared/DbCredentials'
 import localDbCredentials from '@config/local.database.config'
 import cfEnv from 'cfenv'
 import GoogleDrive from './infrastructure/GoogleDrive'
@@ -62,21 +60,22 @@ export const configureApp = (app: Express): { port: number; address: string } =>
   return { port: appEnv.port, address: appEnv.bind }
 }
 
+type DbCredentials = {
+  name: string;
+  hostname: string;
+  port: string;
+  username: string;
+  password: string;
+}
 export const configureDb = (): Promise<Connection | void> => {
-  let dbCredentials: DbCredentials
-  if (appEnv.isLocal) {
-    dbCredentials = localDbCredentials as DbCredentials
-  } else {
-    dbCredentials = appEnv.getServiceCreds('staccato-db') as DbCredentials
-  }
-
-  const dbOptions = {
-    ...ormConfig,
-    'host': dbCredentials.hostname,
-    'port': dbCredentials.port,
-    'username': dbCredentials.username,
-    'password': dbCredentials.password,
-    'database': dbCredentials.name,
+  const dbOptions = localDbCredentials
+  if (!appEnv.isLocal) {
+    const dbCredentials = appEnv.getServiceCreds('staccato-db') as DbCredentials
+    dbOptions.host = dbCredentials.hostname
+    dbOptions.port = Number(dbCredentials.port)
+    dbOptions.username = dbCredentials.username
+    dbOptions.password = dbCredentials.password
+    dbOptions.database = dbCredentials.name
   }
 
   return createConnection(dbOptions as ConnectionOptions)

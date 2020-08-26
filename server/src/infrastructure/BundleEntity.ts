@@ -1,7 +1,7 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm'
 import { ResourceEntity } from './ResourceEntity'
 
-@Entity()
+@Entity({ name: 'bundle' })
 export class BundleEntity {
   @PrimaryGeneratedColumn()
   id: number

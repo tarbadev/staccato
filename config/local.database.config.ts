@@ -1,7 +1,12 @@
-export default {
-  'hostname': 'localhost',
-  'port': '3306',
+import baseOrmConfig from './base.orm.config'
+
+export const config = {
+  ...baseOrmConfig,
+  'host': 'localhost',
+  'port': 3306,
   'username': 'staccato',
   'password': 'staccato',
-  'name': 'staccato',
+  'database': 'staccato',
 }
+export default config
+module.exports = config

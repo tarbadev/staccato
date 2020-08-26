@@ -1,19 +1,10 @@
 import { createConnection, getConnection } from 'typeorm'
-import baseOrmConfig from '@config/base.orm.config'
 import e2eDbCredentials from '@config/e2e.database.config'
 import { ConnectionOptions } from 'typeorm/connection/ConnectionOptions'
 
 const connection = {
   async create() {
-    const dbConfig = {
-      ...baseOrmConfig,
-      ...e2eDbCredentials,
-      database: e2eDbCredentials.name,
-      host: e2eDbCredentials.hostname,
-      name: 'default',
-    }
-
-    await createConnection(dbConfig as ConnectionOptions)
+    await createConnection(e2eDbCredentials as ConnectionOptions)
   },
 
   async close() {

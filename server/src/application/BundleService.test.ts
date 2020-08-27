@@ -37,42 +37,54 @@ describe('BundleService', () => {
     expect(returnedBundle).toEqual(bundle)
   })
 
-  it('should create a Google Drive file and save it', async () => {
-    const filePath = '/path/to/temp/file'
-    const mockUploadFile = jest.fn()
-    const resourceId = 'SomeSuperId'
-    const resourceLink = '/path/to/resource'
-    const bundleWithResource = new Bundle(
-      bundle.id,
-      bundle.name,
-      bundle.googleDriveId,
-      [
+  describe('upload', () => {
+    it('should create a Google Drive file and save it', async () => {
+      const filePath = '/path/to/temp/file'
+      const mockUploadFile = jest.fn()
+      const resourceId = 'SomeSuperId'
+      const resourceLink = '/path/to/resource'
+      const bundleWithResource = new Bundle(
+        bundle.id,
+        bundle.name,
+        bundle.googleDriveId,
+        [
+          {
+            id: 0,
+            title: 'Some Title',
+            type: 'image',
+            googleDriveId: resourceId,
+            googleDriveLink: resourceLink,
+            source: 'https://example.com',
+            authors: ['First Author', 'Second Author'],
+          },
+        ],
+      )
+
+      // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+      // @ts-ignore
+      jest.spyOn(GoogleDrive, 'getInstance').mockReturnValueOnce({
+        uploadFile: mockUploadFile,
+      })
+      mockUploadFile.mockImplementationOnce(() => Promise.resolve({ id: resourceId, link: resourceLink }))
+      BundleRepository.findOne = jest.fn(() => Promise.resolve(bundle))
+      BundleRepository.save = jest.fn(() => Promise.resolve(bundleWithResource))
+
+      const returnedBundle = await bundleService.upload(
+        bundle.id,
         {
-          id: 0,
+          name: 'example.png',
+          type: 'image/png',
+          filePath,
           title: 'Some Title',
-          googleDriveId: resourceId,
-          googleDriveLink: resourceLink,
+          source: 'https://example.com',
+          authors: ['First Author', 'Second Author'],
         },
-      ],
-    )
+      )
 
-    // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
-    // @ts-ignore
-    jest.spyOn(GoogleDrive, 'getInstance').mockReturnValueOnce({
-      uploadFile: mockUploadFile,
+      expect(mockUploadFile).toHaveBeenCalledWith(bundle.googleDriveId, 'example.png', 'image/png', filePath)
+      expect(BundleRepository.save).toHaveBeenCalledWith(bundleWithResource)
+      expect(returnedBundle).toEqual(bundleWithResource)
     })
-    mockUploadFile.mockImplementationOnce(() => Promise.resolve({ id: resourceId, link: resourceLink }))
-    BundleRepository.findOne = jest.fn(() => Promise.resolve(bundle))
-    BundleRepository.save = jest.fn(() => Promise.resolve(bundleWithResource))
-
-    const returnedBundle = await bundleService.upload(
-      bundle.id,
-      { name: 'example.png', type: 'image/png', filePath, title: 'Some Title' },
-    )
-
-    expect(mockUploadFile).toHaveBeenCalledWith(bundle.googleDriveId, 'example.png', 'image/png', filePath)
-    expect(BundleRepository.save).toHaveBeenCalledWith(bundleWithResource)
-    expect(returnedBundle).toEqual(bundleWithResource)
   })
 
   it('should return the bundle on edit', async () => {

@@ -1,4 +1,4 @@
-import Resource from './Resource'
+import Resource, { ResourceType } from './Resource'
 
 export default class Bundle {
   id: number
@@ -13,8 +13,17 @@ export default class Bundle {
     this.resources = resources
   }
 
-  addResource(title: string | undefined, driveId: string, driveLink: string): Bundle {
-    const resource = new Resource(0, title, driveId, driveLink)
+  addResource(params: NewResourceParams): Bundle {
+    const resource = new Resource(0, params.title, params.type, params.driveId, params.driveLink, params.source, params.authors)
     return new Bundle(this.id, this.name, this.googleDriveId, this.resources.concat(resource))
   }
+}
+
+type NewResourceParams = {
+  title?: string;
+  source?: string;
+  authors?: string[];
+  type: ResourceType;
+  driveId: string;
+  driveLink: string;
 }

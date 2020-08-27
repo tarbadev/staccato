@@ -1,7 +1,7 @@
 import BundleRepository from './BundleRepository'
 import connection from '@shared/DbHelperUnit'
 import Bundle from '../application/Bundle'
-import { BundleEntity } from './BundleEntity'
+import { BundleEntity } from './entity/BundleEntity'
 import Resource from '../application/Resource'
 
 describe('BundleRepository', () => {
@@ -43,12 +43,52 @@ describe('BundleRepository', () => {
     const bundle = await connection.store('BundleEntity', { name: 'Some New Bundle', googleDriveId: 'SuperId' })
     bundle.resources = []
 
+    expect(await connection.getAllAuthors()).toHaveLength(0)
+
     const storedBundle = await BundleRepository.save(bundle)
-    const resource = new Resource(0, 'SomeResource', 'someResourceDriveId', '/path/to/resource')
+    const resource = new Resource(
+      0,
+      'SomeResource',
+      'video',
+      'someResourceDriveId',
+      '/path/to/resource',
+      'http://example.com',
+      ['First Author', 'Second Author'],
+    )
     const updatedBundle = new Bundle(storedBundle.id, storedBundle.name, storedBundle.googleDriveId, [resource])
 
     const storedBundleWithResource = await BundleRepository.save(updatedBundle)
+    resource.id = storedBundleWithResource.resources[0].id
 
     expect(storedBundleWithResource.resources[0]).toEqual(resource)
+
+    expect(await connection.getAllAuthors()).toHaveLength(2)
+  })
+
+  it('should retrieve the authors before storing the bundle', async () => {
+    await connection.store('AuthorEntity', { name: 'First Author' })
+    const bundle = await connection.store('BundleEntity', { name: 'Some New Bundle', googleDriveId: 'SuperId' })
+    bundle.resources = []
+
+    expect(await connection.getAllAuthors()).toHaveLength(1)
+
+    const storedBundle = await BundleRepository.save(bundle)
+    const resource = new Resource(
+      0,
+      'SomeResource',
+      'video',
+      'someResourceDriveId',
+      '/path/to/resource',
+      'http://example.com',
+      ['First Author', 'Second Author'],
+    )
+    const updatedBundle = new Bundle(storedBundle.id, storedBundle.name, storedBundle.googleDriveId, [resource])
+
+    const storedBundleWithResource = await BundleRepository.save(updatedBundle)
+    resource.id = storedBundleWithResource.resources[0].id
+
+    expect(storedBundleWithResource.resources[0]).toEqual(resource)
+
+    expect(await connection.getAllAuthors()).toHaveLength(2)
   })
 })

@@ -1,5 +1,5 @@
 import express, { Request, Response } from 'express'
-import BundleService from '../application/BundleService'
+import BundleService, { UploadParams } from '../application/BundleService'
 import { createTempFileFromBase64 } from '../utils'
 import BundleResponse from '@shared/Bundle'
 import Bundle from '../application/Bundle'
@@ -12,7 +12,14 @@ const mapBundleToResponse = (bundle: Bundle): BundleResponse => {
   return {
     id: bundle.id,
     name: bundle.name,
-    resources: bundle.resources.map(resource => ({ id: resource.id, title: resource.title, url: resource.googleDriveLink })),
+    resources: bundle.resources.map(resource => ({
+      id: resource.id,
+      title: resource.title,
+      url: resource.googleDriveLink,
+      type: resource.type,
+      source: resource.source,
+      authors: resource.authors,
+    })),
   }
 }
 
@@ -36,10 +43,15 @@ bundleRouter.post('/:id', async (req: Request, res: Response<BundleResponse>) =>
 
 bundleRouter.post('/:id/resources', async (req: Request, res: Response<BundleResponse>) => {
   const filePath = createTempFileFromBase64(req.body.data, req.body.name)
-  const bundle = await bundleService.upload(
-    Number(req.params.id),
-    { name: req.body.name, title: req.body.title, type: req.body.type, filePath },
-  )
+  const uploadParams: UploadParams = {
+    filePath,
+    name: req.body.name,
+    type: req.body.type,
+    title: req.body.title,
+    source: req.body.source,
+    authors: req.body.authors,
+  }
+  const bundle = await bundleService.upload(Number(req.params.id), uploadParams)
   res.json(mapBundleToResponse(bundle))
 })
 

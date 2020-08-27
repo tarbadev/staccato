@@ -1,5 +1,5 @@
 import { createConnection, getConnection } from 'typeorm'
-import testDbCredentials from '@config/test.database.config.ts'
+import testDbCredentials from '@config/test.database.config'
 import { ConnectionOptions } from 'typeorm/connection/ConnectionOptions'
 
 const connection = {
@@ -13,11 +13,15 @@ const connection = {
 
   async clear() {
     const conn = getConnection()
-    const entities = getConnection().entityMetadatas
+    const tables = [
+      'resource_author',
+      'author',
+      'resource',
+      'bundle',
+    ]
 
-    for (const entity of entities) {
-      const repository = conn.getRepository(entity.name)
-      await repository.query(`DELETE FROM ${entity.tableName}`)
+    for (const table of tables) {
+      await conn.query(`DELETE FROM ${table}`)
     }
   },
 
@@ -27,6 +31,10 @@ const connection = {
 
   get(entity: string, id: number) {
     return getConnection().getRepository(entity).findOne(id)
+  },
+
+  getAllAuthors() {
+    return getConnection().getRepository('AuthorEntity').find()
   },
 }
 export default connection

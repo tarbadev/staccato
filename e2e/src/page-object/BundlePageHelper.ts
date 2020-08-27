@@ -26,13 +26,13 @@ export default class BundlePageHelper extends BasePageHelper {
 
     await this.typeText('[data-add-image-title] input', title)
 
-    const input = await this.getBySelector('[data-add-image-container] input[type="file"]')
+    const input = await this.getBySelector('[data-dropzone-container="image"] input[type="file"]')
     await input.uploadFile(path)
 
     await page.waitFor(500)
     await this.clickOnElement('[data-button-submit]')
 
-    await this.waitForTextByCss('[data-image-resource-title]', title)
+    await this.waitForTextByCss('[data-resource-title]', title)
   }
 
   async getResources() {
@@ -40,11 +40,39 @@ export default class BundlePageHelper extends BasePageHelper {
     const resourceElements = await page.$$('[data-resource-container]')
 
     for (const resource of resourceElements) {
-      const type = 'image'
-      const title = await resource.$eval('[data-image-resource-title]', element => element.textContent)
-      resources.push({ type, title })
+      let type, title, source, authors
+      if (await resource.$('img') !== null) {
+        type = 'image'
+        title = await this.getTextContentBySelector('[data-resource-title]')
+      } else if (await resource.$('video') !== null) {
+        const fullSource = await this.getTextContentBySelector('[data-resource-source]')
+        const fullAuthors = await this.getTextContentBySelector('[data-resource-title] .MuiCardHeader-subheader')
+        source = fullSource?.replace('Source: ', '')
+        authors = fullAuthors?.split(', ')
+        type = 'video'
+        title = await this.getTextContentBySelector('[data-resource-title] .MuiCardHeader-title')
+      }
+
+      resources.push({ type, title, source, authors })
     }
 
     return resources
+  }
+
+  async addVideo(path: string, title: string, source: string, authors: string[]) {
+    await this.clickOnElement('[data-add-resource]')
+    await this.clickOnElement('[data-add-video-resource]')
+
+    await this.typeText('[data-add-video-title] input', title)
+    await this.typeText('[data-add-video-source] input', source)
+    await this.typeText('[data-add-video-authors] input', authors.join(';'))
+
+    const input = await this.getBySelector('[data-dropzone-container="video"] input[type="file"]')
+    await input.uploadFile(path)
+
+    await page.waitFor(500)
+    await this.clickOnElement('[data-button-submit]')
+
+    await this.waitForTextByCss('[data-resource-title]', title)
   }
 }

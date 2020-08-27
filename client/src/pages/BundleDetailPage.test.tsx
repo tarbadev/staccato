@@ -12,7 +12,7 @@ describe('BundleDetailPage', () => {
   it('should retrieve the bundle and display it', async () => {
     const bundleName = 'Some Bundle Name'
     const bundleId = 2
-    const resource = { id: 31, title: 'Such a pretty picture', url: 'path/to/img' }
+    const resource = { id: 31, title: 'Such a pretty picture', url: 'path/to/img', type: 'image' }
     const bundle: Bundle = { name: bundleName, id: bundleId, resources: [resource] }
 
     requestSpy.mockResolvedValue(bundle)
@@ -78,12 +78,15 @@ describe('BundleDetailPage', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Add Resource' }))
 
     await waitFor(() => {
-      const text = screen.getByRole('menuitem', { name: 'Image' })
-      expect(text).toBeInTheDocument()
+      const imageMenu = screen.getByRole('menuitem', { name: 'Image' })
+      expect(imageMenu).toBeInTheDocument()
+
+      const videoMenu = screen.getByRole('menuitem', { name: 'Video' })
+      expect(videoMenu).toBeInTheDocument()
     })
   })
 
-  it('should send an upload request with the file', async () => {
+  it('should send an upload request with the image', async () => {
     const bundleId = 2
     const title = 'My image title'
     const bundle = { name: 'Some Name', id: bundleId, resources: [] }
@@ -129,6 +132,78 @@ describe('BundleDetailPage', () => {
             title,
             type: 'image/png',
             data: `data:image/png;base64,${btoa(someImageContent)}`,
+          },
+        },
+      )
+    })
+  })
+
+  it('should send an upload request with the video', async () => {
+    const bundleId = 2
+    const title = 'My video title'
+    const mimeType = 'video/mp4'
+    const fileName = 'example.mp4'
+    const source = 'http://example.com'
+    const authors = ['First Author', 'Second Author']
+    const bundle = { name: 'Some Name', id: bundleId, resources: [] }
+
+    requestSpy.mockResolvedValue(bundle)
+
+    render(<BundleDetailPage match={{ params: { id: bundleId.toString() } }} />)
+
+    fireEvent.click(screen.getByRole('button', { name: 'Add Resource' }))
+
+    await waitFor(() => {
+      const button = screen.getByRole('menuitem', { name: 'Video' })
+      expect(button).toBeInTheDocument()
+      fireEvent.click(button)
+    })
+
+    const input = screen.getByText('Drag and drop a file here or click')
+    const someVideoContent = 'Some Video Content'
+    const file = new File([someVideoContent], fileName, { type: mimeType })
+    user.upload(input, file)
+    fireEvent.drop(input)
+
+    await waitFor(() => {
+      const input = screen.getByRole('textbox', { name: /title/i }) as HTMLInputElement
+      expect(input).toBeInTheDocument()
+
+      fireEvent.change(input, { target: { value: title } })
+    })
+
+    await waitFor(() => {
+      const input = screen.getByRole('textbox', { name: /source/i }) as HTMLInputElement
+      expect(input).toBeInTheDocument()
+
+      fireEvent.change(input, { target: { value: source } })
+    })
+
+    await waitFor(() => {
+      const input = screen.getByRole('textbox', { name: /authors/i }) as HTMLInputElement
+      expect(input).toBeInTheDocument()
+
+      fireEvent.change(input, { target: { value: authors.join(';') } })
+    })
+
+    await waitFor(() => {
+      const button = screen.getByRole('button', { name: 'Submit' })
+      expect(button).not.toBeDisabled()
+      expect(fireEvent.click(button)).toBeTruthy()
+    })
+
+    await waitFor(() => {
+      expect(request).toHaveBeenCalledWith(
+        {
+          url: `/api/bundles/${bundleId}/resources`,
+          method: 'POST',
+          body: {
+            name: fileName,
+            title,
+            source,
+            authors,
+            type: mimeType,
+            data: `data:${mimeType};base64,${btoa(someVideoContent)}`,
           },
         },
       )

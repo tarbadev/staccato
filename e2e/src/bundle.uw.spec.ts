@@ -50,7 +50,26 @@ describe('Bundle', () => {
     await bundlePageHelper.goTo()
     await bundlePageHelper.addImage(path.join(__dirname, '../assets/kitty.jpg'), imageTitle)
 
-    expect(await bundlePageHelper.getResources()).toEqual([{ type: 'image', title: imageTitle }])
+    const resources = await bundlePageHelper.getResources()
+    expect(resources[0]).toEqual({ type: 'image', title: imageTitle, authors: undefined, source: undefined })
+
+    await deleteFolderById(folderId)
+  })
+
+  it('should add a video', async () => {
+    const videoTitle = 'An example video'
+    const videoSource = 'An example video'
+    const videoAuthors = ['First Author', 'Second Author']
+    const folderId = await createFolder('Bundle 2')
+    const bundleToStore = { name: 'Bundle 2', googleDriveId: folderId }
+    const storedBundle = await connection.store('BundleEntity', bundleToStore)
+
+    bundlePageHelper = new BundlePageHelper(storedBundle.id)
+    await bundlePageHelper.goTo()
+    await bundlePageHelper.addVideo(path.join(__dirname, '../assets/video.mp4'), videoTitle, videoSource, videoAuthors)
+
+    expect(await bundlePageHelper.getResources())
+      .toEqual([{ type: 'video', title: videoTitle, source: videoSource, authors: videoAuthors }])
 
     await deleteFolderById(folderId)
   })

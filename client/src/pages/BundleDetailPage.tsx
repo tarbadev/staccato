@@ -9,11 +9,12 @@ import TextField from '@material-ui/core/TextField'
 import Button from '@material-ui/core/Button'
 import Menu from '@material-ui/core/Menu'
 import MenuItem from '@material-ui/core/MenuItem'
-import { DropzoneArea, FileObject } from 'material-ui-dropzone'
+import { FileObject } from 'material-ui-dropzone'
 import Grid from '@material-ui/core/Grid'
-import Card from '@material-ui/core/Card'
-import CardMedia from '@material-ui/core/CardMedia'
-import CardHeader from '@material-ui/core/CardHeader'
+import { ImageUpload } from '../components/ImageUpload'
+import { VideoUpload } from '../components/VideoUpload'
+import { ImageCard } from '../components/ImageCard'
+import { VideoCard } from '../components/VideoCard'
 
 interface RouteInfo {
   id: string;
@@ -43,11 +44,21 @@ export const BundleDetailPage = ({ match }: RouteComponentProps<RouteInfo>) => {
 
   const closeAddMenu = () => setIsAddMenuDisplayed(false)
 
-  const uploadFiles = (fileObject: FileObject, title: string) => {
+  const uploadImage = (fileObject: FileObject, title: string) => {
     request({
       url: `/api/bundles/${match.params.id}/resources`,
       method: 'POST',
       body: { name: fileObject.file.name, type: fileObject.file.type, data: fileObject.data, title },
+    })
+      .then((bundle: Bundle) => setBundle(bundle))
+      .catch(err => console.error('An error happened while uploading resources', err))
+  }
+
+  const uploadVideo = (fileObject: FileObject, title: string, source: string, authors: string[]) => {
+    request({
+      url: `/api/bundles/${match.params.id}/resources`,
+      method: 'POST',
+      body: { name: fileObject.file.name, type: fileObject.file.type, data: fileObject.data, title, source, authors },
     })
       .then((bundle: Bundle) => setBundle(bundle))
       .catch(err => console.error('An error happened while uploading resources', err))
@@ -63,7 +74,8 @@ export const BundleDetailPage = ({ match }: RouteComponentProps<RouteInfo>) => {
     isAddMenuDisplayed={isAddMenuDisplayed}
     openAddMenu={() => setIsAddMenuDisplayed(true)}
     closeAddMenu={closeAddMenu}
-    uploadFiles={uploadFiles}
+    uploadImage={uploadImage}
+    uploadVideo={uploadVideo}
   />
 }
 
@@ -77,7 +89,8 @@ type BundleDetailPageProps = {
   isAddMenuDisplayed: boolean,
   openAddMenu: () => void,
   closeAddMenu: () => void,
-  uploadFiles: (file: FileObject, title: string) => void,
+  uploadImage: (file: FileObject, title: string) => void,
+  uploadVideo: (file: FileObject, title: string, source: string, authors: string[]) => void,
 }
 const BundleDetailPageDisplay = ({
                                    bundle,
@@ -89,13 +102,12 @@ const BundleDetailPageDisplay = ({
                                    isAddMenuDisplayed,
                                    closeAddMenu,
                                    openAddMenu,
-                                   uploadFiles,
+                                   uploadImage,
+                                   uploadVideo,
                                  }: BundleDetailPageProps) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const [isAddImageDisplayed, setIsAddImageDisplayed] = useState(false)
-  const [fileUpload, setFileUpload] = useState<FileObject>()
-  const [submitEnabled, setSubmitEnabled] = useState(false)
-  const [imageTitle, setImageTitle] = useState('')
+  const [isAddVideoDisplayed, setIsAddVideoDisplayed] = useState(false)
   let title
   if (editMode) {
     title = (<form onSubmit={editBundle}>
@@ -133,69 +145,37 @@ const BundleDetailPageDisplay = ({
     setIsAddImageDisplayed(true)
   }
 
-  const maxFileSize = 1024 * 1024 * 10
+  const displayAddVideo = () => {
+    closeAddMenu()
+    setIsAddVideoDisplayed(true)
+  }
 
   const closeEditMode = () => setIsAddImageDisplayed(false)
-  const onSubmit = () => {
-    if (fileUpload) {
-      uploadFiles(fileUpload, imageTitle)
-    }
+  const onSubmitImage = (title: string, fileToUpload: FileObject) => {
+    uploadImage(fileToUpload, title)
     closeEditMode()
   }
-  const dropAreaImage = isAddImageDisplayed && <div data-add-image-container>
-    <TextField
-        fullWidth={true}
-        value={imageTitle}
-        onChange={({ target }) => setImageTitle(target.value)}
-        label='Title'
-        data-add-image-title
-    />
-    <DropzoneArea
-        acceptedFiles={['image/*']}
-        maxFileSize={maxFileSize}
-        showPreviews={false}
-        showPreviewsInDropzone={true}
-        showFileNamesInPreview={true}
-        onChange={(files) => {
-          if (files[0]) {
-            const reader = new FileReader()
+  const onSubmitVideo = (title: string, fileToUpload: FileObject, source: string, authors: string[]) => {
+    uploadVideo(fileToUpload, title, source, authors)
+    closeEditMode()
+  }
+  const dropAreaImage = isAddImageDisplayed && <ImageUpload onCancel={closeEditMode} onSubmit={onSubmitImage} />
+  const dropAreaVideo = isAddVideoDisplayed && <VideoUpload onCancel={closeEditMode} onSubmit={onSubmitVideo} />
 
-            reader.addEventListener('load', function () {
-              // convert image file to base64 string
-              setFileUpload({ data: reader.result, file: files[0] })
-              setSubmitEnabled(true)
-            }, false)
+  const resources = bundle.resources.map(resource => {
+      let card
 
-            reader.readAsDataURL(files[0])
-          } else {
-            setSubmitEnabled(false)
-          }
-        }}
-        inputProps={{ role: 'input' }}
-        filesLimit={1}
-    />
-    <Grid
-        container
-        direction='row'
-        justify='flex-end'
-        alignItems='center'
-    >
-      <Button variant='outlined' onClick={closeEditMode}>Cancel</Button>
-      <Button variant='outlined' color='primary' disabled={!submitEnabled} onClick={onSubmit}
-              data-button-submit>Submit</Button>
-    </Grid>
-  </div>
+      if (resource.type === 'image') {
+        card = <ImageCard resource={resource} />
+      } else if (resource.type === 'video') {
+        card = <VideoCard resource={resource} />
+      }
 
-  const resources = bundle.resources.map(resource => <Grid item key={resource.id}>
-      <Card>
-        {resource.title && <CardHeader title={resource.title} data-image-resource-title />}
-        <CardMedia
-          component='img'
-          image={resource.url}
-          title={resource.title}
-        />
-      </Card>
-    </Grid>,
+
+      return <Grid item key={resource.id}>
+        {card}
+      </Grid>
+    },
   )
 
   return (<div id='bundle-detail'>
@@ -210,8 +190,10 @@ const BundleDetailPageDisplay = ({
       onClose={closeAddMenu}
     >
       <MenuItem onClick={displayAddImage} data-add-image-resource>Image</MenuItem>
+      <MenuItem onClick={displayAddVideo} data-add-video-resource>Video</MenuItem>
     </Menu>
     {dropAreaImage}
+    {dropAreaVideo}
     <Grid container spacing={2} alignItems='stretch' direction='row' data-resource-container>
       {resources}
     </Grid>

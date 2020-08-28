@@ -4,7 +4,7 @@ applications:
     buildpacks:
       - https://github.com/cloudfoundry/nodejs-buildpack
     instances: 1
-    memory: 64M
+    memory: 128M
     stack: cflinuxfs3
     routes:
       - route: staccato-dev.cfapps.io

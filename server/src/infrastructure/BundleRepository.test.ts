@@ -54,6 +54,8 @@ describe('BundleRepository', () => {
       '/path/to/resource',
       'http://example.com',
       ['First Author', 'Second Author'],
+      'My Super Album',
+      'song',
     )
     const updatedBundle = new Bundle(storedBundle.id, storedBundle.name, storedBundle.googleDriveId, [resource])
 

@@ -13,6 +13,8 @@ const mapResourceEntity = (resourceEntity: ResourceEntity): Resource => {
     resourceEntity.googleDriveLink,
     resourceEntity.source,
     resourceEntity.authors?.map(author => author.name),
+    resourceEntity.album,
+    resourceEntity.audioType,
   )
 }
 
@@ -34,7 +36,8 @@ const mapResource = (resource: Resource): ResourceEntity => {
     resource.googleDriveLink,
     resource.source,
     resource.authors ? resource.authors.map(author => new AuthorEntity(0, author)) : [],
-    undefined,
+    resource.album,
+    resource.audioType,
   )
 }
 

@@ -1,4 +1,5 @@
 import BasePageHelper from './BasePageHelper'
+import { AudioType } from '@shared/Resource'
 
 export default class BundlePageHelper extends BasePageHelper {
   constructor(id: number | string) {
@@ -40,7 +41,7 @@ export default class BundlePageHelper extends BasePageHelper {
     const resourceElements = await page.$$('[data-resource-container]')
 
     for (const resource of resourceElements) {
-      let type, title, source, authors
+      let type, title, source, authors, audioType, album
       if (await resource.$('img') !== null) {
         type = 'image'
         title = await this.getTextContentBySelector('[data-resource-title]')
@@ -51,9 +52,18 @@ export default class BundlePageHelper extends BasePageHelper {
         authors = fullAuthors?.split(', ')
         type = 'video'
         title = await this.getTextContentBySelector('[data-resource-title] .MuiCardHeader-title')
+      } else if (await resource.$('audio') !== null) {
+        const fullType = await this.getTextContentBySelector('[data-music-resource-type]')
+        const fullAuthors = await this.getTextContentBySelector('[data-resource-title] .MuiCardHeader-subheader')
+        const fullTitle = await this.getTextContentBySelector('[data-resource-title] .MuiCardHeader-title')
+        audioType = fullType?.replace('Type: ', '')
+        authors = fullAuthors?.split(', ')
+        type = 'audio'
+        title = fullTitle?.split(' - ')[0]
+        album = fullTitle?.split(' - ')[1]
       }
 
-      resources.push({ type, title, source, authors })
+      resources.push({ type, title, source, authors, audioType, album })
     }
 
     return resources
@@ -68,6 +78,27 @@ export default class BundlePageHelper extends BasePageHelper {
     await this.typeText('[data-add-video-authors] input', authors.join(';'))
 
     const input = await this.getBySelector('[data-dropzone-container="video"] input[type="file"]')
+    await input.uploadFile(path)
+
+    await page.waitFor(500)
+    await this.clickOnElement('[data-button-submit]')
+
+    await this.waitForTextByCss('[data-resource-title]', title)
+  }
+
+  async addMusic(path: string, title: string, album: string, authors: string[], audioType: AudioType) {
+    await this.clickOnElement('[data-add-resource]')
+    await this.clickOnElement('[data-add-audio-resource]')
+
+    await this.typeText('[data-add-music-title] input', title)
+    await this.typeText('[data-add-music-album] input', album)
+    await this.typeText('[data-add-music-authors] input', authors.join(';'))
+
+    if (audioType === 'playback') {
+      await this.clickOnElement('[data-add-music-type]')
+    }
+
+    const input = await this.getBySelector('[data-dropzone-container="music"] input[type="file"]')
     await input.uploadFile(path)
 
     await page.waitFor(500)

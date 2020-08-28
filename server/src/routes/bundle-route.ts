@@ -19,6 +19,8 @@ const mapBundleToResponse = (bundle: Bundle): BundleResponse => {
       type: resource.type,
       source: resource.source,
       authors: resource.authors,
+      album: resource.album,
+      audioType: resource.audioType,
     })),
   }
 }
@@ -50,6 +52,8 @@ bundleRouter.post('/:id/resources', async (req: Request, res: Response<BundleRes
     title: req.body.title,
     source: req.body.source,
     authors: req.body.authors,
+    album: req.body.album,
+    audioType: req.body.audioType,
   }
   const bundle = await bundleService.upload(Number(req.params.id), uploadParams)
   res.json(mapBundleToResponse(bundle))

@@ -2,6 +2,7 @@ import BundleRepository from '../infrastructure/BundleRepository'
 import Bundle from './Bundle'
 import GoogleDrive from '../infrastructure/GoogleDrive'
 import { ResourceType } from './Resource'
+import { AudioType } from '@shared/Resource'
 
 export type UploadParams = {
   name: string;
@@ -10,6 +11,8 @@ export type UploadParams = {
   filePath: string;
   source?: string;
   authors?: string[];
+  album?: string;
+  audioType?: AudioType;
 }
 
 export default class BundleService {

@@ -17,6 +17,8 @@ describe('BundleEntity', () => {
       'First Author',
       'Second Author',
     ],
+    'Some Album',
+    'playback',
   )
   const expectedBundle = new Bundle(32, 'Some super bundle', 'SuperDriveId', [expectedResource])
   const bundleEntity = new BundleEntity(
@@ -32,6 +34,8 @@ describe('BundleEntity', () => {
     expectedResource.googleDriveLink,
     expectedResource.source,
     expectedResource.authors?.map(author => new AuthorEntity(0, author)),
+    expectedResource.album,
+    expectedResource.audioType,
   )
 
   describe('toDomain', () => {

@@ -1,4 +1,6 @@
-export type ResourceType = 'image' | 'video'
+import { AudioType } from '@shared/Resource'
+
+export type ResourceType = 'image' | 'video' | 'audio'
 export default class Resource {
   id: number
   title?: string
@@ -7,6 +9,8 @@ export default class Resource {
   googleDriveLink: string
   source?: string
   authors?: string[]
+  album?: string
+  audioType?: AudioType
 
   constructor(
     id: number,
@@ -14,8 +18,10 @@ export default class Resource {
     type: ResourceType,
     googleDriveId: string,
     googleDriveLink: string,
-    source: string | undefined,
-    authors: string[] | undefined,
+    source?: string,
+    authors?: string[],
+    album?: string,
+    audioType?: AudioType,
   ) {
     this.id = id
     this.title = title
@@ -24,5 +30,7 @@ export default class Resource {
     this.googleDriveLink = googleDriveLink
     this.source = source
     this.authors = authors
+    this.album = album
+    this.audioType = audioType
   }
 }

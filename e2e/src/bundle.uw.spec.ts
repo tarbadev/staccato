@@ -58,7 +58,7 @@ describe('Bundle', () => {
 
   it('should add a video', async () => {
     const videoTitle = 'An example video'
-    const videoSource = 'An example video'
+    const videoSource = 'https://example.com'
     const videoAuthors = ['First Author', 'Second Author']
     const folderId = await createFolder('Bundle 2')
     const bundleToStore = { name: 'Bundle 2', googleDriveId: folderId }
@@ -70,6 +70,24 @@ describe('Bundle', () => {
 
     expect(await bundlePageHelper.getResources())
       .toEqual([{ type: 'video', title: videoTitle, source: videoSource, authors: videoAuthors }])
+
+    await deleteFolderById(folderId)
+  })
+
+  it('should add a song', async () => {
+    const title = 'An example music'
+    const album = 'Some Album'
+    const audioType = 'playback'
+    const authors = ['First Author', 'Second Author']
+    const folderId = await createFolder('Bundle 2')
+    const bundleToStore = { name: 'Bundle 2', googleDriveId: folderId }
+    const storedBundle = await connection.store('BundleEntity', bundleToStore)
+
+    bundlePageHelper = new BundlePageHelper(storedBundle.id)
+    await bundlePageHelper.goTo()
+    await bundlePageHelper.addMusic(path.join(__dirname, '../assets/music.mp3'), title, album, authors, audioType)
+
+    expect(await bundlePageHelper.getResources()).toEqual([{ type: 'audio', title, album, authors, audioType: 'Playback' }])
 
     await deleteFolderById(folderId)
   })

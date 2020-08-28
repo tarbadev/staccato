@@ -15,6 +15,9 @@ import { ImageUpload } from '../components/ImageUpload'
 import { VideoUpload } from '../components/VideoUpload'
 import { ImageCard } from '../components/ImageCard'
 import { VideoCard } from '../components/VideoCard'
+import { AudioType } from '@shared/Resource'
+import { AudioUpload } from '../components/AudioUpload'
+import { AudioCard } from '../components/AudioCard'
 
 interface RouteInfo {
   id: string;
@@ -64,6 +67,16 @@ export const BundleDetailPage = ({ match }: RouteComponentProps<RouteInfo>) => {
       .catch(err => console.error('An error happened while uploading resources', err))
   }
 
+  const uploadAudio = (fileObject: FileObject, title: string, album: string, authors: string[], audioType: AudioType) => {
+    request({
+      url: `/api/bundles/${match.params.id}/resources`,
+      method: 'POST',
+      body: { name: fileObject.file.name, type: fileObject.file.type, data: fileObject.data, title, album, authors, audioType },
+    })
+      .then((bundle: Bundle) => setBundle(bundle))
+      .catch(err => console.error('An error happened while uploading resources', err))
+  }
+
   return <BundleDetailPageDisplay
     bundle={bundle}
     editMode={editMode}
@@ -76,6 +89,7 @@ export const BundleDetailPage = ({ match }: RouteComponentProps<RouteInfo>) => {
     closeAddMenu={closeAddMenu}
     uploadImage={uploadImage}
     uploadVideo={uploadVideo}
+    uploadAudio={uploadAudio}
   />
 }
 
@@ -91,6 +105,7 @@ type BundleDetailPageProps = {
   closeAddMenu: () => void,
   uploadImage: (file: FileObject, title: string) => void,
   uploadVideo: (file: FileObject, title: string, source: string, authors: string[]) => void,
+  uploadAudio: (file: FileObject, title: string, album: string, authors: string[], audioType: AudioType) => void,
 }
 const BundleDetailPageDisplay = ({
                                    bundle,
@@ -104,10 +119,12 @@ const BundleDetailPageDisplay = ({
                                    openAddMenu,
                                    uploadImage,
                                    uploadVideo,
+                                   uploadAudio,
                                  }: BundleDetailPageProps) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const [isAddImageDisplayed, setIsAddImageDisplayed] = useState(false)
   const [isAddVideoDisplayed, setIsAddVideoDisplayed] = useState(false)
+  const [isAddAudioDisplayed, setIsAddAudioDisplayed] = useState(false)
   let title
   if (editMode) {
     title = (<form onSubmit={editBundle}>
@@ -150,7 +167,16 @@ const BundleDetailPageDisplay = ({
     setIsAddVideoDisplayed(true)
   }
 
-  const closeEditMode = () => setIsAddImageDisplayed(false)
+  const displayAddAudio = () => {
+    closeAddMenu()
+    setIsAddAudioDisplayed(true)
+  }
+
+  const closeEditMode = () => {
+    setIsAddImageDisplayed(false)
+    setIsAddVideoDisplayed(false)
+    setIsAddAudioDisplayed(false)
+  }
   const onSubmitImage = (title: string, fileToUpload: FileObject) => {
     uploadImage(fileToUpload, title)
     closeEditMode()
@@ -159,8 +185,13 @@ const BundleDetailPageDisplay = ({
     uploadVideo(fileToUpload, title, source, authors)
     closeEditMode()
   }
+  const onSubmitAudio = (title: string, fileToUpload: FileObject, album: string, authors: string[], audioType: AudioType) => {
+    uploadAudio(fileToUpload, title, album, authors, audioType)
+    closeEditMode()
+  }
   const dropAreaImage = isAddImageDisplayed && <ImageUpload onCancel={closeEditMode} onSubmit={onSubmitImage} />
   const dropAreaVideo = isAddVideoDisplayed && <VideoUpload onCancel={closeEditMode} onSubmit={onSubmitVideo} />
+  const dropAreaAudio = isAddAudioDisplayed && <AudioUpload onCancel={closeEditMode} onSubmit={onSubmitAudio} />
 
   const resources = bundle.resources.map(resource => {
       let card
@@ -169,8 +200,9 @@ const BundleDetailPageDisplay = ({
         card = <ImageCard resource={resource} />
       } else if (resource.type === 'video') {
         card = <VideoCard resource={resource} />
+      } else if (resource.type === 'audio') {
+        card = <AudioCard resource={resource} />
       }
-
 
       return <Grid item key={resource.id}>
         {card}
@@ -191,9 +223,11 @@ const BundleDetailPageDisplay = ({
     >
       <MenuItem onClick={displayAddImage} data-add-image-resource>Image</MenuItem>
       <MenuItem onClick={displayAddVideo} data-add-video-resource>Video</MenuItem>
+      <MenuItem onClick={displayAddAudio} data-add-audio-resource>Audio</MenuItem>
     </Menu>
     {dropAreaImage}
     {dropAreaVideo}
+    {dropAreaAudio}
     <Grid container spacing={2} alignItems='stretch' direction='row' data-resource-container>
       {resources}
     </Grid>

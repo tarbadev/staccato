@@ -2,6 +2,7 @@ import { Column, Entity, JoinTable, ManyToMany, ManyToOne, PrimaryGeneratedColum
 import { BundleEntity } from './BundleEntity'
 import { AuthorEntity } from './AuthorEntity'
 import { ResourceType } from '../../application/Resource'
+import { AudioType } from '@shared/Resource'
 
 @Entity({ name: 'resource' })
 export class ResourceEntity {
@@ -17,6 +18,10 @@ export class ResourceEntity {
   googleDriveLink: string
   @Column()
   source?: string
+  @Column()
+  album?: string
+  @Column()
+  audioType?: AudioType
   @ManyToOne(() => BundleEntity, bundle => bundle.resources)
   bundle?: BundleEntity
   @ManyToMany(() => AuthorEntity, author => author.resources, { cascade: true, eager: true })
@@ -29,8 +34,10 @@ export class ResourceEntity {
     type: ResourceType,
     googleDriveId: string,
     googleDriveLink: string,
-    source: string | undefined,
+    source?: string,
     authors?: AuthorEntity[],
+    album?: string,
+    audioType?: AudioType,
     bundle?: BundleEntity,
   ) {
     this.id = id
@@ -41,5 +48,7 @@ export class ResourceEntity {
     this.source = source
     this.bundle = bundle
     this.authors = authors
+    this.album = album
+    this.audioType = audioType
   }
 }

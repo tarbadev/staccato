@@ -56,6 +56,8 @@ describe('BundleService', () => {
             googleDriveLink: resourceLink,
             source: 'https://example.com',
             authors: ['First Author', 'Second Author'],
+            album: 'Some Hit Album',
+            audioType: 'song',
           },
         ],
       )
@@ -78,6 +80,8 @@ describe('BundleService', () => {
           title: 'Some Title',
           source: 'https://example.com',
           authors: ['First Author', 'Second Author'],
+          album: 'Some Hit Album',
+          audioType: 'song',
         },
       )
 

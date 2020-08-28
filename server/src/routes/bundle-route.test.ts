@@ -17,6 +17,8 @@ describe('BundleRouter', () => {
     '/path/to/resource/file',
     'https://example.com',
     ['First Author', 'Second Author'],
+    'Some Super Hit Album',
+    'song',
   )
   const resourceResponse: ResourceResponse = {
     id: 89,
@@ -25,6 +27,8 @@ describe('BundleRouter', () => {
     type: 'image',
     source: 'https://example.com',
     authors: ['First Author', 'Second Author'],
+    album: 'Some Super Hit Album',
+    audioType: 'song',
   }
   const bundle = new Bundle(32, 'Some super bundle', 'SuperDriveId', [resource])
   const bundleResponse: BundleResponse = { id: 32, name: 'Some super bundle', resources: [resourceResponse] }
@@ -122,7 +126,7 @@ describe('BundleRouter', () => {
   it('should call the BundleService on upload video', async () => {
     const title = 'Super Title'
     const filePath = '/path/to/temp/file'
-    const fileName = 'example.png'
+    const fileName = 'example.mp4'
     const mimeType = 'video/mp4'
     const source = 'https://example.com'
     const authors = ['First Author', 'Second Author']
@@ -140,8 +144,35 @@ describe('BundleRouter', () => {
 
     expect(res.status).toEqual(200)
     expect(res.body).toEqual(bundleResponse)
-    expect(createTempFileFromBase64Spy).toHaveBeenCalledWith(base64Data, 'example.png')
+    expect(createTempFileFromBase64Spy).toHaveBeenCalledWith(base64Data, 'example.mp4')
     expect(uploadSpy)
       .toHaveBeenCalledWith(bundle.id, { name: fileName, title, type: mimeType, filePath, source, authors })
+  })
+
+  it('should call the BundleService on upload music', async () => {
+    const title = 'Super Title'
+    const filePath = '/path/to/temp/file'
+    const fileName = 'example.mp3'
+    const mimeType = 'audio/mp3'
+    const album = 'Super Hit Album'
+    const audioType = 'song'
+    const authors = ['First Author', 'Second Author']
+    const fileContent = 'Some Music Content'
+    const uploadSpy = jest.spyOn(BundleService.prototype, 'upload')
+    uploadSpy.mockResolvedValueOnce(bundle)
+
+    const createTempFileFromBase64Spy = jest.spyOn(Utils, 'createTempFileFromBase64')
+    createTempFileFromBase64Spy.mockReturnValueOnce(filePath)
+
+    const base64Data = `data:${mimeType};base64,${btoa(fileContent)}`
+    const res = await request(app)
+      .post(`/api/bundles/${bundle.id}/resources`)
+      .send({ name: fileName, type: mimeType, title, data: base64Data, album, authors, audioType })
+
+    expect(res.status).toEqual(200)
+    expect(res.body).toEqual(bundleResponse)
+    expect(createTempFileFromBase64Spy).toHaveBeenCalledWith(base64Data, 'example.mp3')
+    expect(uploadSpy)
+      .toHaveBeenCalledWith(bundle.id, { name: fileName, title, type: mimeType, filePath, album, authors, audioType })
   })
 })

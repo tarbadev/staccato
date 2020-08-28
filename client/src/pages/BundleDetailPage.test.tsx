@@ -1,5 +1,5 @@
 import React from 'react'
-import { fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor, waitForElementToBeRemoved } from '@testing-library/react'
 import user from '@testing-library/user-event'
 import { BundleDetailPage } from './BundleDetailPage'
 import * as Utils from '../Utils'
@@ -208,5 +208,88 @@ describe('BundleDetailPage', () => {
         },
       )
     })
+
+    expect(screen.queryByRole('textbox', { name: /title/i })).not.toBeInTheDocument()
+  })
+
+  it('should send an upload request with the music', async () => {
+    const bundleId = 2
+    const title = 'My music title'
+    const mimeType = 'audio/mp3'
+    const fileName = 'example.mp3'
+    const album = 'Some top hit album'
+    const audioType = 'song'
+    const authors = ['First Author', 'Second Author']
+    const bundle = { name: 'Some Name', id: bundleId, resources: [] }
+
+    requestSpy.mockResolvedValue(bundle)
+
+    render(<BundleDetailPage match={{ params: { id: bundleId.toString() } }} />)
+
+    fireEvent.click(screen.getByRole('button', { name: 'Add Resource' }))
+
+    await waitFor(() => {
+      const button = screen.getByRole('menuitem', { name: 'Audio' })
+      expect(button).toBeInTheDocument()
+      fireEvent.click(button)
+    })
+
+    const input = screen.getByText('Drag and drop a file here or click')
+    const fileContent = 'Some Music Content'
+    const file = new File([fileContent], fileName, { type: mimeType })
+    user.upload(input, file)
+    fireEvent.drop(input)
+
+    await waitFor(() => {
+      const input = screen.getByRole('textbox', { name: /title/i }) as HTMLInputElement
+      expect(input).toBeInTheDocument()
+
+      fireEvent.change(input, { target: { value: title } })
+    })
+
+    await waitFor(() => {
+      const input = screen.getByRole('textbox', { name: /album/i }) as HTMLInputElement
+      expect(input).toBeInTheDocument()
+
+      fireEvent.change(input, { target: { value: album } })
+    })
+
+    await waitFor(() => {
+      const input = screen.getByRole('textbox', { name: /authors/i }) as HTMLInputElement
+      expect(input).toBeInTheDocument()
+
+      fireEvent.change(input, { target: { value: authors.join(';') } })
+    })
+
+    const switchElement = screen.getByRole('checkbox') as HTMLInputElement
+    expect(switchElement).toBeInTheDocument()
+
+    fireEvent.change(switchElement, { target: { value: 'playback' } })
+
+    await waitFor(() => {
+      const button = screen.getByRole('button', { name: 'Submit' })
+      expect(button).not.toBeDisabled()
+      expect(fireEvent.click(button)).toBeTruthy()
+    })
+
+    await waitFor(() => {
+      expect(request).toHaveBeenCalledWith(
+        {
+          url: `/api/bundles/${bundleId}/resources`,
+          method: 'POST',
+          body: {
+            name: fileName,
+            title,
+            album,
+            authors,
+            audioType,
+            type: mimeType,
+            data: `data:${mimeType};base64,${btoa(fileContent)}`,
+          },
+        },
+      )
+    })
+
+    expect(screen.queryByRole('textbox', { name: /title/i })).not.toBeInTheDocument()
   })
 })

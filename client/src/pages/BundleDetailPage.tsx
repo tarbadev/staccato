@@ -7,17 +7,12 @@ import IconButton from '@material-ui/core/IconButton'
 import EditIcon from '@material-ui/icons/Edit'
 import TextField from '@material-ui/core/TextField'
 import Button from '@material-ui/core/Button'
-import Menu from '@material-ui/core/Menu'
-import MenuItem from '@material-ui/core/MenuItem'
-import { FileObject } from 'material-ui-dropzone'
 import Grid from '@material-ui/core/Grid'
-import { ImageUpload } from '../components/ImageUpload'
-import { VideoUpload } from '../components/VideoUpload'
 import { ImageCard } from '../components/ImageCard'
 import { VideoCard } from '../components/VideoCard'
-import { AudioType } from '@shared/Resource'
-import { AudioUpload } from '../components/AudioUpload'
 import { AudioCard } from '../components/AudioCard'
+import { UploadRequest } from '@shared/UploadRequest'
+import { ResourceUpload } from '../components/ResourceUpload'
 
 interface RouteInfo {
   id: string;
@@ -27,7 +22,6 @@ export const BundleDetailPage = ({ match }: RouteComponentProps<RouteInfo>) => {
   const [bundle, setBundle] = useState<Bundle>({ id: 0, name: '', resources: [] })
   const [editMode, setEditMode] = useState(false)
   const [editBundleName, setEditBundleName] = useState('')
-  const [isAddMenuDisplayed, setIsAddMenuDisplayed] = useState(false)
 
   useEffect(() => {
     request({ url: `/api/bundles/${match.params.id}` })
@@ -45,33 +39,11 @@ export const BundleDetailPage = ({ match }: RouteComponentProps<RouteInfo>) => {
       })
   }
 
-  const closeAddMenu = () => setIsAddMenuDisplayed(false)
-
-  const uploadImage = (fileObject: FileObject, title: string) => {
+  const uploadResource = (uploadRequest: UploadRequest) => {
     request({
       url: `/api/bundles/${match.params.id}/resources`,
       method: 'POST',
-      body: { name: fileObject.file.name, type: fileObject.file.type, data: fileObject.data, title },
-    })
-      .then((bundle: Bundle) => setBundle(bundle))
-      .catch(err => console.error('An error happened while uploading resources', err))
-  }
-
-  const uploadVideo = (fileObject: FileObject, title: string, source: string, authors: string[]) => {
-    request({
-      url: `/api/bundles/${match.params.id}/resources`,
-      method: 'POST',
-      body: { name: fileObject.file.name, type: fileObject.file.type, data: fileObject.data, title, source, authors },
-    })
-      .then((bundle: Bundle) => setBundle(bundle))
-      .catch(err => console.error('An error happened while uploading resources', err))
-  }
-
-  const uploadAudio = (fileObject: FileObject, title: string, album: string, authors: string[], audioType: AudioType) => {
-    request({
-      url: `/api/bundles/${match.params.id}/resources`,
-      method: 'POST',
-      body: { name: fileObject.file.name, type: fileObject.file.type, data: fileObject.data, title, album, authors, audioType },
+      body: uploadRequest,
     })
       .then((bundle: Bundle) => setBundle(bundle))
       .catch(err => console.error('An error happened while uploading resources', err))
@@ -84,12 +56,7 @@ export const BundleDetailPage = ({ match }: RouteComponentProps<RouteInfo>) => {
     toggleEditMode={() => setEditMode(true)}
     editBundleName={editBundleName}
     onBundleNameChange={setEditBundleName}
-    isAddMenuDisplayed={isAddMenuDisplayed}
-    openAddMenu={() => setIsAddMenuDisplayed(true)}
-    closeAddMenu={closeAddMenu}
-    uploadImage={uploadImage}
-    uploadVideo={uploadVideo}
-    uploadAudio={uploadAudio}
+    uploadResource={uploadResource}
   />
 }
 
@@ -100,12 +67,7 @@ type BundleDetailPageProps = {
   toggleEditMode: () => void,
   editBundleName: string,
   onBundleNameChange: (newName: string) => void,
-  isAddMenuDisplayed: boolean,
-  openAddMenu: () => void,
-  closeAddMenu: () => void,
-  uploadImage: (file: FileObject, title: string) => void,
-  uploadVideo: (file: FileObject, title: string, source: string, authors: string[]) => void,
-  uploadAudio: (file: FileObject, title: string, album: string, authors: string[], audioType: AudioType) => void,
+  uploadResource: (request: UploadRequest) => void;
 }
 const BundleDetailPageDisplay = ({
                                    bundle,
@@ -114,17 +76,8 @@ const BundleDetailPageDisplay = ({
                                    editBundleName,
                                    onBundleNameChange,
                                    toggleEditMode,
-                                   isAddMenuDisplayed,
-                                   closeAddMenu,
-                                   openAddMenu,
-                                   uploadImage,
-                                   uploadVideo,
-                                   uploadAudio,
+                                   uploadResource,
                                  }: BundleDetailPageProps) => {
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
-  const [isAddImageDisplayed, setIsAddImageDisplayed] = useState(false)
-  const [isAddVideoDisplayed, setIsAddVideoDisplayed] = useState(false)
-  const [isAddAudioDisplayed, setIsAddAudioDisplayed] = useState(false)
   let title
   if (editMode) {
     title = (<form onSubmit={editBundle}>
@@ -152,46 +105,6 @@ const BundleDetailPageDisplay = ({
       </Grid>)
   }
 
-  const onAddClick = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(event.currentTarget)
-    openAddMenu()
-  }
-
-  const displayAddImage = () => {
-    closeAddMenu()
-    setIsAddImageDisplayed(true)
-  }
-
-  const displayAddVideo = () => {
-    closeAddMenu()
-    setIsAddVideoDisplayed(true)
-  }
-
-  const displayAddAudio = () => {
-    closeAddMenu()
-    setIsAddAudioDisplayed(true)
-  }
-
-  const closeEditMode = () => {
-    setIsAddImageDisplayed(false)
-    setIsAddVideoDisplayed(false)
-    setIsAddAudioDisplayed(false)
-  }
-  const onSubmitImage = (title: string, fileToUpload: FileObject) => {
-    uploadImage(fileToUpload, title)
-    closeEditMode()
-  }
-  const onSubmitVideo = (title: string, fileToUpload: FileObject, source: string, authors: string[]) => {
-    uploadVideo(fileToUpload, title, source, authors)
-    closeEditMode()
-  }
-  const onSubmitAudio = (title: string, fileToUpload: FileObject, album: string, authors: string[], audioType: AudioType) => {
-    uploadAudio(fileToUpload, title, album, authors, audioType)
-    closeEditMode()
-  }
-  const dropAreaImage = isAddImageDisplayed && <ImageUpload onCancel={closeEditMode} onSubmit={onSubmitImage} />
-  const dropAreaVideo = isAddVideoDisplayed && <VideoUpload onCancel={closeEditMode} onSubmit={onSubmitVideo} />
-  const dropAreaAudio = isAddAudioDisplayed && <AudioUpload onCancel={closeEditMode} onSubmit={onSubmitAudio} />
 
   const resources = bundle.resources.map(resource => {
       let card
@@ -212,22 +125,7 @@ const BundleDetailPageDisplay = ({
 
   return (<div id='bundle-detail'>
     {title}
-    <Button aria-controls="add" aria-haspopup="true" color='primary' onClick={onAddClick} data-add-resource>
-      Add Resource
-    </Button>
-    <Menu
-      anchorEl={anchorEl}
-      keepMounted
-      open={isAddMenuDisplayed}
-      onClose={closeAddMenu}
-    >
-      <MenuItem onClick={displayAddImage} data-add-image-resource>Image</MenuItem>
-      <MenuItem onClick={displayAddVideo} data-add-video-resource>Video</MenuItem>
-      <MenuItem onClick={displayAddAudio} data-add-audio-resource>Audio</MenuItem>
-    </Menu>
-    {dropAreaImage}
-    {dropAreaVideo}
-    {dropAreaAudio}
+    <ResourceUpload uploadResource={uploadResource} />
     <Grid container spacing={2} alignItems='stretch' direction='row' data-resource-container>
       {resources}
     </Grid>

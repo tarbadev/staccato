@@ -6,7 +6,7 @@ import * as Utils from '../utils'
 import Bundle from '../application/Bundle'
 import Resource from '../application/Resource'
 import BundleResponse from '@shared/Bundle'
-import ResourceResponse from '@shared/Resource'
+import ResourceResponse, { AudioType } from '@shared/Resource'
 
 describe('BundleRouter', () => {
   const resource = new Resource(
@@ -102,77 +102,52 @@ describe('BundleRouter', () => {
     expect(res.body).toEqual(bundleResponse)
   })
 
-  it('should call the BundleService on upload image', async () => {
-    const filePath = '/path/to/temp/file'
-    const someImageContent = 'Some Image Content'
-    const uploadSpy = jest.spyOn(BundleService.prototype, 'upload')
-    uploadSpy.mockResolvedValueOnce(bundle)
+  describe('upload resource', () => {
+    type UploadTestOptions = { title?: string; source?: string; authors?: string[]; album?: string; audioType?: AudioType }
+    const testUpload = async (fileName: string, mimeType: string, options: UploadTestOptions): Promise<void> => {
+      const filePath = '/path/to/temp/file'
+      const someFileContent = 'Some File Content'
+      const uploadSpy = jest.spyOn(BundleService.prototype, 'upload')
+      uploadSpy.mockResolvedValueOnce(bundle)
 
-    const createTempFileFromBase64Spy = jest.spyOn(Utils, 'createTempFileFromBase64')
-    createTempFileFromBase64Spy.mockReturnValueOnce(filePath)
+      const createTempFileFromBase64Spy = jest.spyOn(Utils, 'createTempFileFromBase64')
+      createTempFileFromBase64Spy.mockReturnValueOnce(filePath)
 
-    const base64Data = `data:image/png;base64,${btoa(someImageContent)}`
-    const res = await request(app)
-      .post(`/api/bundles/${bundle.id}/resources`)
-      .send({ name: 'example.png', type: 'image/png', title: 'Super Title', data: base64Data })
+      const base64Data = `data:${mimeType};base64,${btoa(someFileContent)}`
+      const res = await request(app)
+        .post(`/api/bundles/${bundle.id}/resources`)
+        .send({ name: fileName, type: mimeType, data: base64Data, ...options })
 
-    expect(res.status).toEqual(200)
-    expect(res.body).toEqual(bundleResponse)
-    expect(createTempFileFromBase64Spy).toHaveBeenCalledWith(base64Data, 'example.png')
-    expect(uploadSpy)
-      .toHaveBeenCalledWith(bundle.id, { name: 'example.png', title: 'Super Title', type: 'image/png', filePath })
-  })
+      expect(res.status).toEqual(200)
+      expect(res.body).toEqual(bundleResponse)
+      expect(createTempFileFromBase64Spy).toHaveBeenCalledWith(base64Data, fileName)
+      expect(uploadSpy)
+        .toHaveBeenCalledWith(bundle.id, { name: fileName, type: mimeType, filePath, ...options })
+    }
 
-  it('should call the BundleService on upload video', async () => {
-    const title = 'Super Title'
-    const filePath = '/path/to/temp/file'
-    const fileName = 'example.mp4'
-    const mimeType = 'video/mp4'
-    const source = 'https://example.com'
-    const authors = ['First Author', 'Second Author']
-    const someVideoContent = 'Some Video Content'
-    const uploadSpy = jest.spyOn(BundleService.prototype, 'upload')
-    uploadSpy.mockResolvedValueOnce(bundle)
+    it('should call the BundleService on upload image', async () => {
+      await testUpload('example.png', 'image/png', { title: 'Super Title' })
+    })
 
-    const createTempFileFromBase64Spy = jest.spyOn(Utils, 'createTempFileFromBase64')
-    createTempFileFromBase64Spy.mockReturnValueOnce(filePath)
+    it('should call the BundleService on upload video', async () => {
+      await testUpload(
+        'example.mp4',
+        'video/mp4',
+        { title: 'Super Title', source: 'https://example.com', authors: ['First Author', 'Second Author'] },
+      )
+    })
 
-    const base64Data = `data:${mimeType};base64,${btoa(someVideoContent)}`
-    const res = await request(app)
-      .post(`/api/bundles/${bundle.id}/resources`)
-      .send({ name: fileName, type: mimeType, title, data: base64Data, source, authors })
-
-    expect(res.status).toEqual(200)
-    expect(res.body).toEqual(bundleResponse)
-    expect(createTempFileFromBase64Spy).toHaveBeenCalledWith(base64Data, 'example.mp4')
-    expect(uploadSpy)
-      .toHaveBeenCalledWith(bundle.id, { name: fileName, title, type: mimeType, filePath, source, authors })
-  })
-
-  it('should call the BundleService on upload music', async () => {
-    const title = 'Super Title'
-    const filePath = '/path/to/temp/file'
-    const fileName = 'example.mp3'
-    const mimeType = 'audio/mp3'
-    const album = 'Super Hit Album'
-    const audioType = 'song'
-    const authors = ['First Author', 'Second Author']
-    const fileContent = 'Some Music Content'
-    const uploadSpy = jest.spyOn(BundleService.prototype, 'upload')
-    uploadSpy.mockResolvedValueOnce(bundle)
-
-    const createTempFileFromBase64Spy = jest.spyOn(Utils, 'createTempFileFromBase64')
-    createTempFileFromBase64Spy.mockReturnValueOnce(filePath)
-
-    const base64Data = `data:${mimeType};base64,${btoa(fileContent)}`
-    const res = await request(app)
-      .post(`/api/bundles/${bundle.id}/resources`)
-      .send({ name: fileName, type: mimeType, title, data: base64Data, album, authors, audioType })
-
-    expect(res.status).toEqual(200)
-    expect(res.body).toEqual(bundleResponse)
-    expect(createTempFileFromBase64Spy).toHaveBeenCalledWith(base64Data, 'example.mp3')
-    expect(uploadSpy)
-      .toHaveBeenCalledWith(bundle.id, { name: fileName, title, type: mimeType, filePath, album, authors, audioType })
+    it('should call the BundleService on upload music', async () => {
+      await testUpload(
+        'example.mp3',
+        'audio/mp3',
+        {
+          title: 'Super Title',
+          album: 'Super Hit Album',
+          authors: ['First Author', 'Second Author'],
+          audioType: 'song',
+        },
+      )
+    })
   })
 })

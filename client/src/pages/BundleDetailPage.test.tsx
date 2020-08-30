@@ -83,6 +83,9 @@ describe('BundleDetailPage', () => {
 
       const videoMenu = screen.getByRole('menuitem', { name: 'Video' })
       expect(videoMenu).toBeInTheDocument()
+
+      const audioMenu = screen.getByRole('menuitem', { name: 'Audio' })
+      expect(audioMenu).toBeInTheDocument()
     })
   })
 

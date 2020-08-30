@@ -13,6 +13,7 @@ import { VideoCard } from '../components/VideoCard'
 import { AudioCard } from '../components/AudioCard'
 import { UploadRequest } from '@shared/UploadRequest'
 import { ResourceUpload } from '../components/ResourceUpload'
+import { SongPartitionCard } from '../components/SongPartitionCard'
 
 interface RouteInfo {
   id: string;
@@ -115,6 +116,8 @@ const BundleDetailPageDisplay = ({
         card = <VideoCard resource={resource} />
       } else if (resource.type === 'audio') {
         card = <AudioCard resource={resource} />
+      } else if (resource.type === 'song-partition') {
+        card = <SongPartitionCard resource={resource} />
       }
 
       return <Grid item key={resource.id}>

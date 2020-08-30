@@ -211,5 +211,20 @@ describe('BundleDetailPage', () => {
         ], album: 'Some top hit album', audioType: 'song',
       })
     })
+
+    it('should send an upload request with the song partition', async () => {
+      await testUpload(
+        'My song partition title',
+        'Song Partition',
+        'example.pdf',
+        'application/pdf',
+        {
+          authors: [
+            'First Author',
+            'Second Author',
+          ],
+        },
+      )
+    })
   })
 })

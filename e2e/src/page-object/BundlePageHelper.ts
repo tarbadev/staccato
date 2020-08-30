@@ -61,6 +61,12 @@ export default class BundlePageHelper extends BasePageHelper {
         type = 'audio'
         title = fullTitle?.split(' - ')[0]
         album = fullTitle?.split(' - ')[1]
+      } else if (await resource.$('.react-pdf__Document') !== null) {
+        const fullAuthors = await this.getTextContentBySelector('[data-resource-title] .MuiCardHeader-subheader')
+        const fullTitle = await this.getTextContentBySelector('[data-resource-title] .MuiCardHeader-title')
+        authors = fullAuthors?.split(', ')
+        type = 'song-partition'
+        title = fullTitle?.split(' - ')[0]
       }
 
       resources.push({ type, title, source, authors, audioType, album })
@@ -99,6 +105,22 @@ export default class BundlePageHelper extends BasePageHelper {
     }
 
     const input = await this.getBySelector('[data-dropzone-container="music"] input[type="file"]')
+    await input.uploadFile(path)
+
+    await page.waitFor(500)
+    await this.clickOnElement('[data-button-submit]')
+
+    await this.waitForTextByCss('[data-resource-title]', title)
+  }
+
+  async addSongPartition(path: string, title: string, authors: string[]) {
+    await this.clickOnElement('[data-add-resource]')
+    await this.clickOnElement('[data-add-song-partition-resource]')
+
+    await this.typeText('[data-add-song-partition-title] input', title)
+    await this.typeText('[data-add-song-partition-authors] input', authors.join(';'))
+
+    const input = await this.getBySelector('[data-dropzone-container="song-partition"] input[type="file"]')
     await input.uploadFile(path)
 
     await page.waitFor(500)

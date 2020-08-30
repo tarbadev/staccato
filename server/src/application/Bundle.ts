@@ -1,5 +1,5 @@
-import Resource, { ResourceType } from './Resource'
-import { AudioType } from '@shared/Resource'
+import Resource from './Resource'
+import { AudioType, ResourceType } from '@shared/Resource'
 
 export default class Bundle {
   id: number

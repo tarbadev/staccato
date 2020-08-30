@@ -8,6 +8,7 @@ import Button from '@material-ui/core/Button'
 import { FileObject } from 'material-ui-dropzone'
 import { AudioType } from '@shared/Resource'
 import { UploadRequest } from '@shared/UploadRequest'
+import { SongPartitionUpload } from './SongPartitionUpload'
 
 type ResourceUploadProps = {
   uploadResource: (request: UploadRequest) => void;
@@ -65,9 +66,21 @@ export const ResourceUpload = ({ uploadResource }: ResourceUploadProps) => {
     closeEditMode()
   }
 
+  const onSubmitSongPartition = (title: string, fileToUpload: FileObject, authors: string[]) => {
+    uploadResource({
+      name: fileToUpload.file.name,
+      type: fileToUpload.file.type,
+      data: fileToUpload.data as string,
+      title,
+      authors,
+    })
+    closeEditMode()
+  }
+
   return <ResourceUploadDisplay displayAddImage={() => displayDropArea('image')}
                                 displayAddVideo={() => displayDropArea('video')}
                                 displayAddAudio={() => displayDropArea('audio')}
+                                displayAddSongPartition={() => displayDropArea('song-partition')}
                                 uploadAreaDisplayed={uploadAreaDisplayed}
                                 isAddMenuDisplayed={isAddMenuDisplayed}
                                 closeAddMenu={closeAddMenu}
@@ -76,6 +89,7 @@ export const ResourceUpload = ({ uploadResource }: ResourceUploadProps) => {
                                 onSubmitImage={onSubmitImage}
                                 onSubmitVideo={onSubmitVideo}
                                 onSubmitAudio={onSubmitAudio}
+                                onSubmitSongPartition={onSubmitSongPartition}
   />
 }
 
@@ -84,6 +98,7 @@ type ResourceUploadDisplayProps = {
   displayAddImage: () => void;
   displayAddVideo: () => void;
   displayAddAudio: () => void;
+  displayAddSongPartition: () => void;
   uploadAreaDisplayed: string;
   isAddMenuDisplayed: boolean;
   closeAddMenu: () => void;
@@ -98,11 +113,13 @@ type ResourceUploadDisplayProps = {
     authors: string[],
     audioType: AudioType,
   ) => void;
+  onSubmitSongPartition: (title: string, file: FileObject, authors: string[]) => void;
 }
 const ResourceUploadDisplay = ({
                                  displayAddImage,
                                  displayAddVideo,
                                  displayAddAudio,
+                                 displayAddSongPartition,
                                  uploadAreaDisplayed,
                                  isAddMenuDisplayed,
                                  closeAddMenu,
@@ -111,6 +128,7 @@ const ResourceUploadDisplay = ({
                                  onSubmitImage,
                                  onSubmitVideo,
                                  onSubmitAudio,
+                                 onSubmitSongPartition,
                                }: ResourceUploadDisplayProps) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
 
@@ -125,6 +143,8 @@ const ResourceUploadDisplay = ({
       <VideoUpload onCancel={closeEditMode} onSubmit={onSubmitVideo} />
   const dropAreaAudio = uploadAreaDisplayed === 'audio' &&
       <AudioUpload onCancel={closeEditMode} onSubmit={onSubmitAudio} />
+  const dropAreaSongPartition = uploadAreaDisplayed === 'song-partition' &&
+      <SongPartitionUpload onCancel={closeEditMode} onSubmit={onSubmitSongPartition} />
 
   return <div>
     <Button aria-controls='add' aria-haspopup='true' color='primary' onClick={onAddClick} data-add-resource>
@@ -139,9 +159,11 @@ const ResourceUploadDisplay = ({
       <MenuItem onClick={displayAddImage} data-add-image-resource>Image</MenuItem>
       <MenuItem onClick={displayAddVideo} data-add-video-resource>Video</MenuItem>
       <MenuItem onClick={displayAddAudio} data-add-audio-resource>Audio</MenuItem>
+      <MenuItem onClick={displayAddSongPartition} data-add-song-partition-resource>Song Partition</MenuItem>
     </Menu>
     {dropAreaImage}
     {dropAreaVideo}
     {dropAreaAudio}
+    {dropAreaSongPartition}
   </div>
 }

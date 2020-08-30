@@ -91,4 +91,20 @@ describe('Bundle', () => {
 
     await deleteFolderById(folderId)
   })
+
+  it('should add a song partition', async () => {
+    const title = 'An example music'
+    const authors = ['First Author', 'Second Author']
+    const folderId = await createFolder('Bundle 2')
+    const bundleToStore = { name: 'Bundle 2', googleDriveId: folderId }
+    const storedBundle = await connection.store('BundleEntity', bundleToStore)
+
+    bundlePageHelper = new BundlePageHelper(storedBundle.id)
+    await bundlePageHelper.goTo()
+    await bundlePageHelper.addSongPartition(path.join(__dirname, '../assets/song-partition.pdf'), title, authors)
+
+    expect(await bundlePageHelper.getResources()).toEqual([{ type: 'song-partition', title, authors }])
+
+    await deleteFolderById(folderId)
+  })
 })

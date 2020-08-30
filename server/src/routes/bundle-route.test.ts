@@ -149,5 +149,13 @@ describe('BundleRouter', () => {
         },
       )
     })
+
+    it('should call the BundleService on upload song partition', async () => {
+      await testUpload(
+        'example.pdf',
+        'application/pdf',
+        { title: 'Super Title', authors: ['First Author', 'Second Author'] },
+      )
+    })
   })
 })

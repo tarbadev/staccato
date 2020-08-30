@@ -1,8 +1,7 @@
 import { Column, Entity, JoinTable, ManyToMany, ManyToOne, PrimaryGeneratedColumn } from 'typeorm'
 import { BundleEntity } from './BundleEntity'
 import { AuthorEntity } from './AuthorEntity'
-import { ResourceType } from '../../application/Resource'
-import { AudioType } from '@shared/Resource'
+import { AudioType, ResourceType } from '@shared/Resource'
 
 @Entity({ name: 'resource' })
 export class ResourceEntity {

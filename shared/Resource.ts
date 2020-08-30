@@ -1,4 +1,4 @@
-export type ResourceType = 'image' | 'video' | 'audio'
+export type ResourceType = 'image' | 'video' | 'audio' | 'song-partition'
 export type AudioType = 'song' | 'playback'
 export default interface Resource {
   id: number;

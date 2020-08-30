@@ -1,8 +1,7 @@
 import BundleRepository from '../infrastructure/BundleRepository'
 import Bundle from './Bundle'
 import GoogleDrive from '../infrastructure/GoogleDrive'
-import { ResourceType } from './Resource'
-import { AudioType } from '@shared/Resource'
+import { AudioType, ResourceType } from '@shared/Resource'
 
 export type UploadParams = {
   name: string;
@@ -42,11 +41,17 @@ export default class BundleService {
     const bundle = await BundleRepository.findOne(id)
     const driveResource = await GoogleDrive.getInstance()
       .uploadFile(bundle.googleDriveId, uploadParams.name, uploadParams.type, uploadParams.filePath)
+    const tempType = uploadParams.type.split('/')[0]
+    let type = tempType as ResourceType
+    if (tempType === 'application') {
+      type = 'song-partition'
+    }
+
     const newBundle = bundle.addResource({
       driveId: driveResource.id,
       driveLink: driveResource.link,
       ...uploadParams,
-      type: uploadParams.type.split('/')[0] as ResourceType,
+      type,
     })
     return BundleRepository.save(newBundle)
   }

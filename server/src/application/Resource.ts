@@ -1,6 +1,5 @@
-import { AudioType } from '@shared/Resource'
+import { AudioType, ResourceType } from '@shared/Resource'
 
-export type ResourceType = 'image' | 'video' | 'audio'
 export default class Resource {
   id: number
   title?: string

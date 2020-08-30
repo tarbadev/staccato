@@ -2,6 +2,7 @@ import BundleService from './BundleService'
 import BundleRepository from '../infrastructure/BundleRepository'
 import GoogleDrive from '../infrastructure/GoogleDrive'
 import Bundle from './Bundle'
+import Resource from './Resource'
 
 describe('BundleService', () => {
   const bundle = new Bundle(32, 'Some super bundle', 'SuperDriveId')
@@ -86,6 +87,53 @@ describe('BundleService', () => {
       )
 
       expect(mockUploadFile).toHaveBeenCalledWith(bundle.googleDriveId, 'example.png', 'image/png', filePath)
+      expect(BundleRepository.save).toHaveBeenCalledWith(bundleWithResource)
+      expect(returnedBundle).toEqual(bundleWithResource)
+    })
+
+    it('should determine the type song partition', async () => {
+      const filePath = '/path/to/temp/file'
+      const mockUploadFile = jest.fn()
+      const resourceId = 'SomeSuperId'
+      const resourceLink = '/path/to/resource'
+      const bundleWithResource = new Bundle(
+        bundle.id,
+        bundle.name,
+        bundle.googleDriveId,
+        [
+          new Resource(
+            0,
+            'Some Title',
+            'song-partition',
+            resourceId,
+            resourceLink,
+            undefined,
+            ['First Author', 'Second Author'],
+          ),
+        ],
+      )
+
+      // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+      // @ts-ignore
+      jest.spyOn(GoogleDrive, 'getInstance').mockReturnValueOnce({
+        uploadFile: mockUploadFile,
+      })
+      mockUploadFile.mockImplementationOnce(() => Promise.resolve({ id: resourceId, link: resourceLink }))
+      BundleRepository.findOne = jest.fn(() => Promise.resolve(bundle))
+      BundleRepository.save = jest.fn(() => Promise.resolve(bundleWithResource))
+
+      const returnedBundle = await bundleService.upload(
+        bundle.id,
+        {
+          name: 'example.pdf',
+          type: 'application/pdf',
+          filePath,
+          title: 'Some Title',
+          authors: ['First Author', 'Second Author'],
+        },
+      )
+
+      expect(mockUploadFile).toHaveBeenCalledWith(bundle.googleDriveId, 'example.pdf', 'application/pdf', filePath)
       expect(BundleRepository.save).toHaveBeenCalledWith(bundleWithResource)
       expect(returnedBundle).toEqual(bundleWithResource)
     })

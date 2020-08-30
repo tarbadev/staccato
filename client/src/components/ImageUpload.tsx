@@ -20,6 +20,7 @@ export const ImageUpload = ({ onCancel, onSubmit }: ImageUploadProps) => {
     value={title}
     onChange={({ target }) => setTitle(target.value)}
     label='Title'
+    id='title'
     data-add-image-title
   />
 

@@ -1,10 +1,11 @@
 import React from 'react'
-import { fireEvent, render, screen, waitFor, waitForElementToBeRemoved } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import user from '@testing-library/user-event'
 import { BundleDetailPage } from './BundleDetailPage'
 import * as Utils from '../Utils'
 import { request } from '../Utils'
 import Bundle from '@shared/Bundle'
+import { AudioType } from '@shared/Resource'
 
 const requestSpy = jest.spyOn(Utils, 'request')
 
@@ -89,210 +90,126 @@ describe('BundleDetailPage', () => {
     })
   })
 
-  it('should send an upload request with the image', async () => {
-    const bundleId = 2
-    const title = 'My image title'
-    const bundle = { name: 'Some Name', id: bundleId, resources: [] }
+  describe('upload resource', () => {
+    const testUpload = async (
+      title: string,
+      resourceType: string,
+      fileName: string,
+      mimeType: string,
+      otherFields?: { source?: string, album?: string, authors?: string[], audioType?: AudioType },
+    ) => {
+      const bundleId = 2
+      const bundle = { name: 'Some Name', id: bundleId, resources: [] }
 
-    requestSpy.mockResolvedValue(bundle)
+      requestSpy.mockResolvedValue(bundle)
 
-    render(<BundleDetailPage match={{ params: { id: bundleId.toString() } }} />)
+      render(<BundleDetailPage match={{ params: { id: bundleId.toString() } }} />)
 
-    fireEvent.click(screen.getByRole('button', { name: 'Add Resource' }))
+      fireEvent.click(screen.getByRole('button', { name: 'Add Resource' }))
 
-    await waitFor(() => {
-      const text = screen.getByRole('menuitem', { name: 'Image' })
-      expect(text).toBeInTheDocument()
-      fireEvent.click(text)
-    })
+      await waitFor(() => {
+        const text = screen.getByRole('menuitem', { name: resourceType })
+        expect(text).toBeInTheDocument()
+        fireEvent.click(text)
+      })
 
-    const input = screen.getByText('Drag and drop a file here or click')
-    const someImageContent = 'Some Image Content'
-    const file = new File([someImageContent], 'example.png', { type: 'image/png' })
-    user.upload(input, file)
-    fireEvent.drop(input)
+      const input = screen.getByText('Drag and drop a file here or click')
+      const someFileContent = 'Some File Content'
+      const file = new File([someFileContent], fileName, { type: mimeType })
+      user.upload(input, file)
+      fireEvent.drop(input)
 
-    await waitFor(() => {
-      const input = screen.getByRole('textbox') as HTMLInputElement
-      expect(input).toBeInTheDocument()
+      await waitFor(() => {
+        const input = screen.getByRole('textbox', { name: /title/i }) as HTMLInputElement
+        expect(input).toBeInTheDocument()
 
-      fireEvent.change(input, { target: { value: title } })
-    })
+        fireEvent.change(input, { target: { value: title } })
+      })
 
-    await waitFor(() => {
-      const button = screen.getByRole('button', { name: 'Submit' })
-      expect(button).not.toBeDisabled()
-      expect(fireEvent.click(button)).toBeTruthy()
-    })
+      if (otherFields) {
+        if (otherFields.source) {
+          await waitFor(() => {
+            const input = screen.getByRole('textbox', { name: /source/i }) as HTMLInputElement
+            expect(input).toBeInTheDocument()
 
-    await waitFor(() => {
-      expect(request).toHaveBeenCalledWith(
-        {
-          url: `/api/bundles/${bundleId}/resources`,
-          method: 'POST',
-          body: {
-            name: 'example.png',
-            title,
-            type: 'image/png',
-            data: `data:image/png;base64,${btoa(someImageContent)}`,
+            fireEvent.change(input, { target: { value: otherFields.source } })
+          })
+        }
+
+        if (otherFields.authors) {
+          await waitFor(() => {
+            const input = screen.getByRole('textbox', { name: /authors/i }) as HTMLInputElement
+            expect(input).toBeInTheDocument()
+
+            fireEvent.change(input, { target: { value: otherFields.authors.join(';') } })
+          })
+        }
+
+        if (otherFields.album) {
+          await waitFor(() => {
+            const input = screen.getByRole('textbox', { name: /album/i }) as HTMLInputElement
+            expect(input).toBeInTheDocument()
+
+            fireEvent.change(input, { target: { value: otherFields.album } })
+          })
+        }
+
+        if (otherFields.audioType) {
+          const switchElement = screen.getByRole('checkbox') as HTMLInputElement
+          expect(switchElement).toBeInTheDocument()
+
+          fireEvent.change(
+            switchElement,
+            { target: { value: otherFields.audioType === 'playback' ? 'song' : 'playback' } },
+          )
+        }
+      }
+
+      await waitFor(() => {
+        const button = screen.getByRole('button', { name: 'Submit' })
+        expect(button).not.toBeDisabled()
+        expect(fireEvent.click(button)).toBeTruthy()
+      })
+
+      await waitFor(() => {
+        expect(request).toHaveBeenCalledWith(
+          {
+            url: `/api/bundles/${bundleId}/resources`,
+            method: 'POST',
+            body: {
+              name: fileName,
+              title,
+              type: mimeType,
+              data: `data:${mimeType};base64,${btoa(someFileContent)}`,
+              ...otherFields,
+            },
           },
-        },
-      )
-    })
-  })
+        )
+      })
 
-  it('should send an upload request with the video', async () => {
-    const bundleId = 2
-    const title = 'My video title'
-    const mimeType = 'video/mp4'
-    const fileName = 'example.mp4'
-    const source = 'http://example.com'
-    const authors = ['First Author', 'Second Author']
-    const bundle = { name: 'Some Name', id: bundleId, resources: [] }
+      expect(screen.queryByRole('textbox', { name: /title/i })).not.toBeInTheDocument()
+    }
 
-    requestSpy.mockResolvedValue(bundle)
-
-    render(<BundleDetailPage match={{ params: { id: bundleId.toString() } }} />)
-
-    fireEvent.click(screen.getByRole('button', { name: 'Add Resource' }))
-
-    await waitFor(() => {
-      const button = screen.getByRole('menuitem', { name: 'Video' })
-      expect(button).toBeInTheDocument()
-      fireEvent.click(button)
+    it('should send an upload request with the image', async () => {
+      await testUpload('My image title', 'Image', 'example.png', 'image/png')
     })
 
-    const input = screen.getByText('Drag and drop a file here or click')
-    const someVideoContent = 'Some Video Content'
-    const file = new File([someVideoContent], fileName, { type: mimeType })
-    user.upload(input, file)
-    fireEvent.drop(input)
-
-    await waitFor(() => {
-      const input = screen.getByRole('textbox', { name: /title/i }) as HTMLInputElement
-      expect(input).toBeInTheDocument()
-
-      fireEvent.change(input, { target: { value: title } })
+    it('should send an upload request with the video', async () => {
+      await testUpload('My video title', 'Video', 'example.mp4', 'video/mp4', {
+        authors: [
+          'First Author',
+          'Second Author',
+        ], source: 'http://example.com',
+      })
     })
 
-    await waitFor(() => {
-      const input = screen.getByRole('textbox', { name: /source/i }) as HTMLInputElement
-      expect(input).toBeInTheDocument()
-
-      fireEvent.change(input, { target: { value: source } })
+    it('should send an upload request with the music', async () => {
+      await testUpload('My music title', 'Audio', 'example.mp3', 'audio/mp3', {
+        authors: [
+          'First Author',
+          'Second Author',
+        ], album: 'Some top hit album', audioType: 'song',
+      })
     })
-
-    await waitFor(() => {
-      const input = screen.getByRole('textbox', { name: /authors/i }) as HTMLInputElement
-      expect(input).toBeInTheDocument()
-
-      fireEvent.change(input, { target: { value: authors.join(';') } })
-    })
-
-    await waitFor(() => {
-      const button = screen.getByRole('button', { name: 'Submit' })
-      expect(button).not.toBeDisabled()
-      expect(fireEvent.click(button)).toBeTruthy()
-    })
-
-    await waitFor(() => {
-      expect(request).toHaveBeenCalledWith(
-        {
-          url: `/api/bundles/${bundleId}/resources`,
-          method: 'POST',
-          body: {
-            name: fileName,
-            title,
-            source,
-            authors,
-            type: mimeType,
-            data: `data:${mimeType};base64,${btoa(someVideoContent)}`,
-          },
-        },
-      )
-    })
-
-    expect(screen.queryByRole('textbox', { name: /title/i })).not.toBeInTheDocument()
-  })
-
-  it('should send an upload request with the music', async () => {
-    const bundleId = 2
-    const title = 'My music title'
-    const mimeType = 'audio/mp3'
-    const fileName = 'example.mp3'
-    const album = 'Some top hit album'
-    const audioType = 'song'
-    const authors = ['First Author', 'Second Author']
-    const bundle = { name: 'Some Name', id: bundleId, resources: [] }
-
-    requestSpy.mockResolvedValue(bundle)
-
-    render(<BundleDetailPage match={{ params: { id: bundleId.toString() } }} />)
-
-    fireEvent.click(screen.getByRole('button', { name: 'Add Resource' }))
-
-    await waitFor(() => {
-      const button = screen.getByRole('menuitem', { name: 'Audio' })
-      expect(button).toBeInTheDocument()
-      fireEvent.click(button)
-    })
-
-    const input = screen.getByText('Drag and drop a file here or click')
-    const fileContent = 'Some Music Content'
-    const file = new File([fileContent], fileName, { type: mimeType })
-    user.upload(input, file)
-    fireEvent.drop(input)
-
-    await waitFor(() => {
-      const input = screen.getByRole('textbox', { name: /title/i }) as HTMLInputElement
-      expect(input).toBeInTheDocument()
-
-      fireEvent.change(input, { target: { value: title } })
-    })
-
-    await waitFor(() => {
-      const input = screen.getByRole('textbox', { name: /album/i }) as HTMLInputElement
-      expect(input).toBeInTheDocument()
-
-      fireEvent.change(input, { target: { value: album } })
-    })
-
-    await waitFor(() => {
-      const input = screen.getByRole('textbox', { name: /authors/i }) as HTMLInputElement
-      expect(input).toBeInTheDocument()
-
-      fireEvent.change(input, { target: { value: authors.join(';') } })
-    })
-
-    const switchElement = screen.getByRole('checkbox') as HTMLInputElement
-    expect(switchElement).toBeInTheDocument()
-
-    fireEvent.change(switchElement, { target: { value: 'playback' } })
-
-    await waitFor(() => {
-      const button = screen.getByRole('button', { name: 'Submit' })
-      expect(button).not.toBeDisabled()
-      expect(fireEvent.click(button)).toBeTruthy()
-    })
-
-    await waitFor(() => {
-      expect(request).toHaveBeenCalledWith(
-        {
-          url: `/api/bundles/${bundleId}/resources`,
-          method: 'POST',
-          body: {
-            name: fileName,
-            title,
-            album,
-            authors,
-            audioType,
-            type: mimeType,
-            data: `data:${mimeType};base64,${btoa(fileContent)}`,
-          },
-        },
-      )
-    })
-
-    expect(screen.queryByRole('textbox', { name: /title/i })).not.toBeInTheDocument()
   })
 })

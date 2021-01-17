@@ -53,7 +53,26 @@ const addVideo = (path: string, title: string, source: string, authors: string[]
   cy.get('[data-resource-title]').contains(title, { timeout: 2000 })
 }
 
-const verifyExpectedResource = ({ album = '', authors = [], source = '', title, type }: {
+const addMusic = (path: string, title: string, album: string, authors: string[], audioType: AudioType): void => {
+  cy.get('[data-add-resource]').click()
+  cy.get('[data-add-audio-resource]').click()
+
+  typeText('[data-add-music-title] input', title)
+  typeText('[data-add-music-album] input', album)
+  typeText('[data-add-music-authors] input', authors.join(';'))
+
+  if (audioType === 'playback') {
+    cy.get('[data-add-music-type]').click()
+  }
+
+  cy.get('[data-dropzone-container="music"] input[type="file"]').attachFile(path)
+
+  cy.get('[data-button-submit]').click()
+
+  cy.get('[data-resource-title]').contains(title, { timeout: 2000 })
+}
+
+const verifyExpectedResource = ({ album = '', authors = [], source = '', title, type, audioType }: {
   title: string;
   type: ResourceType;
   source?: string;
@@ -68,7 +87,9 @@ const verifyExpectedResource = ({ album = '', authors = [], source = '', title, 
     verifyTextContent('[data-resource-source]', source, source => source.replace('Source: ', ''))
     verifyTextContent('[data-resource-title] .MuiCardHeader-subheader', authors.join(', '))
   } else if (type === 'audio') {
-    verifyTextContent('[data-music-resource-type]', source, type => type.replace('Type: ', ''))
+    if (audioType) {
+      verifyTextContent('[data-music-resource-type]', audioType, type => type.replace('Type: ', '').toLowerCase())
+    }
     verifyTextContent('[data-resource-title] .MuiCardHeader-subheader', authors.join(', '))
     verifyTextContent(
       '[data-resource-title] .MuiCardHeader-title',
@@ -77,7 +98,7 @@ const verifyExpectedResource = ({ album = '', authors = [], source = '', title, 
     )
     verifyTextContent(
       '[data-resource-title] .MuiCardHeader-title',
-      (album)!,
+      album,
       text => text.split(' - ')[1],
     )
   } else if (type === 'song-partition') {
@@ -163,6 +184,27 @@ describe('Bundle', () => {
             addVideo('video.mp4', videoTitle, videoSource, videoAuthors)
 
             verifyExpectedResource({ type: 'video', title: videoTitle, source: videoSource, authors: videoAuthors })
+
+            cy.task('googleDrive:deleteFolderById', folderId)
+          })
+      })
+  })
+
+  it('should add a song', () => {
+    cy.task('googleDrive:createFolder', 'Bundle 2')
+      .then(folderId => {
+        const title = 'An example music'
+        const album = 'Some Album'
+        const audioType = 'playback'
+        const authors = ['First Author', 'Second Author']
+        const bundleToStore = { name: 'Bundle 2', googleDriveId: folderId }
+        cy.task('database:store', { entity: 'BundleEntity', object: bundleToStore })
+          .then(b => b as BundleEntity)
+          .then(storedBundle => {
+            cy.goToBundlePage(storedBundle.id)
+            addMusic('music.mp3', title, album, authors, audioType)
+
+            verifyExpectedResource({ type: 'audio', title, album, authors, audioType: 'playback' })
 
             cy.task('googleDrive:deleteFolderById', folderId)
           })

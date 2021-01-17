@@ -72,6 +72,20 @@ const addMusic = (path: string, title: string, album: string, authors: string[],
   cy.get('[data-resource-title]').contains(title, { timeout: 2000 })
 }
 
+const addSongPartition = (path: string, title: string, authors: string[]): void => {
+  cy.get('[data-add-resource]').click()
+  cy.get('[data-add-song-partition-resource]').click()
+
+  typeText('[data-add-song-partition-title] input', title)
+  typeText('[data-add-song-partition-authors] input', authors.join(';'))
+
+  cy.get('[data-dropzone-container="song-partition"] input[type="file"]').attachFile(path)
+
+  cy.get('[data-button-submit]').click()
+
+  cy.get('[data-resource-title]').contains(title, { timeout: 2000 })
+}
+
 const verifyExpectedResource = ({ album = '', authors = [], source = '', title, type, audioType }: {
   title: string;
   type: ResourceType;
@@ -205,6 +219,25 @@ describe('Bundle', () => {
             addMusic('music.mp3', title, album, authors, audioType)
 
             verifyExpectedResource({ type: 'audio', title, album, authors, audioType: 'playback' })
+
+            cy.task('googleDrive:deleteFolderById', folderId)
+          })
+      })
+  })
+
+  it('should add a song partition', () => {
+    cy.task('googleDrive:createFolder', 'Bundle 2')
+      .then(folderId => {
+        const title = 'An example music'
+        const authors = ['First Author', 'Second Author']
+        const bundleToStore = { name: 'Bundle 2', googleDriveId: folderId }
+        cy.task('database:store', { entity: 'BundleEntity', object: bundleToStore })
+          .then(b => b as BundleEntity)
+          .then(storedBundle => {
+            cy.goToBundlePage(storedBundle.id)
+            addSongPartition('song-partition.pdf', title, authors)
+
+            verifyExpectedResource({ type: 'song-partition', title, authors })
 
             cy.task('googleDrive:deleteFolderById', folderId)
           })

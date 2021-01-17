@@ -15,6 +15,7 @@
     "test": "(cd client && yarn test) && (cd server && yarn test)",
     "test-e2e": "cd e2e && yarn test",
     "cypress:open": "cypress open",
+    "cypress:run": "cypress run",
     "start": "node server/src/server.js",
     "start-dev": "concurrently \"cd server && yarn start\" \"cd client && yarn start\" --kill-others"
   },

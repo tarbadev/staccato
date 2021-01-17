@@ -6,7 +6,7 @@ export default {
     return createConnection(e2eDbCredentials as ConnectionOptions)
       .then(() => null)
       .catch(err => {
-        cy.log('An error happened while connecting to DB', err.message)
+        console.log('An error happened while connecting to DB', err.message)
         return null
       })
   },
@@ -15,7 +15,7 @@ export default {
     return getConnection().close()
       .then(() => null)
       .catch(err => {
-        cy.log('An error happened while closing the DB', err.message)
+        console.log('An error happened while closing the DB', err.message)
         return null
       })
   },
@@ -41,7 +41,7 @@ export default {
       .getRepository(entity)
       .save(object)
       .catch(err => {
-        cy.log('An error happened while storing the DB', err.message)
+        console.log('An error happened while storing the DB', err.message)
         return null
       })
   },

@@ -38,6 +38,21 @@ const addImage = (path: string, title: string): void => {
   cy.get('[data-resource-title]').contains(title, { timeout: 2000 })
 }
 
+const addVideo = (path: string, title: string, source: string, authors: string[]): void => {
+  cy.get('[data-add-resource]').click()
+  cy.get('[data-add-video-resource]').click()
+
+  typeText('[data-add-video-title] input', title)
+  typeText('[data-add-video-source] input', source)
+  typeText('[data-add-video-authors] input', authors.join(';'))
+
+  cy.get('[data-dropzone-container="video"] input[type="file"]').attachFile(path)
+
+  cy.get('[data-button-submit]').click()
+
+  cy.get('[data-resource-title]').contains(title, { timeout: 2000 })
+}
+
 const verifyExpectedResource = ({ album = '', authors = [], source = '', title, type }: {
   title: string;
   type: ResourceType;
@@ -51,10 +66,10 @@ const verifyExpectedResource = ({ album = '', authors = [], source = '', title, 
   } else if (type === 'video') {
     verifyTextContent('[data-resource-title] .MuiCardHeader-title', title)
     verifyTextContent('[data-resource-source]', source, source => source.replace('Source: ', ''))
-    verifyTextContent('[data-resource-title] .MuiCardHeader-subheader', authors.join(','))
+    verifyTextContent('[data-resource-title] .MuiCardHeader-subheader', authors.join(', '))
   } else if (type === 'audio') {
     verifyTextContent('[data-music-resource-type]', source, type => type.replace('Type: ', ''))
-    verifyTextContent('[data-resource-title] .MuiCardHeader-subheader', authors.join(','))
+    verifyTextContent('[data-resource-title] .MuiCardHeader-subheader', authors.join(', '))
     verifyTextContent(
       '[data-resource-title] .MuiCardHeader-title',
       title,
@@ -66,7 +81,7 @@ const verifyExpectedResource = ({ album = '', authors = [], source = '', title, 
       text => text.split(' - ')[1],
     )
   } else if (type === 'song-partition') {
-    verifyTextContent('[data-resource-title] .MuiCardHeader-subheader', authors.join(','))
+    verifyTextContent('[data-resource-title] .MuiCardHeader-subheader', authors.join(', '))
     verifyTextContent(
       '[data-resource-title] .MuiCardHeader-title',
       title,
@@ -128,6 +143,26 @@ describe('Bundle', () => {
               type: 'image',
               title: imageTitle,
             })
+
+            cy.task('googleDrive:deleteFolderById', folderId)
+          })
+      })
+  })
+
+  it('should add a video', () => {
+    cy.task('googleDrive:createFolder', 'Bundle 2')
+      .then(folderId => {
+        const videoTitle = 'An example video'
+        const videoSource = 'https://example.com'
+        const videoAuthors = ['First Author', 'Second Author']
+        const bundleToStore = { name: 'Bundle 2', googleDriveId: folderId }
+        cy.task('database:store', { entity: 'BundleEntity', object: bundleToStore })
+          .then(b => b as BundleEntity)
+          .then(storedBundle => {
+            cy.goToBundlePage(storedBundle.id)
+            addVideo('video.mp4', videoTitle, videoSource, videoAuthors)
+
+            verifyExpectedResource({ type: 'video', title: videoTitle, source: videoSource, authors: videoAuthors })
 
             cy.task('googleDrive:deleteFolderById', folderId)
           })

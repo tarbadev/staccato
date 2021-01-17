@@ -1,15 +1,13 @@
 import { AudioType, ResourceType } from '@shared/Resource'
 import { BundleEntity } from 'staccato-server/src/infrastructure/entity/BundleEntity'
-import Chainable = Cypress.Chainable
 
-const typeText = (selector: string, textToType: string): Chainable<JQuery> => cy.get(selector).clear().type(textToType)
 const editName = (newName: string): void => {
   const editButtonSelector = '[data-edit-bundle-name]'
   const bundleNameSelector = '[data-new-bundle-name] input'
   const submitBundleSelector = '[data-submit-bundle]'
 
   cy.get(editButtonSelector).click()
-  typeText(bundleNameSelector, newName)
+  cy.typeText(bundleNameSelector, newName)
   cy.get(submitBundleSelector).click()
   cy.waitFor(`[data-bundle-name='${newName}']`)
 }
@@ -29,7 +27,7 @@ const addImage = (path: string, title: string): void => {
   cy.get('[data-add-resource]').click()
   cy.get('[data-add-image-resource]').click()
 
-  typeText('[data-add-image-title] input', title)
+  cy.typeText('[data-add-image-title] input', title)
 
   cy.get('[data-dropzone-container="image"] input[type="file"]').attachFile(path)
 
@@ -42,9 +40,9 @@ const addVideo = (path: string, title: string, source: string, authors: string[]
   cy.get('[data-add-resource]').click()
   cy.get('[data-add-video-resource]').click()
 
-  typeText('[data-add-video-title] input', title)
-  typeText('[data-add-video-source] input', source)
-  typeText('[data-add-video-authors] input', authors.join(';'))
+  cy.typeText('[data-add-video-title] input', title)
+  cy.typeText('[data-add-video-source] input', source)
+  cy.typeText('[data-add-video-authors] input', authors.join(';'))
 
   cy.get('[data-dropzone-container="video"] input[type="file"]').attachFile(path)
 
@@ -57,9 +55,9 @@ const addMusic = (path: string, title: string, album: string, authors: string[],
   cy.get('[data-add-resource]').click()
   cy.get('[data-add-audio-resource]').click()
 
-  typeText('[data-add-music-title] input', title)
-  typeText('[data-add-music-album] input', album)
-  typeText('[data-add-music-authors] input', authors.join(';'))
+  cy.typeText('[data-add-music-title] input', title)
+  cy.typeText('[data-add-music-album] input', album)
+  cy.typeText('[data-add-music-authors] input', authors.join(';'))
 
   if (audioType === 'playback') {
     cy.get('[data-add-music-type]').click()
@@ -76,8 +74,8 @@ const addSongPartition = (path: string, title: string, authors: string[]): void 
   cy.get('[data-add-resource]').click()
   cy.get('[data-add-song-partition-resource]').click()
 
-  typeText('[data-add-song-partition-title] input', title)
-  typeText('[data-add-song-partition-authors] input', authors.join(';'))
+  cy.typeText('[data-add-song-partition-title] input', title)
+  cy.typeText('[data-add-song-partition-authors] input', authors.join(';'))
 
   cy.get('[data-dropzone-container="song-partition"] input[type="file"]').attachFile(path)
 

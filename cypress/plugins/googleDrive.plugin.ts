@@ -3,7 +3,6 @@ import { google } from 'googleapis'
 import { GaxiosPromise, GaxiosResponse } from 'gaxios'
 
 const keyFile = path.join(__dirname, '../../config/drive-credentials.json')
-console.log(keyFile)
 
 const drive = google.drive({
   version: 'v3',
@@ -48,6 +47,11 @@ export default {
   },
 
   async 'googleDrive:deleteFolderById'(folderId: string): GaxiosPromise<void> {
+    return drive.files.delete({ fileId: folderId })
+  },
+
+  async 'googleDrive:deleteFolder'(name: string): GaxiosPromise<void> {
+    const folderId = await findFolder(name)
     return drive.files.delete({ fileId: folderId })
   },
 }

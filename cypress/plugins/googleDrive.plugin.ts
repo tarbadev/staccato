@@ -54,4 +54,27 @@ export default {
     const folderId = await findFolder(name)
     return drive.files.delete({ fileId: folderId })
   },
+
+  async 'googleDrive:deletePermission'({
+                                         email,
+                                         failOnError = false,
+                                       }: { email: string; failOnError?: boolean }): Promise<null> {
+    const folderId = await getMainFolderId()
+    const permissions = await drive.permissions.list({ fileId: folderId, fields: 'permissions(id, emailAddress)' })
+      .then(response => response.data.permissions)
+    // @ts-ignore
+    const permissionIndex = permissions.findIndex(permission => permission.emailAddress === email)
+    if (permissionIndex >= 0) {
+      // @ts-ignore
+      const permissionId = permissions[permissionIndex].id
+
+      await drive.permissions.delete({ fileId: folderId!!, permissionId: permissionId!! })
+    } else {
+      if (failOnError) {
+        throw new Error(`Permission not found for user ${email}`)
+      }
+    }
+
+    return null
+  },
 }

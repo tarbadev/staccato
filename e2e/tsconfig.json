@@ -3,7 +3,6 @@
     "module": "esnext",
     "esModuleInterop": true,
     "target": "es6",
-    "noImplicitAny": true,
     "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true,
     "moduleResolution": "node",
@@ -11,7 +10,7 @@
     "experimentalDecorators": true,
     "resolveJsonModule": true
   },
-  "extends": "../base-tsconfig.json",
+  "extends": "../tsconfig.json",
   "include": [
     "src"
   ]

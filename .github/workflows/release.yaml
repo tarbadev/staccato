@@ -75,18 +75,6 @@ jobs:
     needs: build
     steps:
       - uses: actions/checkout@v2
-      - name: Cache node modules
-        uses: actions/cache@v2
-        env:
-          cache-name: cache-node-modules
-        with:
-          path: |
-            **/node_modules
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-build-${{ env.cache-name }}-
-            ${{ runner.os }}-build-
-            ${{ runner.os }}-
       - uses: actions/download-artifact@v2
         with:
           name: "build"
@@ -106,6 +94,7 @@ jobs:
           context: .
           platforms: linux/amd64,linux/arm64,linux/386
           push: true
+          file: ./Dockerfile
           tags: |
             tarbadev/staccato:latest
             tarbadev/staccato:0.1.0

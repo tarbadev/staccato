@@ -37,6 +37,8 @@ jobs:
         run: yarn --frozen-lockfile
       - name: "Build artifacts"
         run: yarn build
+      - name: "Build docker image"
+        run: docker build . -t tarbadev/staccato:0.1.0
       - name: "Upload build folder"
         uses: actions/upload-artifact@v1
         with:

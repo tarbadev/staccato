@@ -11,7 +11,7 @@ configureDb()
   .then(({ port, address }) => {
     app.listen(port, address, () => {
       // eslint-disable-next-line no-console
-      console.log(`Server is running on: ${port}`)
+      console.log(`Server is running on: ${address}:${port}`)
     })
   })
   // eslint-disable-next-line no-console

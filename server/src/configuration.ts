@@ -12,10 +12,11 @@ import history from 'connect-history-api-fallback'
 import { Connection, ConnectionOptions, createConnection } from 'typeorm'
 import localDbCredentials from '@config/local.database.config'
 import GoogleDrive from './infrastructure/GoogleDrive'
+import baseOrmConfig from '@config/base.orm.config'
 
 export const configureApp = (app: Express): { port: number; address: string } => {
   const port = Number(process.env.PORT) || 4000
-  const address = process.env.HOST || '127.0.0.1'
+  const address = process.env.ADDRESS || '127.0.0.1'
 
   const uploadLimit = '10mb'
 
@@ -56,21 +57,29 @@ export const configureApp = (app: Express): { port: number; address: string } =>
 }
 
 export const configureDb = (): Promise<Connection | void> => {
-  const dbOptions = localDbCredentials
+  let dbOptions
   if (process.env.DB_HOST
     && process.env.DB_PORT
     && process.env.DB_USERNAME
     && process.env.DB_PASSWORD
     && process.env.DB_NAME) {
-    dbOptions.host = process.env.DB_HOST
-    dbOptions.port = Number(process.env.DB_PORT)
-    dbOptions.username = process.env.DB_USERNAME
-    dbOptions.password = process.env.DB_PASSWORD
-    dbOptions.database = process.env.DB_NAME
+    // eslint-disable-next-line no-console
+    console.log('Using environment DB configuration')
+    dbOptions = {
+      ...baseOrmConfig,
+      host: process.env.DB_HOST,
+      port: Number(process.env.DB_PORT),
+      username: process.env.DB_USERNAME,
+      password: process.env.DB_PASSWORD,
+      database: process.env.DB_NAME,
+    }
+  } else {
+    // eslint-disable-next-line no-console
+    console.log('Using local DB configuration')
+    dbOptions = localDbCredentials
   }
 
   return createConnection(dbOptions as ConnectionOptions)
-    // eslint-disable-next-line no-console
     .catch(err => {
       throw new Error(`A problem happened while initializing Database: \n${err}`)
     })
@@ -80,7 +89,6 @@ export const configureDrive = (): Promise<void> => {
   const driveCredentialsPath = path.join(__dirname, '../../config/drive-credentials.json')
 
   return GoogleDrive.initialize(driveCredentialsPath)
-    // eslint-disable-next-line no-console
     .catch(err => {
       throw new Error(`A problem happened while initializing Google Drive: \n${err}`)
     })

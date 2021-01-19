@@ -11,16 +11,11 @@ import settingsRouter from './routes/settings-route'
 import history from 'connect-history-api-fallback'
 import { Connection, ConnectionOptions, createConnection } from 'typeorm'
 import localDbCredentials from '@config/local.database.config'
-import cfEnv from 'cfenv'
 import GoogleDrive from './infrastructure/GoogleDrive'
 
-const appEnv = cfEnv.getAppEnv()
-
 export const configureApp = (app: Express): { port: number; address: string } => {
-  const port = process.env.PORT || 4000
-  if (appEnv.isLocal) {
-    appEnv.port = Number(port)
-  }
+  const port = Number(process.env.PORT) || 4000
+  const address = process.env.HOST || '127.0.0.1'
 
   const uploadLimit = '10mb'
 
@@ -57,25 +52,21 @@ export const configureApp = (app: Express): { port: number; address: string } =>
     res.status(500).send('Something broke!')
   })
 
-  return { port: appEnv.port, address: appEnv.bind }
+  return { port, address }
 }
 
-type DbCredentials = {
-  name: string;
-  hostname: string;
-  port: string;
-  username: string;
-  password: string;
-}
 export const configureDb = (): Promise<Connection | void> => {
   const dbOptions = localDbCredentials
-  if (!appEnv.isLocal) {
-    const dbCredentials = appEnv.getServiceCreds('staccato-db') as DbCredentials
-    dbOptions.host = dbCredentials.hostname
-    dbOptions.port = Number(dbCredentials.port)
-    dbOptions.username = dbCredentials.username
-    dbOptions.password = dbCredentials.password
-    dbOptions.database = dbCredentials.name
+  if (process.env.DB_HOST
+    && process.env.DB_PORT
+    && process.env.DB_USERNAME
+    && process.env.DB_PASSWORD
+    && process.env.DB_NAME) {
+    dbOptions.host = process.env.DB_HOST
+    dbOptions.port = Number(process.env.DB_PORT)
+    dbOptions.username = process.env.DB_USERNAME
+    dbOptions.password = process.env.DB_PASSWORD
+    dbOptions.database = process.env.DB_NAME
   }
 
   return createConnection(dbOptions as ConnectionOptions)

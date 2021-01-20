@@ -1,10 +1,10 @@
 import { createConnection, getConnection } from 'typeorm'
-import e2eDbCredentials from '@config/e2e.database.config'
-import { ConnectionOptions } from 'typeorm/connection/ConnectionOptions'
+import { config as envDbCredentials } from '../config/env.database.config'
+import localDbCredentials from '../config/local.database.config'
 
 const connection = {
   async create() {
-    await createConnection(e2eDbCredentials as ConnectionOptions)
+    await createConnection(envDbCredentials || localDbCredentials)
   },
 
   async close() {

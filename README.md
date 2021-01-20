@@ -71,5 +71,5 @@ module.exports = {
   exit # Quit bash
     ```
 ### Staccato deployment
-- Create secret for drive credentials: `kubectl create secret generic staccato-drive-config --from-file=<FILE_PATH>`
+- Create secret for drive credentials: `kubectl create secret generic staccato-drive-config --from-file=<PATH>/drive-credentials.json`
 - Run script: `./kubernetes/deployStaccato.sh`

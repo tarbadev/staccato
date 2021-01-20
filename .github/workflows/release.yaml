@@ -61,18 +61,102 @@ jobs:
         run: yarn --frozen-lockfile
       - name: "Build artifacts"
         run: yarn build
-      - name: "Build docker image"
-        run: docker build . -t tarbadev/staccato:0.1.0
       - name: "Upload build folder"
         uses: actions/upload-artifact@v1
         with:
           name: "build"
           path: build
 
-  build-and-push-docker:
-    name: Build and Push Docker image
+  build-docker-image:
+    name: Build Docker image
     runs-on: ubuntu-latest
     needs: build
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/download-artifact@v2
+        with:
+          name: "build"
+          path: build
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+      - name: Build Docker images
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          file: ./Dockerfile
+          tags: |
+            tarbadev/staccato:latest
+            tarbadev/staccato:0.1.0
+          outputs: type=docker,dest=/tmp/staccato-image.tar
+      - name: Upload artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: staccato-image
+          path: /tmp/staccato-image.tar
+
+  e2e:
+    name: E2E Tests
+    needs: build-docker-image
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Download artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: staccato-image
+          path: /tmp
+      - name: Load Docker image
+        run: |
+          docker load --input /tmp/staccato-image.tar
+          docker image ls -a
+      - name: Cache node modules
+        uses: actions/cache@v2
+        env:
+          cache-name: cache-node-modules
+        with:
+          path: |
+            **/node_modules
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
+      - name: Setup Mysql
+        uses: mirromutth/mysql-action@v1.1
+        with:
+          mysql database: 'staccato'
+          mysql user: 'staccato'
+          mysql password: 'staccato'
+          mysql version: '8.0.22'
+      - name: "Install Node.js 14.8.0"
+        uses: actions/setup-node@v1
+        with:
+          node-version: 14.8.0
+      - name: "Install dependencies"
+        run: yarn --frozen-lockfile
+      - name: "Create Google Drive credentials file"
+        run: echo "$GOOGLE_DRIVE_SERVICE_ACCOUNT" > config/drive-credentials.json
+        env:
+          GOOGLE_DRIVE_SERVICE_ACCOUNT: ${{ secrets.GOOGLE_DRIVE_CREDENTIALS_DEV }}
+      - name: "Run Docker image"
+        run: |
+          sleep 10s
+          docker run -e "PORT=8888" -e "NODE_ENV=production" -e "DB_HOST=127.0.0.1" -e "DB_PORT=3306" -e "DB_USERNAME=staccato" -e "DB_PASSWORD=staccato" -e "DB_NAME=staccato" -v $(pwd)/config/drive-credentials.json:/usr/src/app/config/drive-credentials.json --name staccato --network=host -d -t tarbadev/staccato:latest
+          sleep 5s
+      - name: "Run E2E Tests"
+        run: yarn test-e2e
+        env:
+          APP_URL: http://127.0.0.1:8888
+          DB_HOST: 127.0.0.1
+          DB_PORT: 3306
+          DB_USERNAME: staccato
+          DB_PASSWORD: staccato
+          DB_NAME: staccato
+
+  push-docker-images:
+    name: Build and Push Docker images
+    needs: e2e
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
       - uses: actions/download-artifact@v2
@@ -88,129 +172,13 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-      - name: Build and push
+      - name: Build and Push Docker images
         uses: docker/build-push-action@v2
         with:
           context: .
-          platforms: linux/arm64,linux/amd64
-          push: true
           file: ./Dockerfile
+          platforms: linux/arm64,linux/amd64
           tags: |
             tarbadev/staccato:latest
             tarbadev/staccato:0.1.0
-
-  dev-deploy:
-    name: Deploy - Development
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-      - uses: actions/checkout@v2
-      - name: Cache node modules
-        uses: actions/cache@v2
-        env:
-          cache-name: cache-node-modules
-        with:
-          path: |
-            **/node_modules
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-build-${{ env.cache-name }}-
-            ${{ runner.os }}-build-
-            ${{ runner.os }}-
-      - uses: actions/download-artifact@v2
-        with:
-          name: "build"
-          path: build
-      - name: "Create Google Drive credentials file"
-        run: echo "$GOOGLE_DRIVE_SERVICE_ACCOUNT" > build/config/drive-credentials.json
-        env:
-          GOOGLE_DRIVE_SERVICE_ACCOUNT: ${{ secrets.GOOGLE_DRIVE_CREDENTIALS_DEV }}
-      - name: "Deploy to dev environment"
-        uses: d3sandoval/cloud-foundry-action@1.1.1
-        env:
-          CF_TARGET_ORG: ${{ secrets.CF_ORG }}
-          CF_TARGET_SPACE: "development"
-          CF_USERNAME: ${{ secrets.CF_USERNAME }}
-          CF_PASSWORD: ${{ secrets.CF_PASSWORD }}
-        with:
-          args: "push -f manifest-development.yml"
-
-  e2e:
-    name: E2E Tests
-    runs-on: ubuntu-latest
-    needs: dev-deploy
-    steps:
-    - uses: actions/checkout@v2
-    - name: Cache node modules
-      uses: actions/cache@v2
-      env:
-        cache-name: cache-node-modules
-      with:
-        path: |
-          **/node_modules
-        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/yarn.lock') }}
-        restore-keys: |
-          ${{ runner.os }}-build-${{ env.cache-name }}-
-          ${{ runner.os }}-build-
-          ${{ runner.os }}-
-    - name: "Install Node.js 14.8.0"
-      uses: actions/setup-node@v1
-      with:
-        node-version: 14.8.0
-    - name: "Install dependencies"
-      run: yarn --frozen-lockfile
-    - name: "Retrieve DB service key"
-      uses: d3sandoval/cloud-foundry-action@1.1.1
-      env:
-        CF_TARGET_ORG: ${{ secrets.CF_ORG }}
-        CF_TARGET_SPACE: "development"
-        CF_USERNAME: ${{ secrets.CF_USERNAME }}
-        CF_PASSWORD: ${{ secrets.CF_PASSWORD }}
-      with:
-        args: "service-key staccato-db e2e_key > /github/workspace/e2e_key.json"
-    - name: "Create Google Drive credentials file"
-      run: echo "$GOOGLE_DRIVE_SERVICE_ACCOUNT" > config/drive-credentials.json
-      env:
-        GOOGLE_DRIVE_SERVICE_ACCOUNT: ${{ secrets.GOOGLE_DRIVE_CREDENTIALS_DEV }}
-    - name: "Run E2E Tests"
-      run: |
-        DB_CREDENTIALS=$(cat e2e_key.json) \
-        yarn test-e2e
-      env:
-        APP_URL: https://staccato-dev.cfapps.io
-
-  prod-deploy:
-    name: Deploy - Production
-    runs-on: ubuntu-latest
-    needs: e2e
-    steps:
-      - uses: actions/checkout@v2
-      - name: Cache node modules
-        uses: actions/cache@v2
-        env:
-          cache-name: cache-node-modules
-        with:
-          path: |
-            **/node_modules
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-build-${{ env.cache-name }}-
-            ${{ runner.os }}-build-
-            ${{ runner.os }}-
-      - uses: actions/download-artifact@v2
-        with:
-          name: "build"
-          path: build
-      - name: "Create Google Drive credentials file"
-        run: echo "$GOOGLE_DRIVE_SERVICE_ACCOUNT" > build/config/drive-credentials.json
-        env:
-          GOOGLE_DRIVE_SERVICE_ACCOUNT: ${{ secrets.GOOGLE_DRIVE_CREDENTIALS_PROD }}
-      - name: "Deploy to Production environment"
-        uses: d3sandoval/cloud-foundry-action@1.1.1
-        env:
-          CF_TARGET_ORG: ${{ secrets.CF_ORG }}
-          CF_TARGET_SPACE: "production"
-          CF_USERNAME: ${{ secrets.CF_USERNAME }}
-          CF_PASSWORD: ${{ secrets.CF_PASSWORD }}
-        with:
-          args: "push -f manifest-production.yml"
+          push: true

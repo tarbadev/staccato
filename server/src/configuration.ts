@@ -9,10 +9,10 @@ import path from 'path'
 import bundleRouter from './routes/bundle-route'
 import settingsRouter from './routes/settings-route'
 import history from 'connect-history-api-fallback'
-import { Connection, ConnectionOptions, createConnection } from 'typeorm'
+import { Connection, createConnection } from 'typeorm'
 import localDbCredentials from '@config/local.database.config'
+import { config as envDbCredentials } from '@config/env.database.config'
 import GoogleDrive from './infrastructure/GoogleDrive'
-import baseOrmConfig from '@config/base.orm.config'
 
 export const configureApp = (app: Express): { port: number; address: string } => {
   const port = Number(process.env.PORT) || 4000
@@ -57,29 +57,7 @@ export const configureApp = (app: Express): { port: number; address: string } =>
 }
 
 export const configureDb = (): Promise<Connection | void> => {
-  let dbOptions
-  if (process.env.DB_HOST
-    && process.env.DB_PORT
-    && process.env.DB_USERNAME
-    && process.env.DB_PASSWORD
-    && process.env.DB_NAME) {
-    // eslint-disable-next-line no-console
-    console.log('Using environment DB configuration')
-    dbOptions = {
-      ...baseOrmConfig,
-      host: process.env.DB_HOST,
-      port: Number(process.env.DB_PORT),
-      username: process.env.DB_USERNAME,
-      password: process.env.DB_PASSWORD,
-      database: process.env.DB_NAME,
-    }
-  } else {
-    // eslint-disable-next-line no-console
-    console.log('Using local DB configuration')
-    dbOptions = localDbCredentials
-  }
-
-  return createConnection(dbOptions as ConnectionOptions)
+  return createConnection(envDbCredentials || localDbCredentials)
     .catch(err => {
       throw new Error(`A problem happened while initializing Database: \n${err}`)
     })

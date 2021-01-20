@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: staccato
+  name: staccato
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: staccato
+  template:
+    metadata:
+      labels:
+        app: staccato
+    spec:
+      containers:
+        - image: tarbadev/staccato:0.1.0
+          name: staccato
+          ports:
+            - containerPort: 4000
+              protocol: TCP
+          env:
+            - name: PORT
+              value: '4000'
+            - name: NODE_ENV
+              value: 'PRODUCTION'
+            - name: DB_HOST
+              value: 'mysql-server'
+            - name: DB_PORT
+              value: '3306'
+            - name: DB_USERNAME
+              value: 'staccato'
+            - name: DB_NAME
+              value: 'staccato'
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secret
+                  key: password
+          volumeMounts:
+            - name: drive-config
+              mountPath: "/usr/src/app/config/drive-credentials.json"
+              subPath: "drive-credentials.json"
+              readOnly: true
+      volumes:
+        - name: drive-config
+          secret:
+            secretName: staccato-drive-config

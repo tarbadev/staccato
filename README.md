@@ -55,3 +55,21 @@ module.exports = {
 - `yarn ts-node ../node_modules/.bin/typeorm migration:create -f ../config/local.database.config.ts -n <name>`
 - Modify the generated script under `./server/migrations`. Follow [this link](https://typeorm.io/#/migrations) to see the QueryRunner API
 - Start the server and verify migration 
+
+## Deployment to Kubernetes
+### Mysql deployment
+- Create secret for mysql password: `kubectl create secret generic mysql-secret --from-literal=password=<PASSWORD>`
+- Run script: `./kubernetes/deployMysql.sh`
+- Setup mysql DB and user:
+    ```bash
+  kubectl exec <MYSQL_SERVER_POD_NAME> --stdin --tty -- /bin/bash
+  mysql -u root -p
+  create database staccato;
+  CREATE USER 'staccato'@'%' IDENTIFIED BY '<PASSWORD>';
+  GRANT ALL PRIVILEGES ON staccato.* TO 'staccato'@'%';
+  exit # Quit mysql
+  exit # Quit bash
+    ```
+### Staccato deployment
+- Create secret for drive credentials: `kubectl create secret generic staccato-drive-config --from-file=<FILE_PATH>`
+- Run script: `./kubernetes/deployStaccato.sh`

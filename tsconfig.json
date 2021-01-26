@@ -5,6 +5,7 @@
       "@config/*": ["config/*"],
       "@shared/*": ["shared/*"]
     },
+    "noImplicitAny": true,
     "removeComments": true
   },
   "extends": "@tsconfig/recommended/tsconfig.json"

@@ -9,7 +9,7 @@ export class ResourceEntity {
   id: number
   @Column()
   title?: string
-  @Column()
+  @Column({ type: 'varchar' })
   type: ResourceType
   @Column()
   googleDriveId: string
@@ -19,7 +19,7 @@ export class ResourceEntity {
   source?: string
   @Column()
   album?: string
-  @Column()
+  @Column({ type: 'varchar' })
   audioType?: AudioType
   @ManyToOne(() => BundleEntity, bundle => bundle.resources)
   bundle?: BundleEntity

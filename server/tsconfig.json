@@ -3,7 +3,6 @@
     "module": "commonjs",
     "esModuleInterop": true,
     "target": "es6",
-    "noImplicitAny": true,
     "moduleResolution": "node",
     "sourceMap": true,
     "outDir": "build",
@@ -11,7 +10,7 @@
     "experimentalDecorators": true,
     "resolveJsonModule": true
   },
-  "extends": "../base-tsconfig.json",
+  "extends": "../tsconfig.json",
   "include": [
     "src",
     "migrations"

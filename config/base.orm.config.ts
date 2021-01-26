@@ -1,8 +1,9 @@
 import path from 'path'
 import { ConnectionOptions } from 'typeorm'
 
-const entitiesPath = path.join(__dirname, '../server/src/infrastructure/**/*Entity.@(ts|js)')
-const migrationsPath = path.join(__dirname, '../server/migrations')
+const serverPath = path.join(__dirname, '../server')
+const entitiesPath = path.join(serverPath, 'src/infrastructure/**/*Entity.@(ts|js)')
+const migrationsPath = path.join(serverPath, 'migrations')
 
 const baseOptions: ConnectionOptions = {
   type: 'mysql',

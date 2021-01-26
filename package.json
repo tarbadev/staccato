@@ -4,8 +4,7 @@
   "private": true,
   "workspaces": [
     "server",
-    "client",
-    "e2e"
+    "client"
   ],
   "scripts": {
     "build": "yarn build-modules && yarn move-modules && cp package.json ./build/ && cp ./yarn.lock ./build/",
@@ -13,13 +12,16 @@
     "move-modules": "mv -f server/build build && mv -f client/build build/frontend",
     "clean": "rm -rf build",
     "test": "(cd client && yarn test) && (cd server && yarn test)",
-    "test-e2e": "cd e2e && yarn test",
+    "cypress:open": "cypress open",
+    "cypress:run": "cypress run",
     "start": "node server/src/server.js",
     "start-dev": "concurrently \"cd server && yarn start\" \"cd client && yarn start\" --kill-others"
   },
   "devDependencies": {
     "@tsconfig/recommended": "^1.0.1",
     "concurrently": "^5.3.0",
+    "cypress": "^6.2.1",
+    "cypress-file-upload": "^4.1.1",
     "module-alias": "^2.2.2"
   },
   "_moduleAliases": {

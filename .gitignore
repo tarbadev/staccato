@@ -29,3 +29,7 @@ server/build
 e2e_key.json
 
 config/drive-credentials.json
+
+#cypress
+cypress/videos
+cypress/screenshots

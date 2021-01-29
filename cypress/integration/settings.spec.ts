@@ -31,7 +31,7 @@ describe('Settings', () => {
 
     addAuthorizedUser('someuser@example.com')
 
-    cy.get('[data-authorized-user', { timeout: 6000 }).should('have.length', 3)
+    cy.get('[data-authorized-user', { timeout: 10000 }).should('have.length', 3)
 
     cy.task('googleDrive:deletePermission', { email: 'someuser@example.com', failOnError: true })
   })

@@ -32,3 +32,4 @@ config/drive-credentials.json
 
 #cypress
 cypress/videos
+cypress/screenshots

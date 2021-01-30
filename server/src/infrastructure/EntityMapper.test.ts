@@ -4,6 +4,9 @@ import Bundle from '../application/Bundle'
 import Resource from '../application/Resource'
 import { ResourceEntity } from './entity/ResourceEntity'
 import { AuthorEntity } from './entity/AuthorEntity'
+import { ComposerEntity } from './entity/ComposerEntity'
+import { ArrangerEntity } from './entity/ArrangerEntity'
+import { InstrumentEntity } from './entity/InstrumentEntity'
 
 describe('BundleEntity', () => {
   const expectedResource = new Resource(
@@ -19,13 +22,11 @@ describe('BundleEntity', () => {
     ],
     'Some Album',
     'playback',
+    ['First Composer', 'Second Composer'],
+    ['First Arranger', 'Second Arranger'],
+    ['Piano', 'Violin', 'Trumpet'],
   )
   const expectedBundle = new Bundle(32, 'Some super bundle', 'SuperDriveId', [expectedResource])
-  const bundleEntity = new BundleEntity(
-    expectedBundle.id,
-    expectedBundle.name,
-    expectedBundle.googleDriveId,
-  )
   const resourceEntity = new ResourceEntity(
     expectedResource.id,
     expectedResource.title,
@@ -36,6 +37,16 @@ describe('BundleEntity', () => {
     expectedResource.authors?.map(author => new AuthorEntity(0, author)),
     expectedResource.album,
     expectedResource.audioType,
+    undefined,
+    expectedResource.composers?.map(composer => new ComposerEntity(0, composer)),
+    expectedResource.arrangers?.map(arranger => new ArrangerEntity(0, arranger)),
+    expectedResource.instruments?.map(instrument => new InstrumentEntity(0, instrument)),
+  )
+  const bundleEntity = new BundleEntity(
+    expectedBundle.id,
+    expectedBundle.name,
+    expectedBundle.googleDriveId,
+    [resourceEntity]
   )
 
   describe('toDomain', () => {

@@ -14,6 +14,7 @@ import { AudioCard } from '../components/AudioCard'
 import { UploadRequest } from '@shared/UploadRequest'
 import { ResourceUpload } from '../components/ResourceUpload'
 import { SongPartitionCard } from '../components/SongPartitionCard'
+import { OrchestralPartitionCard } from '../components/OrchestralPartitionCard'
 
 interface RouteInfo {
   id: string;
@@ -118,6 +119,8 @@ const BundleDetailPageDisplay = ({
         card = <AudioCard resource={resource} />
       } else if (resource.type === 'song-partition') {
         card = <SongPartitionCard resource={resource} />
+      } else if (resource.type === 'orchestral-partition') {
+        card = <OrchestralPartitionCard resource={resource} />
       }
 
       return <Grid item key={resource.id}>

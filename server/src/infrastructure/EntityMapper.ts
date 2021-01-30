@@ -3,6 +3,9 @@ import Bundle from '../application/Bundle'
 import { ResourceEntity } from './entity/ResourceEntity'
 import Resource from '../application/Resource'
 import { AuthorEntity } from './entity/AuthorEntity'
+import { ComposerEntity } from './entity/ComposerEntity'
+import { ArrangerEntity } from './entity/ArrangerEntity'
+import { InstrumentEntity } from './entity/InstrumentEntity'
 
 const mapResourceEntity = (resourceEntity: ResourceEntity): Resource => {
   return new Resource(
@@ -15,6 +18,9 @@ const mapResourceEntity = (resourceEntity: ResourceEntity): Resource => {
     resourceEntity.authors?.map(author => author.name),
     resourceEntity.album,
     resourceEntity.audioType,
+    resourceEntity.composers?.map(composer => composer.name),
+    resourceEntity.arrangers?.map(arranger => arranger.name),
+    resourceEntity.instruments?.map(instrument => instrument.name),
   )
 }
 
@@ -38,6 +44,10 @@ const mapResource = (resource: Resource): ResourceEntity => {
     resource.authors ? resource.authors.map(author => new AuthorEntity(0, author)) : [],
     resource.album,
     resource.audioType,
+    undefined,
+    resource.composers ? resource.composers.map(composer => new ComposerEntity(0, composer)) : [],
+    resource.arrangers ? resource.arrangers.map(arranger => new ArrangerEntity(0, arranger)) : [],
+    resource.instruments ? resource.instruments.map(instrument => new InstrumentEntity(0, instrument)) : [],
   )
 }
 

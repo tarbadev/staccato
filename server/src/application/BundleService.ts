@@ -10,6 +10,9 @@ export type UploadParams = {
   filePath: string;
   source?: string;
   authors?: string[];
+  composers?: string[];
+  arrangers?: string[];
+  instruments?: string[];
   album?: string;
   audioType?: AudioType;
 }
@@ -43,8 +46,10 @@ export default class BundleService {
       .uploadFile(bundle.googleDriveId, uploadParams.name, uploadParams.type, uploadParams.filePath)
     const tempType = uploadParams.type.split('/')[0]
     let type = tempType as ResourceType
-    if (tempType === 'application') {
+    if (tempType === 'application' && !uploadParams.instruments) {
       type = 'song-partition'
+    } else if (tempType === 'application' && uploadParams.instruments) {
+      type = 'orchestral-partition'
     }
 
     const newBundle = bundle.addResource({

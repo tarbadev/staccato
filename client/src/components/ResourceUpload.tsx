@@ -9,6 +9,7 @@ import { FileObject } from 'material-ui-dropzone'
 import { AudioType } from '@shared/Resource'
 import { UploadRequest } from '@shared/UploadRequest'
 import { SongPartitionUpload } from './SongPartitionUpload'
+import { OrchestralPartitionUpload } from './OrchestralPartitionUpload'
 
 type ResourceUploadProps = {
   uploadResource: (request: UploadRequest) => void;
@@ -77,10 +78,24 @@ export const ResourceUpload = ({ uploadResource }: ResourceUploadProps) => {
     closeEditMode()
   }
 
+  const onSubmitOrchestralPartition = (title: string, fileToUpload: FileObject, composers: string[], arrangers: string[], instruments: string[]) => {
+    uploadResource({
+      name: fileToUpload.file.name,
+      type: fileToUpload.file.type,
+      data: fileToUpload.data as string,
+      title,
+      composers,
+      arrangers,
+      instruments,
+    })
+    closeEditMode()
+  }
+
   return <ResourceUploadDisplay displayAddImage={() => displayDropArea('image')}
                                 displayAddVideo={() => displayDropArea('video')}
                                 displayAddAudio={() => displayDropArea('audio')}
                                 displayAddSongPartition={() => displayDropArea('song-partition')}
+                                displayAddOrchestralPartition={() => displayDropArea('orchestral-partition')}
                                 uploadAreaDisplayed={uploadAreaDisplayed}
                                 isAddMenuDisplayed={isAddMenuDisplayed}
                                 closeAddMenu={closeAddMenu}
@@ -90,6 +105,7 @@ export const ResourceUpload = ({ uploadResource }: ResourceUploadProps) => {
                                 onSubmitVideo={onSubmitVideo}
                                 onSubmitAudio={onSubmitAudio}
                                 onSubmitSongPartition={onSubmitSongPartition}
+                                onSubmitOrchestralPartition={onSubmitOrchestralPartition}
   />
 }
 
@@ -99,6 +115,7 @@ type ResourceUploadDisplayProps = {
   displayAddVideo: () => void;
   displayAddAudio: () => void;
   displayAddSongPartition: () => void;
+  displayAddOrchestralPartition: () => void;
   uploadAreaDisplayed: string;
   isAddMenuDisplayed: boolean;
   closeAddMenu: () => void;
@@ -114,12 +131,14 @@ type ResourceUploadDisplayProps = {
     audioType: AudioType,
   ) => void;
   onSubmitSongPartition: (title: string, file: FileObject, authors: string[]) => void;
+  onSubmitOrchestralPartition: (title: string, file: FileObject, composers: string[], arrangers: string[], instruments: string[]) => void;
 }
 const ResourceUploadDisplay = ({
                                  displayAddImage,
                                  displayAddVideo,
                                  displayAddAudio,
                                  displayAddSongPartition,
+                                 displayAddOrchestralPartition,
                                  uploadAreaDisplayed,
                                  isAddMenuDisplayed,
                                  closeAddMenu,
@@ -129,6 +148,7 @@ const ResourceUploadDisplay = ({
                                  onSubmitVideo,
                                  onSubmitAudio,
                                  onSubmitSongPartition,
+                                 onSubmitOrchestralPartition,
                                }: ResourceUploadDisplayProps) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
 
@@ -145,6 +165,8 @@ const ResourceUploadDisplay = ({
       <AudioUpload onCancel={closeEditMode} onSubmit={onSubmitAudio} />
   const dropAreaSongPartition = uploadAreaDisplayed === 'song-partition' &&
       <SongPartitionUpload onCancel={closeEditMode} onSubmit={onSubmitSongPartition} />
+  const dropAreaOrchestralPartition = uploadAreaDisplayed === 'orchestral-partition' &&
+      <OrchestralPartitionUpload onCancel={closeEditMode} onSubmit={onSubmitOrchestralPartition} />
 
   return <div>
     <Button aria-controls='add' aria-haspopup='true' color='primary' onClick={onAddClick} data-add-resource>
@@ -160,10 +182,12 @@ const ResourceUploadDisplay = ({
       <MenuItem onClick={displayAddVideo} data-add-video-resource>Video</MenuItem>
       <MenuItem onClick={displayAddAudio} data-add-audio-resource>Audio</MenuItem>
       <MenuItem onClick={displayAddSongPartition} data-add-song-partition-resource>Song Partition</MenuItem>
+      <MenuItem onClick={displayAddOrchestralPartition} data-add-orchestral-partition-resource>Orchestral Partition</MenuItem>
     </Menu>
     {dropAreaImage}
     {dropAreaVideo}
     {dropAreaAudio}
     {dropAreaSongPartition}
+    {dropAreaOrchestralPartition}
   </div>
 }

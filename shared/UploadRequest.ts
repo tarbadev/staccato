@@ -23,4 +23,11 @@ export type AudioUploadRequest = RequiredUploadRequest & {
   audioType?: AudioType;
 }
 
-export type UploadRequest = ImageUploadRequest | VideoUploadRequest | AudioUploadRequest
+export type OrchestralPartitionUploadRequest = RequiredUploadRequest & {
+  title?: string;
+  composers?: string[];
+  arrangers?: string[];
+  instruments?: string[];
+}
+
+export type UploadRequest = ImageUploadRequest | VideoUploadRequest | AudioUploadRequest | OrchestralPartitionUploadRequest

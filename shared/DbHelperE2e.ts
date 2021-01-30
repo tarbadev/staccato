@@ -16,6 +16,9 @@ const connection = {
     const tables = [
       'resource_author',
       'author',
+      'composer',
+      'arranger',
+      'instrument',
       'resource',
       'bundle',
     ]

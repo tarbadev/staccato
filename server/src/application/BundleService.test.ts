@@ -137,6 +137,58 @@ describe('BundleService', () => {
       expect(BundleRepository.save).toHaveBeenCalledWith(bundleWithResource)
       expect(returnedBundle).toEqual(bundleWithResource)
     })
+
+    it('should determine the type orchestral partition', async () => {
+      const filePath = '/path/to/temp/file'
+      const mockUploadFile = jest.fn()
+      const resourceId = 'SomeSuperId'
+      const resourceLink = '/path/to/resource'
+      const bundleWithResource = new Bundle(
+        bundle.id,
+        bundle.name,
+        bundle.googleDriveId,
+        [
+          new Resource(
+            0,
+            'Some Title',
+            'orchestral-partition',
+            resourceId,
+            resourceLink,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            ['Piano', 'Trumpet'],
+          ),
+        ],
+      )
+
+      // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+      // @ts-ignore
+      jest.spyOn(GoogleDrive, 'getInstance').mockReturnValueOnce({
+        uploadFile: mockUploadFile,
+      })
+      mockUploadFile.mockImplementationOnce(() => Promise.resolve({ id: resourceId, link: resourceLink }))
+      BundleRepository.findOne = jest.fn(() => Promise.resolve(bundle))
+      BundleRepository.save = jest.fn(() => Promise.resolve(bundleWithResource))
+
+      const returnedBundle = await bundleService.upload(
+        bundle.id,
+        {
+          name: 'example.pdf',
+          type: 'application/pdf',
+          filePath,
+          title: 'Some Title',
+          instruments: ['Piano', 'Trumpet'],
+        },
+      )
+
+      expect(mockUploadFile).toHaveBeenCalledWith(bundle.googleDriveId, 'example.pdf', 'application/pdf', filePath)
+      expect(BundleRepository.save).toHaveBeenCalledWith(bundleWithResource)
+      expect(returnedBundle).toEqual(bundleWithResource)
+    })
   })
 
   it('should return the bundle on edit', async () => {

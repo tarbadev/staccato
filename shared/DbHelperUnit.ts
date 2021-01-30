@@ -15,7 +15,13 @@ const connection = {
     const conn = getConnection()
     const tables = [
       'resource_author',
+      'resource_composer',
+      'resource_arranger',
+      'resource_instrument',
       'author',
+      'composer',
+      'arranger',
+      'instrument',
       'resource',
       'bundle',
     ]
@@ -35,6 +41,18 @@ const connection = {
 
   getAllAuthors() {
     return getConnection().getRepository('AuthorEntity').find()
+  },
+
+  getAllComposers() {
+    return getConnection().getRepository('ComposerEntity').find()
+  },
+
+  getAllArrangers() {
+    return getConnection().getRepository('ArrangerEntity').find()
+  },
+
+  getAllInstruments() {
+    return getConnection().getRepository('InstrumentEntity').find()
   },
 }
 export default connection

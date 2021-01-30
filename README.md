@@ -34,14 +34,6 @@ For more control, run `yarn cypress:open`
 
 ## Database Migration
 ### Create a Migration file
-#### Option 1: Generate Migration File
-- Stop the server if it is running
-- `cd server`
-- Modify the `*Entity.ts` class (Adding a Column, modifying a column, adding a relationship...)
-- `yarn ts-node ../node_modules/.bin/typeorm migration:generate -f ../config/local.database.config.ts -n <name>`
-- Modify the generated script under `./server/migrations`. Follow [this link](https://typeorm.io/#/migrations) to see the QueryRunner API
-- Start the server and verify migration 
-#### Option 2: Create Migration File
 - Stop the server if it is running
 - `cd server`
 - `yarn ts-node ../node_modules/.bin/typeorm migration:create -f ../config/local.database.config.ts -n <name>`

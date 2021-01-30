@@ -21,6 +21,9 @@ const mapBundleToResponse = (bundle: Bundle): BundleResponse => {
       authors: resource.authors,
       album: resource.album,
       audioType: resource.audioType,
+      composers: resource.composers,
+      arrangers: resource.arrangers,
+      instruments: resource.instruments,
     })),
   }
 }
@@ -52,6 +55,9 @@ bundleRouter.post('/:id/resources', async (req: Request, res: Response<BundleRes
     title: req.body.title,
     source: req.body.source,
     authors: req.body.authors,
+    composers: req.body.composers,
+    arrangers: req.body.arrangers,
+    instruments: req.body.instruments,
     album: req.body.album,
     audioType: req.body.audioType,
   }

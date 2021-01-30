@@ -1,4 +1,4 @@
-export type ResourceType = 'image' | 'video' | 'audio' | 'song-partition'
+export type ResourceType = 'image' | 'video' | 'audio' | 'song-partition' | 'orchestral-partition'
 export type AudioType = 'song' | 'playback'
 export default interface Resource {
   id: number;
@@ -7,6 +7,9 @@ export default interface Resource {
   type: ResourceType;
   source?: string;
   authors?: string[];
+  composers?: string[];
+  arrangers?: string[];
+  instruments?: string[];
   album?: string;
   audioType?: AudioType;
 }

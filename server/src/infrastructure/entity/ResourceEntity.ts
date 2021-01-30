@@ -2,6 +2,9 @@ import { Column, Entity, JoinTable, ManyToMany, ManyToOne, PrimaryGeneratedColum
 import { BundleEntity } from './BundleEntity'
 import { AuthorEntity } from './AuthorEntity'
 import { AudioType, ResourceType } from '@shared/Resource'
+import { ComposerEntity } from './ComposerEntity'
+import { ArrangerEntity } from './ArrangerEntity'
+import { InstrumentEntity } from './InstrumentEntity'
 
 @Entity({ name: 'resource' })
 export class ResourceEntity {
@@ -26,6 +29,15 @@ export class ResourceEntity {
   @ManyToMany(() => AuthorEntity, author => author.resources, { cascade: true, eager: true })
   @JoinTable({ name: 'resource_author' })
   authors?: AuthorEntity[]
+  @ManyToMany(() => ComposerEntity, composer => composer.resources, { cascade: true, eager: true })
+  @JoinTable({ name: 'resource_composer' })
+  composers?: ComposerEntity[]
+  @ManyToMany(() => ArrangerEntity, arranger => arranger.resources, { cascade: true, eager: true })
+  @JoinTable({ name: 'resource_arranger' })
+  arrangers?: ArrangerEntity[]
+  @ManyToMany(() => InstrumentEntity, instrument => instrument.resources, { cascade: true, eager: true })
+  @JoinTable({ name: 'resource_instrument' })
+  instruments?: InstrumentEntity[]
 
   constructor(
     id: number,
@@ -38,6 +50,9 @@ export class ResourceEntity {
     album?: string,
     audioType?: AudioType,
     bundle?: BundleEntity,
+    composers?: ComposerEntity[],
+    arrangers?: ArrangerEntity[],
+    instruments?: InstrumentEntity[],
   ) {
     this.id = id
     this.title = title
@@ -49,5 +64,8 @@ export class ResourceEntity {
     this.authors = authors
     this.album = album
     this.audioType = audioType
+    this.composers = composers
+    this.arrangers = arrangers
+    this.instruments = instruments
   }
 }

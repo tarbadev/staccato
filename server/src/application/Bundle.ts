@@ -25,6 +25,9 @@ export default class Bundle {
       params.authors,
       params.album,
       params.audioType,
+      params.composers,
+      params.arrangers,
+      params.instruments,
     )
     return new Bundle(this.id, this.name, this.googleDriveId, this.resources.concat(resource))
   }
@@ -39,4 +42,7 @@ type NewResourceParams = {
   driveLink: string;
   album?: string;
   audioType?: AudioType;
+  composers?: string[];
+  arrangers?: string[];
+  instruments?: string[];
 }

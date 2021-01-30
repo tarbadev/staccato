@@ -35,11 +35,6 @@ jobs:
       - name: "Install dependencies"
         if: steps.yarn-cache.outputs.cache-hit != 'true'
         run: yarn --frozen-lockfile
-      - name: Debug
-        run: |
-          yarn cypress cache path
-          ls -la ~/.cache
-          ls -la ~/.cache/Cypress
       - name: "Run Unit Tests"
         run: yarn test
 

@@ -84,13 +84,48 @@ const addSongPartition = (path: string, title: string, authors: string[]): void 
   cy.get('[data-resource-title]').contains(title, { timeout: 2000 })
 }
 
-const verifyExpectedResource = ({ album = '', authors = [], source = '', title, type, audioType }: {
+const addOrchestralPartition = (
+  path: string,
+  title: string,
+  composers: string[],
+  arrangers: string[],
+  instruments: string[],
+): void => {
+  cy.get('[data-add-resource]').click()
+  cy.get('[data-add-orchestral-partition-resource]').click()
+
+  cy.typeText('[data-add-orchestral-partition-title] input', title)
+  cy.typeText('[data-add-orchestral-partition-composers] input', composers.join(';'))
+  cy.typeText('[data-add-orchestral-partition-arrangers] input', arrangers.join(';'))
+  cy.typeText('[data-add-orchestral-partition-instruments] input', instruments.join(';'))
+
+  cy.get('[data-dropzone-container="orchestral-partition"] input[type="file"]').attachFile(path)
+
+  cy.get('[data-button-submit]').click()
+
+  cy.get('[data-resource-title]').contains(title, { timeout: 2000 })
+}
+
+const verifyExpectedResource = ({
+                                  album = '',
+                                  authors = [],
+                                  source = '',
+                                  title,
+                                  type,
+                                  audioType,
+                                  composers = [],
+                                  arrangers = [],
+                                  instruments = [],
+                                }: {
   title: string;
   type: ResourceType;
   source?: string;
   authors?: string[];
   album?: string;
   audioType?: AudioType;
+  composers?: string[];
+  arrangers?: string[];
+  instruments?: string[];
 }): void => {
   if (type === 'image') {
     verifyTextContent('[data-resource-title]', title)
@@ -120,6 +155,23 @@ const verifyExpectedResource = ({ album = '', authors = [], source = '', title, 
       title,
       text => text.split(' - ')[0],
     )
+  } else if (type === 'orchestral-partition') {
+    verifyTextContent(
+      '[data-resource-title] .MuiCardHeader-title',
+      title,
+      text => text.split(' - ')[0],
+    )
+    verifyTextContent(
+      '[data-resource-title] .MuiCardHeader-subheader',
+      composers.join(', '),
+      text => text.split(' - ')[0].replace('Composed by ', ''),
+    )
+    verifyTextContent(
+      '[data-resource-title] .MuiCardHeader-subheader',
+      arrangers.join(', '),
+      text => text.split(' - ')[1].replace('Arranged by ', ''),
+    )
+    verifyTextContent('[data-resource-instruments]', instruments.join(', '), text => text.replace('Instruments: ', ''))
   }
 }
 
@@ -236,6 +288,27 @@ describe('Bundle', () => {
             addSongPartition('song-partition.pdf', title, authors)
 
             verifyExpectedResource({ type: 'song-partition', title, authors })
+
+            cy.task('googleDrive:deleteFolderById', folderId)
+          })
+      })
+  })
+
+  it('should add a orchestral partition', () => {
+    cy.task('googleDrive:createFolder', 'Bundle 2')
+      .then(folderId => {
+        const title = 'An example music'
+        const composers = ['First Composer', 'Second Composer']
+        const arrangers = ['First Arranger', 'Second Arranger']
+        const instruments = ['Piano', 'Violin', 'Trumpet']
+        const bundleToStore = { name: 'Bundle 2', googleDriveId: folderId }
+        cy.task('database:store', { entity: 'BundleEntity', object: bundleToStore })
+          .then(b => b as BundleEntity)
+          .then(storedBundle => {
+            cy.goToBundlePage(storedBundle.id)
+            addOrchestralPartition('orchestral-partition.pdf', title, composers, arrangers, instruments)
+
+            verifyExpectedResource({ type: 'orchestral-partition', title, composers, arrangers, instruments })
 
             cy.task('googleDrive:deleteFolderById', folderId)
           })

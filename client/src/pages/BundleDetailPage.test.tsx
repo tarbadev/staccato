@@ -87,6 +87,12 @@ describe('BundleDetailPage', () => {
 
       const audioMenu = screen.getByRole('menuitem', { name: 'Audio' })
       expect(audioMenu).toBeInTheDocument()
+
+      const songMenu = screen.getByRole('menuitem', { name: 'Song Partition' })
+      expect(songMenu).toBeInTheDocument()
+
+      const orchestralMenu = screen.getByRole('menuitem', { name: 'Orchestral Partition' })
+      expect(orchestralMenu).toBeInTheDocument()
     })
   })
 
@@ -96,7 +102,7 @@ describe('BundleDetailPage', () => {
       resourceType: string,
       fileName: string,
       mimeType: string,
-      otherFields?: { source?: string, album?: string, authors?: string[], audioType?: AudioType },
+      otherFields?: { source?: string, album?: string, authors?: string[], composers?: string[], arrangers?: string[], instruments?: string[], audioType?: AudioType },
     ) => {
       const bundleId = 2
       const bundle = { name: 'Some Name', id: bundleId, resources: [] }
@@ -142,6 +148,33 @@ describe('BundleDetailPage', () => {
             expect(input).toBeInTheDocument()
 
             fireEvent.change(input, { target: { value: otherFields.authors.join(';') } })
+          })
+        }
+
+        if (otherFields.composers) {
+          await waitFor(() => {
+            const input = screen.getByRole('textbox', { name: /composers/i }) as HTMLInputElement
+            expect(input).toBeInTheDocument()
+
+            fireEvent.change(input, { target: { value: otherFields.composers.join(';') } })
+          })
+        }
+
+        if (otherFields.arrangers) {
+          await waitFor(() => {
+            const input = screen.getByRole('textbox', { name: /arrangers/i }) as HTMLInputElement
+            expect(input).toBeInTheDocument()
+
+            fireEvent.change(input, { target: { value: otherFields.arrangers.join(';') } })
+          })
+        }
+
+        if (otherFields.instruments) {
+          await waitFor(() => {
+            const input = screen.getByRole('textbox', { name: /instruments/i }) as HTMLInputElement
+            expect(input).toBeInTheDocument()
+
+            fireEvent.change(input, { target: { value: otherFields.instruments.join(';') } })
           })
         }
 
@@ -223,6 +256,20 @@ describe('BundleDetailPage', () => {
             'First Author',
             'Second Author',
           ],
+        },
+      )
+    })
+
+    it('should send an upload request with the orchestral partition', async () => {
+      await testUpload(
+        'My orchestral partition title',
+        'Orchestral Partition',
+        'example.pdf',
+        'application/pdf',
+        {
+          composers: ['First Composer', 'Second Composer'],
+          arrangers: ['First Arranger', 'Second Arranger'],
+          instruments: ['Piano', 'Violin', 'Trumpet'],
         },
       )
     })

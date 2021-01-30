@@ -10,6 +10,9 @@ export default class Resource {
   authors?: string[]
   album?: string
   audioType?: AudioType
+  composers?: string[]
+  arrangers?: string[]
+  instruments?: string[]
 
   constructor(
     id: number,
@@ -21,6 +24,9 @@ export default class Resource {
     authors?: string[],
     album?: string,
     audioType?: AudioType,
+    composers?: string[],
+    arrangers?: string[],
+    instruments?: string[],
   ) {
     this.id = id
     this.title = title
@@ -31,5 +37,8 @@ export default class Resource {
     this.authors = authors
     this.album = album
     this.audioType = audioType
+    this.composers = composers
+    this.arrangers = arrangers
+    this.instruments = instruments
   }
 }

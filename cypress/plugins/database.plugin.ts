@@ -25,7 +25,13 @@ export default {
     const conn = getConnection()
     const tables = [
       'resource_author',
+      'resource_composer',
+      'resource_arranger',
+      'resource_instrument',
       'author',
+      'composer',
+      'arranger',
+      'instrument',
       'resource',
       'bundle',
     ]

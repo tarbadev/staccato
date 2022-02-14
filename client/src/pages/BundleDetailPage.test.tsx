@@ -309,5 +309,9 @@ describe('BundleDetailPage', () => {
     it('should delete a video', async () => {
       await testDeleteResource('video')
     })
+
+    it('should delete a music', async () => {
+      await testDeleteResource('audio')
+    })
   })
 })

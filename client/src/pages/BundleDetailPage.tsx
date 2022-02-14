@@ -118,7 +118,7 @@ const BundleDetailPageDisplay = ({
       } else if (resource.type === 'video') {
         card = <VideoCard resource={resource} onDeleteClick={onDeleteClick} />
       } else if (resource.type === 'audio') {
-        card = <AudioCard resource={resource} />
+        card = <AudioCard resource={resource} onDeleteClick={onDeleteClick} />
       } else if (resource.type === 'song-partition') {
         card = <SongPartitionCard resource={resource} />
       } else if (resource.type === 'orchestral-partition') {

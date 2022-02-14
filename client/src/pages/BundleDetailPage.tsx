@@ -110,11 +110,13 @@ const BundleDetailPageDisplay = ({
 
   const resources = bundle.resources.map(resource => {
       let card
+      const deleteResourceUrl = `/api/bundles/${bundle.id}/resources/${resource.id}`
+      const onDeleteClick = () => request({ url: deleteResourceUrl, method: 'DELETE' })
 
       if (resource.type === 'image') {
-        card = <ImageCard resource={resource} />
+        card = <ImageCard resource={resource} onDeleteClick={onDeleteClick} />
       } else if (resource.type === 'video') {
-        card = <VideoCard resource={resource} />
+        card = <VideoCard resource={resource} onDeleteClick={onDeleteClick} />
       } else if (resource.type === 'audio') {
         card = <AudioCard resource={resource} />
       } else if (resource.type === 'song-partition') {
@@ -134,7 +136,8 @@ const BundleDetailPageDisplay = ({
     <ResourceUpload uploadResource={uploadResource} />
     <Grid container spacing={2} alignItems='stretch' direction='row' data-resource-container>
       <Grid item xs={12}>
-        <Button data-view-in-drive variant='contained' color='primary' target='_blank' href={bundle.driveUrl}>View in Drive</Button>
+        <Button data-view-in-drive variant='contained' color='primary' target='_blank' href={bundle.driveUrl}>View in
+          Drive</Button>
       </Grid>
       {resources}
     </Grid>

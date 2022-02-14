@@ -5,7 +5,7 @@ import { BundleDetailPage } from './BundleDetailPage'
 import * as Utils from '../Utils'
 import { request } from '../Utils'
 import Bundle from '@shared/Bundle'
-import { AudioType } from '@shared/Resource'
+import Resource, { AudioType, ResourceType } from '@shared/Resource'
 
 const requestSpy = jest.spyOn(Utils, 'request')
 
@@ -13,8 +13,8 @@ describe('BundleDetailPage', () => {
   it('should retrieve the bundle and display it', async () => {
     const bundleName = 'Some Bundle Name'
     const bundleId = 2
-    const resource = { id: 31, title: 'Such a pretty picture', url: 'path/to/img', type: 'image' }
-    const bundle: Bundle = { name: bundleName, id: bundleId, resources: [resource] }
+    const resource: Resource = { id: 31, title: 'Such a pretty picture', url: 'path/to/img', type: 'image' }
+    const bundle: Bundle = { name: bundleName, id: bundleId, driveUrl: '', resources: [resource] }
 
     requestSpy.mockResolvedValue(bundle)
 
@@ -26,10 +26,10 @@ describe('BundleDetailPage', () => {
       const text = screen.getByText(bundleName)
       expect(text).toBeInTheDocument()
 
-      const resourceTitle = screen.getByText(resource.title)
+      const resourceTitle = screen.getByText(resource.title!)
       expect(resourceTitle).toBeInTheDocument()
 
-      const image = screen.getByTitle(resource.title)
+      const image = screen.getByTitle(resource.title!)
       expect(image).toBeInTheDocument()
     })
   })
@@ -147,7 +147,7 @@ describe('BundleDetailPage', () => {
             const input = screen.getByRole('textbox', { name: /authors/i }) as HTMLInputElement
             expect(input).toBeInTheDocument()
 
-            fireEvent.change(input, { target: { value: otherFields.authors.join(';') } })
+            fireEvent.change(input, { target: { value: otherFields!.authors!.join(';') } })
           })
         }
 
@@ -156,7 +156,7 @@ describe('BundleDetailPage', () => {
             const input = screen.getByRole('textbox', { name: /composers/i }) as HTMLInputElement
             expect(input).toBeInTheDocument()
 
-            fireEvent.change(input, { target: { value: otherFields.composers.join(';') } })
+            fireEvent.change(input, { target: { value: otherFields!.composers!.join(';') } })
           })
         }
 
@@ -165,7 +165,7 @@ describe('BundleDetailPage', () => {
             const input = screen.getByRole('textbox', { name: /arrangers/i }) as HTMLInputElement
             expect(input).toBeInTheDocument()
 
-            fireEvent.change(input, { target: { value: otherFields.arrangers.join(';') } })
+            fireEvent.change(input, { target: { value: otherFields!.arrangers!.join(';') } })
           })
         }
 
@@ -174,7 +174,7 @@ describe('BundleDetailPage', () => {
             const input = screen.getByRole('textbox', { name: /instruments/i }) as HTMLInputElement
             expect(input).toBeInTheDocument()
 
-            fireEvent.change(input, { target: { value: otherFields.instruments.join(';') } })
+            fireEvent.change(input, { target: { value: otherFields!.instruments!.join(';') } })
           })
         }
 
@@ -272,6 +272,42 @@ describe('BundleDetailPage', () => {
           instruments: ['Piano', 'Violin', 'Trumpet'],
         },
       )
+    })
+  })
+
+  describe('delete resource', () => {
+    const testDeleteResource = async (resourceType: ResourceType) => {
+      const bundleId = 2
+      const resourceId = 43765
+      const resource: Resource = { title: 'Some amazing resource', url: '', id: resourceId, type: resourceType }
+      const bundle: Bundle = { name: 'Some Name', id: bundleId, driveUrl: '', resources: [resource] }
+
+      requestSpy.mockResolvedValue(bundle)
+
+      render(<BundleDetailPage match={{ params: { id: bundleId.toString() } }} />)
+
+      await waitFor(() => {
+        const button = screen.getByRole('button', { name: 'delete' })
+        expect(button).not.toBeDisabled()
+        expect(fireEvent.click(button)).toBeTruthy()
+      })
+
+      await waitFor(() => {
+        expect(request).toHaveBeenCalledWith(
+          {
+            url: `/api/bundles/${bundleId}/resources/${resourceId}`,
+            method: 'DELETE',
+          },
+        )
+      })
+    }
+
+    it('should delete an image', async () => {
+      await testDeleteResource('image')
+    })
+
+    it('should delete a video', async () => {
+      await testDeleteResource('video')
     })
   })
 })

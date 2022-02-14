@@ -6,11 +6,14 @@ import Resource from '@shared/Resource'
 import { CardContent } from '@material-ui/core'
 import Typography from '@material-ui/core/Typography'
 import { Link } from 'react-router-dom'
+import { DeleteButton } from './DeleteButton'
 
-export const VideoCard = ({ resource }: { resource: Resource }) => {
+export const VideoCard = ({ resource, onDeleteClick }: { resource: Resource, onDeleteClick: Function }) => {
   return <Card>
-    {resource.title && <CardHeader title={resource.title}
-                                   subheader={resource.authors?.join(', ')} data-resource-title />}
+    <CardHeader title={resource.title}
+                subheader={resource.authors?.join(', ')}
+                data-resource-title
+                action={<DeleteButton onDeleteClick={onDeleteClick} />} />
     <CardMedia
       component='video'
       src={resource.url}
@@ -19,9 +22,10 @@ export const VideoCard = ({ resource }: { resource: Resource }) => {
       controls
     />
     {resource.source &&
-    <CardContent>
-      <Typography paragraph data-resource-source>Source: <Link to={resource.source}>{resource.source}</Link></Typography>
-    </CardContent>
+        <CardContent>
+          <Typography paragraph
+                      data-resource-source>Source: <Link to={resource.source}>{resource.source}</Link></Typography>
+        </CardContent>
     }
   </Card>
 }

@@ -2,6 +2,7 @@ import BundleRepository from '../infrastructure/BundleRepository'
 import Bundle from './Bundle'
 import GoogleDrive from '../infrastructure/GoogleDrive'
 import { AudioType, ResourceType } from '@shared/Resource'
+import ResourceRepository from '../infrastructure/ResourceRepository'
 
 export type UploadParams = {
   name: string;
@@ -59,5 +60,15 @@ export default class BundleService {
       type,
     })
     return BundleRepository.save(newBundle)
+  }
+
+  async deleteResource(bundleId: number, resourceId: number): Promise<Bundle> {
+    const bundle = await BundleRepository.findOne(bundleId)
+    const resource = bundle.resources.find(res => res.id == resourceId)
+
+    await ResourceRepository.delete(resource!.id)
+    await GoogleDrive.getInstance().deleteFile(resource!.googleDriveId)
+
+    return await BundleRepository.findOne(bundleId)
   }
 }

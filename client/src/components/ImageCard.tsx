@@ -7,7 +7,7 @@ import { DeleteButton } from './DeleteButton'
 
 export const ImageCard = ({ resource, onDeleteClick }: { resource: Resource, onDeleteClick: Function }) => {
   return <Card>
-    <CardHeader title={resource.title} action={<DeleteButton onDeleteClick={onDeleteClick} />} />
+    <CardHeader title={resource.title} action={<DeleteButton onDeleteClick={onDeleteClick} />} data-resource-title    />
     <CardMedia
       component='img'
       image={resource.url}

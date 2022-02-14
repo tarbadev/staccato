@@ -182,4 +182,20 @@ describe('BundleRouter', () => {
       )
     })
   })
+
+  it('should call the BundleService on delete resource', async () => {
+    const bundleId = 43
+    const resourceId = 980
+
+    const deleteSpy = jest.spyOn(BundleService.prototype, 'deleteResource')
+    deleteSpy.mockResolvedValueOnce(bundle)
+
+    const res = await request(app)
+      .delete(`/api/bundles/${bundleId}/resources/${resourceId}`)
+
+    expect(deleteSpy).toHaveBeenCalledWith(bundleId, resourceId)
+
+    expect(res.status).toEqual(200)
+    expect(res.body).toEqual(bundleResponse)
+  })
 })

@@ -66,4 +66,9 @@ bundleRouter.post('/:id/resources', async (req: Request, res: Response<BundleRes
   res.json(mapBundleToResponse(bundle))
 })
 
+bundleRouter.delete('/:id/resources/:resourceId', async (req: Request, res: Response<BundleResponse>) => {
+  const bundle = await bundleService.deleteResource(Number(req.params.id), Number(req.params.resourceId))
+  res.json(mapBundleToResponse(bundle))
+})
+
 export default bundleRouter

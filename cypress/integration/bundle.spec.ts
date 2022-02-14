@@ -1,5 +1,6 @@
 import { AudioType, ResourceType } from '@shared/Resource'
 import { BundleEntity } from 'staccato-server/src/infrastructure/entity/BundleEntity'
+import { describe } from 'mocha'
 
 const editName = (newName: string): void => {
   const editButtonSelector = '[data-edit-bundle-name]'
@@ -34,6 +35,15 @@ const addImage = (path: string, title: string): void => {
   cy.get('[data-button-submit]').click()
 
   cy.get('[data-resource-title]').contains(title, { timeout: 2000 })
+}
+
+const deleteResourceByTitle = (title: string): void => {
+  cy.get('[data-resource-title]')
+    .contains(title, { timeout: 2000 })
+    .get('[data-delete-icon]')
+    .click()
+
+  cy.get('[data-resource-title]', { timeout: 15000 }).should('not.exist')
 }
 
 const addVideo = (path: string, title: string, source: string, authors: string[]): void => {
@@ -213,7 +223,7 @@ describe('Bundle', () => {
       })
   })
 
-  it('should add an image', () => {
+  it('should add and delete an image', () => {
     cy.task('googleDrive:createFolder', 'Bundle 2')
       .then(folderId => {
         const imageTitle = 'Super cute kitty'
@@ -229,12 +239,17 @@ describe('Bundle', () => {
               title: imageTitle,
             })
 
+            cy.task('googleDrive:getFilesInFolder', folderId).should('not.be.empty')
+
+            deleteResourceByTitle(imageTitle)
+
+            cy.task('googleDrive:getFilesInFolder', folderId).should('be.empty')
             cy.task('googleDrive:deleteFolderById', folderId)
           })
       })
   })
 
-  it('should add a video', () => {
+  it('should add and delete a video', () => {
     cy.task('googleDrive:createFolder', 'Bundle 2')
       .then(folderId => {
         const videoTitle = 'An example video'
@@ -249,12 +264,17 @@ describe('Bundle', () => {
 
             verifyExpectedResource({ type: 'video', title: videoTitle, source: videoSource, authors: videoAuthors })
 
+            cy.task('googleDrive:getFilesInFolder', folderId).should('not.be.empty')
+
+            deleteResourceByTitle(videoTitle)
+
+            cy.task('googleDrive:getFilesInFolder', folderId).should('be.empty')
             cy.task('googleDrive:deleteFolderById', folderId)
           })
       })
   })
 
-  it('should add a song', () => {
+  it('should add and delete a song', () => {
     cy.task('googleDrive:createFolder', 'Bundle 2')
       .then(folderId => {
         const title = 'An example music'
@@ -270,12 +290,17 @@ describe('Bundle', () => {
 
             verifyExpectedResource({ type: 'audio', title, album, authors, audioType: 'playback' })
 
+            cy.task('googleDrive:getFilesInFolder', folderId).should('not.be.empty')
+
+            deleteResourceByTitle(title)
+
+            cy.task('googleDrive:getFilesInFolder', folderId).should('be.empty')
             cy.task('googleDrive:deleteFolderById', folderId)
           })
       })
   })
 
-  it('should add a song partition', () => {
+  it('should add and delete a song partition', () => {
     cy.task('googleDrive:createFolder', 'Bundle 2')
       .then(folderId => {
         const title = 'An example music'
@@ -289,12 +314,17 @@ describe('Bundle', () => {
 
             verifyExpectedResource({ type: 'song-partition', title, authors })
 
+            cy.task('googleDrive:getFilesInFolder', folderId).should('not.be.empty')
+
+            deleteResourceByTitle(title)
+
+            cy.task('googleDrive:getFilesInFolder', folderId).should('be.empty')
             cy.task('googleDrive:deleteFolderById', folderId)
           })
       })
   })
 
-  it('should add a orchestral partition', () => {
+  it('should add and delete an orchestral partition', () => {
     cy.task('googleDrive:createFolder', 'Bundle 2')
       .then(folderId => {
         const title = 'An example music'
@@ -310,6 +340,11 @@ describe('Bundle', () => {
 
             verifyExpectedResource({ type: 'orchestral-partition', title, composers, arrangers, instruments })
 
+            cy.task('googleDrive:getFilesInFolder', folderId).should('not.be.empty')
+
+            deleteResourceByTitle(title)
+
+            cy.task('googleDrive:getFilesInFolder', folderId).should('be.empty')
             cy.task('googleDrive:deleteFolderById', folderId)
           })
       })

@@ -54,5 +54,9 @@ const connection = {
   getAllInstruments() {
     return getConnection().getRepository('InstrumentEntity').find()
   },
+
+  getAllResources() {
+    return getConnection().getRepository('ResourceEntity').find()
+  },
 }
 export default connection

@@ -77,4 +77,14 @@ export default {
 
     return null
   },
+
+  async 'googleDrive:getFilesInFolder'(folderId: string): Promise<string[] | null> {
+    const children = await drive.files.list({ pageSize: 100, q: `'${folderId}' in parents` })
+
+    const fileIds = children.data.files && children.data.files
+      .map(file => file.id ? file.id : null)
+      .filter((fileId): fileId is string => fileId != null)
+
+    return fileIds || null
+  },
 }

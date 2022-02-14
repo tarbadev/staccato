@@ -129,4 +129,8 @@ export default class GoogleDrive {
         .then(() => ({ id: fileId, link: `https://drive.google.com/uc?id=${fileId}` }))
     })
   }
+
+  async deleteFile(fileId: string): Promise<void> {
+    await this.drive.files.delete({ fileId })
+  }
 }

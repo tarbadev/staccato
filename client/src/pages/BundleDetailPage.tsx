@@ -51,6 +51,12 @@ export const BundleDetailPage = ({ match }: RouteComponentProps<RouteInfo>) => {
       .catch(err => console.error('An error happened while uploading resources', err))
   }
 
+  const deleteResource = (resourceId: number) => {
+    const deleteResourceUrl = `/api/bundles/${bundle.id}/resources/${resourceId}`
+    request({ url: deleteResourceUrl, method: 'DELETE' })
+      .then(bundle => setBundle(bundle))
+  }
+
   return <BundleDetailPageDisplay
     bundle={bundle}
     editMode={editMode}
@@ -59,6 +65,7 @@ export const BundleDetailPage = ({ match }: RouteComponentProps<RouteInfo>) => {
     editBundleName={editBundleName}
     onBundleNameChange={setEditBundleName}
     uploadResource={uploadResource}
+    deleteResource={deleteResource}
   />
 }
 
@@ -70,6 +77,7 @@ type BundleDetailPageProps = {
   editBundleName: string,
   onBundleNameChange: (newName: string) => void,
   uploadResource: (request: UploadRequest) => void;
+  deleteResource: (resourceId: number) => void;
 }
 const BundleDetailPageDisplay = ({
                                    bundle,
@@ -79,6 +87,7 @@ const BundleDetailPageDisplay = ({
                                    onBundleNameChange,
                                    toggleEditMode,
                                    uploadResource,
+                                   deleteResource,
                                  }: BundleDetailPageProps) => {
   let title
   if (editMode) {
@@ -110,8 +119,7 @@ const BundleDetailPageDisplay = ({
 
   const resources = bundle.resources.map(resource => {
       let card
-      const deleteResourceUrl = `/api/bundles/${bundle.id}/resources/${resource.id}`
-      const onDeleteClick = () => request({ url: deleteResourceUrl, method: 'DELETE' })
+      const onDeleteClick = () => deleteResource(resource.id)
 
       if (resource.type === 'image') {
         card = <ImageCard resource={resource} onDeleteClick={onDeleteClick} />

@@ -25,6 +25,7 @@ describe('GoogleDrive', () => {
   const mockCreateFile = jest.fn()
   const mockListFile = jest.fn()
   const mockUpdateFile = jest.fn()
+  const mockDeleteFile = jest.fn()
   const mockListPermissions = jest.fn()
   const mockCreatePermissions = jest.fn()
   const driveObject = {
@@ -32,6 +33,7 @@ describe('GoogleDrive', () => {
       create: mockCreateFile,
       list: mockListFile,
       update: mockUpdateFile,
+      delete: mockDeleteFile,
     },
     permissions: {
       list: mockListPermissions,
@@ -247,6 +249,21 @@ describe('GoogleDrive', () => {
 
         expect(returnedPermission).toEqual(permission)
         expect(mockCreatePermissions).toHaveBeenCalledWith(expectedOptions)
+      })
+    })
+
+    describe('deleteFile', () => {
+      it('should delete the file given an id', async () => {
+        const folderId = 'SuperSecretId'
+        const expectedOptions: Params$Resource$Files$Update = {
+          fileId: folderId,
+        }
+
+        mockDeleteFile.mockResolvedValueOnce({ data: { id: folderId } })
+
+        await googleDriveInstance.deleteFile(folderId)
+
+        expect(mockDeleteFile).toHaveBeenCalledWith(expectedOptions)
       })
     })
   })

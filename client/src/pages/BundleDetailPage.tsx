@@ -21,7 +21,7 @@ interface RouteInfo {
 }
 
 export const BundleDetailPage = ({ match }: RouteComponentProps<RouteInfo>) => {
-  const [bundle, setBundle] = useState<Bundle>({ id: 0, name: '', resources: [] })
+  const [bundle, setBundle] = useState<Bundle>({ id: 0, name: '', driveUrl: '', resources: [] })
   const [editMode, setEditMode] = useState(false)
   const [editBundleName, setEditBundleName] = useState('')
 
@@ -133,6 +133,9 @@ const BundleDetailPageDisplay = ({
     {title}
     <ResourceUpload uploadResource={uploadResource} />
     <Grid container spacing={2} alignItems='stretch' direction='row' data-resource-container>
+      <Grid item xs={12}>
+        <Button data-view-in-drive variant='contained' color='primary' target='_blank' href={bundle.driveUrl}>View in Drive</Button>
+      </Grid>
       {resources}
     </Grid>
   </div>)

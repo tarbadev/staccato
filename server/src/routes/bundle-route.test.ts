@@ -37,7 +37,12 @@ describe('BundleRouter', () => {
     instruments: ['Piano', 'Violin', 'Trumpet'],
   }
   const bundle = new Bundle(32, 'Some super bundle', 'SuperDriveId', [resource])
-  const bundleResponse: BundleResponse = { id: 32, name: 'Some super bundle', resources: [resourceResponse] }
+  const bundleResponse: BundleResponse = {
+    id: 32,
+    name: 'Some super bundle',
+    driveUrl: `https://drive.google.com/drive/folders/${bundle.googleDriveId}`,
+    resources: [resourceResponse],
+  }
   let app: Express
 
   beforeAll(() => {

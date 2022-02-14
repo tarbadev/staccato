@@ -314,4 +314,17 @@ describe('Bundle', () => {
           })
       })
   })
+
+  it('should open the bundle folder in Drive', () => {
+    const bundleToStore: BundleEntity = { id: 0, name: 'Bundle 2', googleDriveId: '1xDo3_2QB5OqBiskgyHR8ekgJX1uVyWmG' }
+    cy.task('database:store', { entity: 'BundleEntity', object: bundleToStore })
+      .then(b => b as BundleEntity)
+      .then(storedBundle => {
+        cy.goToBundlePage(storedBundle.id)
+
+        cy.get('[data-view-in-drive]')
+          .should('have.attr', 'target', '_blank')
+          .should('have.attr', 'href', `https://drive.google.com/drive/folders/${storedBundle.googleDriveId}`)
+      })
+  })
 })

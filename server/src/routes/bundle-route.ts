@@ -12,6 +12,7 @@ const mapBundleToResponse = (bundle: Bundle): BundleResponse => {
   return {
     id: bundle.id,
     name: bundle.name,
+    driveUrl: `https://drive.google.com/drive/folders/${bundle.googleDriveId}`,
     resources: bundle.resources.map(resource => ({
       id: resource.id,
       title: resource.title,

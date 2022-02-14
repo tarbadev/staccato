@@ -313,5 +313,9 @@ describe('BundleDetailPage', () => {
     it('should delete a music', async () => {
       await testDeleteResource('audio')
     })
+
+    it('should delete a song partition', async () => {
+      await testDeleteResource('song-partition')
+    })
   })
 })

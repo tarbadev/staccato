@@ -3,10 +3,11 @@ import Card from '@material-ui/core/Card'
 import React, { useState } from 'react'
 import Resource from '@shared/Resource'
 import { Document, Page, pdfjs } from 'react-pdf'
+import { DeleteButton } from './DeleteButton'
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`
 
-export const SongPartitionCard = ({ resource }: { resource: Resource }) => {
+export const SongPartitionCard = ({ resource, onDeleteClick }: { resource: Resource, onDeleteClick: Function }) => {
   const [numPages, setNumPages] = useState(0)
 
   const onDocumentLoadSuccess = ({ numPages }: { numPages: number }) => {
@@ -14,8 +15,10 @@ export const SongPartitionCard = ({ resource }: { resource: Resource }) => {
   }
 
   return <Card>
-    {resource.title && <CardHeader title={resource.title}
-                                   subheader={resource.authors?.join(', ')} data-resource-title />}
+    <CardHeader title={resource.title}
+                subheader={resource.authors?.join(', ')}
+                data-resource-title
+                action={<DeleteButton onDeleteClick={onDeleteClick} />} />
     <Document
       file={`https://cors-anywhere.herokuapp.com/${resource.url}`}
       onLoadSuccess={onDocumentLoadSuccess}

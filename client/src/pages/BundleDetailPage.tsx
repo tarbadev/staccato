@@ -122,7 +122,7 @@ const BundleDetailPageDisplay = ({
       } else if (resource.type === 'song-partition') {
         card = <SongPartitionCard resource={resource} onDeleteClick={onDeleteClick} />
       } else if (resource.type === 'orchestral-partition') {
-        card = <OrchestralPartitionCard resource={resource} />
+        card = <OrchestralPartitionCard resource={resource} onDeleteClick={onDeleteClick} />
       }
 
       return <Grid item key={resource.id}>

@@ -4,10 +4,14 @@ import React, { useState } from 'react'
 import Resource from '@shared/Resource'
 import { Document, Page, pdfjs } from 'react-pdf'
 import { CardContent, Typography } from '@material-ui/core'
+import { DeleteButton } from './DeleteButton'
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`
 
-export const OrchestralPartitionCard = ({ resource }: { resource: Resource }) => {
+export const OrchestralPartitionCard = ({
+                                          resource,
+                                          onDeleteClick,
+                                        }: { resource: Resource, onDeleteClick: Function }) => {
   const [numPages, setNumPages] = useState(0)
 
   const onDocumentLoadSuccess = ({ numPages }: { numPages: number }) => {
@@ -19,10 +23,12 @@ export const OrchestralPartitionCard = ({ resource }: { resource: Resource }) =>
   const subHeader = `Composed by ${composersSubHeader} - Arranged by ${arrangersSubHeader}`
 
   return <Card>
-    {resource.title && <CardHeader title={resource.title}
-                                   subheader={subHeader} data-resource-title />}
+    <CardHeader title={resource.title}
+                subheader={subHeader}
+                data-resource-title
+                action={<DeleteButton onDeleteClick={onDeleteClick} />} />
     <CardContent>
-      <Typography color="textSecondary" gutterBottom data-resource-instruments>
+      <Typography color='textSecondary' gutterBottom data-resource-instruments>
         Instruments: {resource.instruments?.join(', ')}
       </Typography>
     </CardContent>

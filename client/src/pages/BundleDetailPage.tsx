@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { Typography } from '@material-ui/core'
-import { RouteComponentProps } from 'react-router'
+import { useParams } from 'react-router-dom'
 import Bundle from '@shared/Bundle'
 import { request } from '../Utils'
 import IconButton from '@material-ui/core/IconButton'
@@ -20,18 +20,19 @@ interface RouteInfo {
   id: string;
 }
 
-export const BundleDetailPage = ({ match }: RouteComponentProps<RouteInfo>) => {
+export const BundleDetailPage = () => {
   const [bundle, setBundle] = useState<Bundle>({ id: 0, name: '', driveUrl: '', resources: [] })
   const [editMode, setEditMode] = useState(false)
   const [editBundleName, setEditBundleName] = useState('')
+  const params = useParams()
 
   useEffect(() => {
-    request({ url: `/api/bundles/${match.params.id}` })
+    request({ url: `/api/bundles/${params.id}` })
       .then(data => {
         setBundle(data)
         setEditBundleName(data.name)
       })
-  }, [match.params.id])
+  }, [params.id])
 
   const editBundle = () => {
     request({ url: `/api/bundles/${bundle.id}`, method: 'POST', body: { name: editBundleName } })
@@ -43,7 +44,7 @@ export const BundleDetailPage = ({ match }: RouteComponentProps<RouteInfo>) => {
 
   const uploadResource = (uploadRequest: UploadRequest) => {
     request({
-      url: `/api/bundles/${match.params.id}/resources`,
+      url: `/api/bundles/${params.id}/resources`,
       method: 'POST',
       body: uploadRequest,
     })

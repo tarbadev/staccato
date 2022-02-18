@@ -6,19 +6,26 @@ import * as Utils from '../Utils'
 import { request } from '../Utils'
 import Bundle from '@shared/Bundle'
 import Resource, { AudioType, ResourceType } from '@shared/Resource'
+import { useParams } from 'react-router-dom'
 
 const requestSpy = jest.spyOn(Utils, 'request')
+jest.mock('react-router-dom')
 
 describe('BundleDetailPage', () => {
+  const bundleId = 2
+
+  beforeEach(() => {
+    useParams.mockReturnValue({ id: bundleId.toString() })
+  })
+
   it('should retrieve the bundle and display it', async () => {
     const bundleName = 'Some Bundle Name'
-    const bundleId = 2
     const resource: Resource = { id: 31, title: 'Such a pretty picture', url: 'path/to/img', type: 'image' }
     const bundle: Bundle = { name: bundleName, id: bundleId, driveUrl: '', resources: [resource] }
 
     requestSpy.mockResolvedValue(bundle)
 
-    render(<BundleDetailPage match={{ params: { id: bundleId.toString() } }} />)
+    render(<BundleDetailPage />)
 
     expect(request).toHaveBeenLastCalledWith({ url: `/api/bundles/${bundleId}` })
 
@@ -37,11 +44,10 @@ describe('BundleDetailPage', () => {
   it('should send a request to rename the bundle', async () => {
     const bundleName = 'Some Bundle Name'
     const newName = 'New Name'
-    const bundleId = 2
 
     requestSpy.mockResolvedValue({ name: bundleName, id: bundleId, resources: [] })
 
-    render(<BundleDetailPage match={{ params: { id: bundleId.toString() } }} />)
+    render(<BundleDetailPage />)
 
     fireEvent.click(screen.getByRole('button', { name: 'edit' }))
 
@@ -70,11 +76,9 @@ describe('BundleDetailPage', () => {
   })
 
   it('should display a menu to add resources', async () => {
-    const bundleId = 2
-
     requestSpy.mockResolvedValue({ name: 'Some Name', id: bundleId, resources: [] })
 
-    render(<BundleDetailPage match={{ params: { id: bundleId.toString() } }} />)
+    render(<BundleDetailPage />)
 
     fireEvent.click(screen.getByRole('button', { name: 'Add Resource' }))
 
@@ -104,12 +108,11 @@ describe('BundleDetailPage', () => {
       mimeType: string,
       otherFields?: { source?: string, album?: string, authors?: string[], composers?: string[], arrangers?: string[], instruments?: string[], audioType?: AudioType },
     ) => {
-      const bundleId = 2
       const bundle = { name: 'Some Name', id: bundleId, resources: [] }
 
       requestSpy.mockResolvedValue(bundle)
 
-      render(<BundleDetailPage match={{ params: { id: bundleId.toString() } }} />)
+      render(<BundleDetailPage />)
 
       fireEvent.click(screen.getByRole('button', { name: 'Add Resource' }))
 
@@ -277,14 +280,13 @@ describe('BundleDetailPage', () => {
 
   describe('delete resource', () => {
     const testDeleteResource = async (resourceType: ResourceType) => {
-      const bundleId = 2
       const resourceId = 43765
       const resource: Resource = { title: 'Some amazing resource', url: '', id: resourceId, type: resourceType }
       const bundle: Bundle = { name: 'Some Name', id: bundleId, driveUrl: '', resources: [resource] }
 
       requestSpy.mockResolvedValue(bundle)
 
-      render(<BundleDetailPage match={{ params: { id: bundleId.toString() } }} />)
+      render(<BundleDetailPage />)
 
       await waitFor(() => {
         const button = screen.getByRole('button', { name: 'delete' })

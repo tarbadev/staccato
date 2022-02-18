@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 
 import Bundle from '@shared/Bundle'
 import { request } from '../Utils'
@@ -10,7 +10,7 @@ import { ExpressAdd } from '../components/ExpressAdd'
 
 export const HomePage = () => {
   const [bundles, setBundles] = useState([])
-  const history = useHistory()
+  const navigate = useNavigate()
 
   const loadBundles = () => {
     request({ url: '/api/bundles' })
@@ -29,7 +29,7 @@ export const HomePage = () => {
 
   return <HomePageDisplay
     bundles={bundles}
-    displayBundleDetails={id => history.push(`/bundles/${id}`)}
+    displayBundleDetails={id => navigate(`/bundles/${id}`)}
     addBundle={addBundle}
   />
 }

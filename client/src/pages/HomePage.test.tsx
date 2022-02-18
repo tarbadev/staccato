@@ -3,18 +3,22 @@ import { fireEvent, render, screen, waitFor, waitForElementToBeRemoved } from '@
 import { HomePage } from './HomePage'
 import * as Utils from '../Utils'
 import { request } from '../Utils'
-
-const mockPush = jest.fn()
-
-jest.mock('react-router-dom', () => ({
-  useHistory: () => ({
-    push: mockPush,
-  }),
-}))
+import { useNavigate } from 'react-router-dom'
 
 const requestSpy = jest.spyOn(Utils, 'request')
+jest.mock('react-router-dom')
 
 describe('HomePage', () => {
+  const mockNavigate = jest.fn()
+
+  beforeAll(() => {
+    useNavigate.mockReturnValue(mockNavigate)
+  })
+
+  beforeEach(() => {
+    mockNavigate.mockReset()
+  })
+
   const verifyBundleIsInDoc = async (bundleName: string) => {
     await waitFor(() => {
       const text = screen.getByText(bundleName)
@@ -73,7 +77,7 @@ describe('HomePage', () => {
     await verifyBundleIsInDoc(bundleName)
     fireEvent.click(screen.getByText(bundleName))
 
-    expect(mockPush).toHaveBeenCalledWith(`/bundles/${bundleId}`)
+    expect(mockNavigate).toHaveBeenCalledWith(`/bundles/${bundleId}`)
   })
 
   it('should post the new bundle', async () => {

@@ -5,7 +5,7 @@ import Typography from '@material-ui/core/Typography'
 import IconButton from '@material-ui/core/IconButton'
 import SettingsIcon from '@material-ui/icons/Settings'
 import makeStyles from '@material-ui/core/styles/makeStyles'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -19,14 +19,14 @@ const useStyles = makeStyles((theme) => ({
 
 export const Header = () => {
   const classes = useStyles()
-  const history = useHistory()
+  const navigate = useNavigate()
 
   return <AppBar position="static" className={classes.root}>
     <Toolbar>
-      <Typography variant="h6" className={classes.title} onClick={() => history.push('/')}>
+      <Typography variant="h6" className={classes.title} onClick={() => navigate('/')}>
         Staccato
       </Typography>
-      <IconButton color="inherit" onClick={() => history.push('/settings')} data-menu-settings>
+      <IconButton color="inherit" onClick={() => navigate('/settings')} data-menu-settings>
         <SettingsIcon />
       </IconButton>
     </Toolbar>

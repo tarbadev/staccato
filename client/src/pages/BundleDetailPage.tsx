@@ -16,10 +16,6 @@ import { ResourceUpload } from '../components/ResourceUpload'
 import { SongPartitionCard } from '../components/SongPartitionCard'
 import { OrchestralPartitionCard } from '../components/OrchestralPartitionCard'
 
-interface RouteInfo {
-  id: string;
-}
-
 export const BundleDetailPage = () => {
   const [bundle, setBundle] = useState<Bundle>({ id: 0, name: '', driveUrl: '', resources: [] })
   const [editMode, setEditMode] = useState(false)

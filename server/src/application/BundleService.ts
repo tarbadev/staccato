@@ -66,8 +66,12 @@ export default class BundleService {
     const bundle = await BundleRepository.findOne(bundleId)
     const resource = bundle.resources.find(res => res.id == resourceId)
 
-    await ResourceRepository.delete(resource!.id)
-    await GoogleDrive.getInstance().deleteFile(resource!.googleDriveId)
+    if (resource == null) {
+      throw new Error('Resource not found')
+    }
+
+    await ResourceRepository.delete(resource.id)
+    await GoogleDrive.getInstance().deleteFile(resource.googleDriveId)
 
     return await BundleRepository.findOne(bundleId)
   }

@@ -14,5 +14,5 @@
     "comma-dangle": ["error", "always-multiline"],
     "quotes": ["error", "single"]
   },
-  "ignorePatterns": ["**/node_modules", "**/build", "**/jest.config.js"]
+  "ignorePatterns": ["**/node_modules", "**/build", "**/jest.config.js", "**/*.test.ts"]
 }

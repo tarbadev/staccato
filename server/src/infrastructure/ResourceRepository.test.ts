@@ -58,4 +58,10 @@ describe('ResourceRepository', () => {
 
     expect(await connection.getAllResources()).toHaveLength(0)
   })
+
+  it('should throw an error if the resource is not found', async () => {
+    expect(await connection.getAllResources()).toHaveLength(0)
+
+    await expect(ResourceRepository.delete(123)).rejects.toThrow('Resource was not found')
+  })
 })

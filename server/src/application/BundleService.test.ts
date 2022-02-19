@@ -257,4 +257,28 @@ describe('BundleService', () => {
     expect(ResourceRepository.delete).toHaveBeenCalledWith(resourceId)
     expect(mockDeleteFile).toHaveBeenCalledWith(driveId)
   })
+
+  it('should throw an error when the resource does not exist', async () => {
+    const bundleId = 432
+    const resourceId = 987
+    const bundleWithoutResource = new Bundle(
+      32,
+      'Some super bundle',
+      'SuperDriveId',
+      [],
+    )
+
+    const mockDeleteFile = jest.fn()
+    // @ts-ignore
+    jest.spyOn(GoogleDrive, 'getInstance').mockReturnValueOnce({ deleteFile: mockDeleteFile })
+
+    BundleRepository.findOne = jest.fn(() => Promise.resolve(bundleWithoutResource))
+    ResourceRepository.delete = jest.fn()
+
+    await expect(bundleService.deleteResource(bundleId, resourceId)).rejects.toThrow('Resource not found')
+
+    expect(BundleRepository.findOne).toHaveBeenCalledWith(bundleId)
+    expect(ResourceRepository.delete).not.toHaveBeenCalled()
+    expect(mockDeleteFile).not.toHaveBeenCalled()
+  })
 })

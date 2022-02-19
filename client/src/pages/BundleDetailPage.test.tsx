@@ -1,21 +1,24 @@
 import React from 'react'
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
-import user from '@testing-library/user-event'
+import userEvent from '@testing-library/user-event'
 import { BundleDetailPage } from './BundleDetailPage'
 import * as Utils from '../Utils'
 import { request } from '../Utils'
 import Bundle from '@shared/Bundle'
 import Resource, { AudioType, ResourceType } from '@shared/Resource'
 import { useParams } from 'react-router-dom'
+import { mocked } from 'jest-mock'
 
 const requestSpy = jest.spyOn(Utils, 'request')
 jest.mock('react-router-dom')
+
+const mockUseParams = mocked(useParams)
 
 describe('BundleDetailPage', () => {
   const bundleId = 2
 
   beforeEach(() => {
-    useParams.mockReturnValue({ id: bundleId.toString() })
+    mockUseParams.mockReturnValue({ id: bundleId.toString() })
   })
 
   it('should retrieve the bundle and display it', async () => {
@@ -122,10 +125,10 @@ describe('BundleDetailPage', () => {
         fireEvent.click(text)
       })
 
-      const input = screen.getByText('Drag and drop a file here or click')
+      const input = screen.getByLabelText('dropzone')
       const someFileContent = 'Some File Content'
       const file = new File([someFileContent], fileName, { type: mimeType })
-      user.upload(input, file)
+      userEvent.upload(input, file)
       fireEvent.drop(input)
 
       await waitFor(() => {

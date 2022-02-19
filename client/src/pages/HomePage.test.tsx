@@ -4,19 +4,18 @@ import { HomePage } from './HomePage'
 import * as Utils from '../Utils'
 import { request } from '../Utils'
 import { useNavigate } from 'react-router-dom'
+import { mocked } from 'jest-mock'
 
 const requestSpy = jest.spyOn(Utils, 'request')
 jest.mock('react-router-dom')
 
+const mockUseNavigate = mocked(useNavigate)
+
 describe('HomePage', () => {
   const mockNavigate = jest.fn()
 
-  beforeAll(() => {
-    useNavigate.mockReturnValue(mockNavigate)
-  })
-
   beforeEach(() => {
-    mockNavigate.mockReset()
+    mockUseNavigate.mockReturnValue(mockNavigate)
   })
 
   const verifyBundleIsInDoc = async (bundleName: string) => {

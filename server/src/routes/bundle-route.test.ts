@@ -124,7 +124,7 @@ describe('BundleRouter', () => {
       const createTempFileFromBase64Spy = jest.spyOn(Utils, 'createTempFileFromBase64')
       createTempFileFromBase64Spy.mockReturnValueOnce(filePath)
 
-      const base64Data = `data:${mimeType};base64,${btoa(someFileContent)}`
+      const base64Data = `data:${mimeType};base64,${Buffer.from(someFileContent).toString('base64')}`
       const res = await request(app)
         .post(`/api/bundles/${bundle.id}/resources`)
         .send({ name: fileName, type: mimeType, data: base64Data, ...options })

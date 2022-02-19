@@ -44,7 +44,7 @@ export const DropzoneFileUpload = ({ dataTag, acceptedFiles, topFields, onCancel
           setSubmitEnabled(false)
         }
       }}
-      inputProps={{ role: 'input' }}
+      inputProps={{ 'aria-label': 'dropzone' }}
       filesLimit={1}
     />
     <Grid

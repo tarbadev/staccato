@@ -33,10 +33,10 @@ jobs:
             ${{ runner.os }}-build-${{ env.cache-name }}-
             ${{ runner.os }}-build-
             ${{ runner.os }}-
-      - name: "Install Node.js 14.8.0"
+      - name: "Install Node.js 14.19.0"
         uses: actions/setup-node@v1
         with:
-          node-version: 14.8.0
+          node-version: 14.19.0
       - name: "Install dependencies"
         if: steps.yarn-cache.outputs.cache-hit != 'true'
         run: yarn --frozen-lockfile
@@ -63,10 +63,10 @@ jobs:
             ${{ runner.os }}-build-${{ env.cache-name }}-
             ${{ runner.os }}-build-
             ${{ runner.os }}-
-      - name: "Install Node.js 14.8.0"
+      - name: "Install Node.js 14.19.0"
         uses: actions/setup-node@v1
         with:
-          node-version: 14.8.0
+          node-version: 14.19.0
       - name: "Install dependencies"
         if: steps.yarn-cache.outputs.cache-hit != 'true'
         run: yarn --frozen-lockfile
@@ -141,10 +141,10 @@ jobs:
           mysql user: 'staccato'
           mysql password: 'staccato'
           mysql version: '8.0.22'
-      - name: "Install Node.js 14.8.0"
+      - name: "Install Node.js 14.19.0"
         uses: actions/setup-node@v1
         with:
-          node-version: 14.8.0
+          node-version: 14.19.0
       - name: "Install dependencies"
         if: steps.yarn-cache.outputs.cache-hit != 'true'
         run: yarn --frozen-lockfile

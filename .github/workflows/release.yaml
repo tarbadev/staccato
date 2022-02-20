@@ -178,7 +178,7 @@ jobs:
   push-docker-images:
     name: Build and Push Docker images
     needs: e2e
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/main' && startsWith(github.event.head_commit.message, '[finish')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2

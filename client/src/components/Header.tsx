@@ -4,7 +4,7 @@ import SettingsIcon from '@mui/icons-material/Settings'
 import { makeStyles } from '@mui/styles'
 import { useNavigate } from 'react-router-dom'
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(() => ({
   root: {
     flexGrow: 1,
   },

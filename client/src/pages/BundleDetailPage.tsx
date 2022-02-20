@@ -126,7 +126,7 @@ const BundleDetailPageDisplay = ({
         card = <OrchestralPartitionCard resource={resource} onDeleteClick={onDeleteClick} />
       }
 
-      return <Grid item key={resource.id}>
+      return <Grid item key={resource.id} xs={12}>
         {card}
       </Grid>
     },

@@ -1,26 +1,23 @@
-import React, { useState } from 'react'
+import React from 'react'
 import Resource from '@shared/Resource'
-import { Document, Page, pdfjs } from 'react-pdf'
-import { CardContent, Typography, CardHeader, Card } from '@mui/material'
+import { Card, CardContent, CardHeader, Typography } from '@mui/material'
 import { DeleteButton } from './DeleteButton'
+import { PdfViewer } from './PdfViewer'
 
-pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`
+type OrchestralPartitionCardProps = {
+  resource: Resource;
+  onDeleteClick: Function;
+}
 
 export const OrchestralPartitionCard = ({
                                           resource,
                                           onDeleteClick,
-                                        }: { resource: Resource, onDeleteClick: Function }) => {
-  const [numPages, setNumPages] = useState(0)
-
-  const onDocumentLoadSuccess = ({ numPages }: { numPages: number }) => {
-    setNumPages(numPages)
-  }
-
+                                        }: OrchestralPartitionCardProps) => {
   const composersSubHeader = resource.composers?.join(', ')
   const arrangersSubHeader = resource.arrangers?.join(', ')
   const subHeader = `Composed by ${composersSubHeader} - Arranged by ${arrangersSubHeader}`
 
-  return <Card>
+  return <Card style={{ height: '100vh' }}>
     <CardHeader title={resource.title}
                 subheader={subHeader}
                 data-resource-title
@@ -30,20 +27,6 @@ export const OrchestralPartitionCard = ({
         Instruments: {resource.instruments?.join(', ')}
       </Typography>
     </CardContent>
-    <Document
-      file={`https://cors-anywhere.herokuapp.com/${resource.url}`}
-      onLoadSuccess={onDocumentLoadSuccess}
-      options={{ httpHeaders: { 'Access-Control-Allow-Origin': '*' } }}
-    >
-      {Array.from(
-        new Array(numPages),
-        (el, index) => (
-          <Page
-            key={`page_${index + 1}`}
-            pageNumber={index + 1}
-          />
-        ),
-      )}
-    </Document>
+    <PdfViewer src={resource.url} title={resource.title} />
   </Card>
 }

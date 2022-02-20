@@ -1,6 +1,5 @@
-import CardHeader from '@material-ui/core/CardHeader'
-import Card from '@material-ui/core/Card'
 import React, { useState } from 'react'
+import { Card, CardHeader } from '@mui/material'
 import Resource from '@shared/Resource'
 import { Document, Page, pdfjs } from 'react-pdf'
 import { DeleteButton } from './DeleteButton'

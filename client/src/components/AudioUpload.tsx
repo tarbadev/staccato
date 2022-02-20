@@ -1,10 +1,8 @@
 import { DropzoneFileUpload } from './DropzoneFileUpload'
 import React, { useState } from 'react'
-import { FileObject } from 'material-ui-dropzone'
-import TextField from '@material-ui/core/TextField'
+import { FileObject } from 'mui-file-dropzone'
+import { Grid, TextField, Switch } from '@mui/material'
 import { AudioType } from '@shared/Resource'
-import { Grid } from '@material-ui/core'
-import Switch from '@material-ui/core/Switch'
 
 type MusicUploadProps = {
   onCancel: () => void;

@@ -1,7 +1,6 @@
 import React, { useState } from 'react'
-import { DropzoneArea, FileObject } from 'material-ui-dropzone'
-import Grid from '@material-ui/core/Grid'
-import Button from '@material-ui/core/Button'
+import { DropzoneArea, FileObject } from 'mui-file-dropzone'
+import { Grid, Button } from '@mui/material'
 
 type DropZoneUpload = {
   dataTag: string;
@@ -30,6 +29,7 @@ export const DropzoneFileUpload = ({ dataTag, acceptedFiles, topFields, onCancel
       showPreviews={false}
       showPreviewsInDropzone={true}
       showFileNamesInPreview={true}
+      fileObjects={[]}
       onChange={(files) => {
         if (files[0]) {
           const reader = new FileReader()
@@ -50,7 +50,7 @@ export const DropzoneFileUpload = ({ dataTag, acceptedFiles, topFields, onCancel
     <Grid
       container
       direction='row'
-      justify='flex-end'
+      justifyContent='flex-end'
       alignItems='center'
     >
       <Button variant='outlined' onClick={onCancelClick}>Cancel</Button>

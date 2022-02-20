@@ -1,7 +1,7 @@
-import { DropzoneFileUpload } from './DropzoneFileUpload'
 import React, { useState } from 'react'
-import { FileObject } from 'material-ui-dropzone'
-import TextField from '@material-ui/core/TextField'
+import { DropzoneFileUpload } from './DropzoneFileUpload'
+import { FileObject } from 'mui-file-dropzone'
+import { TextField } from '@mui/material'
 
 type VideoUploadProps = {
   onCancel: () => void;
@@ -46,6 +46,9 @@ export const VideoUpload = ({ onCancel, onSubmit }: VideoUploadProps) => {
     data-add-video-authors
   />
 
-  return <DropzoneFileUpload dataTag='video' acceptedFiles={['video/*']} onCancelClick={onCancel}
-                             onSubmitClick={submitVideo} topFields={[titleComponent, sourceComponent, authorsComponent]} />
+  return <DropzoneFileUpload dataTag='video'
+                             acceptedFiles={['video/*']}
+                             onCancelClick={onCancel}
+                             onSubmitClick={submitVideo}
+                             topFields={[titleComponent, sourceComponent, authorsComponent]} />
 }

@@ -1,9 +1,7 @@
-import CardHeader from '@material-ui/core/CardHeader'
-import Card from '@material-ui/core/Card'
 import React, { useState } from 'react'
 import Resource from '@shared/Resource'
 import { Document, Page, pdfjs } from 'react-pdf'
-import { CardContent, Typography } from '@material-ui/core'
+import { CardContent, Typography, CardHeader, Card } from '@mui/material'
 import { DeleteButton } from './DeleteButton'
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`

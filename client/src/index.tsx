@@ -1,15 +1,25 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import CssBaseline from '@material-ui/core/CssBaseline'
 import { BrowserRouter } from 'react-router-dom'
 import { App } from './components/App'
 import * as serviceWorker from './serviceWorker'
+import { createTheme, Theme, ThemeProvider } from '@mui/material/styles'
+import { CssBaseline } from '@mui/material'
+
+const theme = createTheme()
+
+declare module '@mui/styles/defaultTheme' {
+  interface DefaultTheme extends Theme {
+  }
+}
 
 ReactDOM.render(
   <React.StrictMode>
     <BrowserRouter>
-      <CssBaseline/>
-      <App/>
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <App />
+      </ThemeProvider>
     </BrowserRouter>
   </React.StrictMode>,
   document.getElementById('root'),

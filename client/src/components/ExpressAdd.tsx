@@ -1,8 +1,5 @@
-import Tooltip from '@material-ui/core/Tooltip'
-import Fab from '@material-ui/core/Fab'
-import AddIcon from '@material-ui/icons/Add'
-import TextField from '@material-ui/core/TextField'
-import Button from '@material-ui/core/Button'
+import { Button, Fab, TextField, Tooltip } from '@mui/material'
+import AddIcon from '@mui/icons-material/Add'
 import React, { FormEvent, useState } from 'react'
 
 type ExpressAddProps = {
@@ -29,7 +26,13 @@ type ExpressAddDisplayProps = {
   onSubmitCallback: () => void,
 }
 
-const ExpressAddDisplay = ({ onAddClick, isEditMode, newElementName, onNewElementNameChange, onSubmitCallback }: ExpressAddDisplayProps) => {
+const ExpressAddDisplay = ({
+                             onAddClick,
+                             isEditMode,
+                             newElementName,
+                             onNewElementNameChange,
+                             onSubmitCallback,
+                           }: ExpressAddDisplayProps) => {
   const onFormSubmit = (event: FormEvent) => {
     event.preventDefault()
     onSubmitCallback()
@@ -42,16 +45,16 @@ const ExpressAddDisplay = ({ onAddClick, isEditMode, newElementName, onNewElemen
       </Fab>
     </Tooltip>
     {isEditMode &&
-    <form onSubmit={onFormSubmit}>
-      <TextField
-          label='Name'
-          value={newElementName}
-          onChange={({ target }) => onNewElementNameChange(target.value)}
-          data-new-express-name />
-      <Button variant='contained' color='primary' onClick={onSubmitCallback} data-submit-express>
-        Submit
-      </Button>
-    </form>
+        <form onSubmit={onFormSubmit}>
+          <TextField
+              label='Name'
+              value={newElementName}
+              onChange={({ target }) => onNewElementNameChange(target.value)}
+              data-new-express-name />
+          <Button variant='contained' color='primary' onClick={onSubmitCallback} data-submit-express>
+            Submit
+          </Button>
+        </form>
     }
   </>
 }

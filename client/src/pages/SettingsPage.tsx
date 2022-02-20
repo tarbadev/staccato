@@ -1,9 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { ExpressAdd } from '../components/ExpressAdd'
 import { request } from '../Utils'
-import List from '@material-ui/core/List'
-import ListItem from '@material-ui/core/ListItem'
-import ListItemText from '@material-ui/core/ListItemText'
+import { List, ListItem, ListItemText } from '@mui/material'
 
 export const SettingsPage = () => {
   const [authorizedUsers, setAuthorizedUsers] = useState([])

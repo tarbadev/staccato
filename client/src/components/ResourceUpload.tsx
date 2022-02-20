@@ -1,11 +1,9 @@
-import Menu from '@material-ui/core/Menu'
-import MenuItem from '@material-ui/core/MenuItem'
 import React, { useState } from 'react'
+import { Button, Menu, MenuItem } from '@mui/material'
 import { ImageUpload } from './ImageUpload'
 import { VideoUpload } from './VideoUpload'
 import { AudioUpload } from './AudioUpload'
-import Button from '@material-ui/core/Button'
-import { FileObject } from 'material-ui-dropzone'
+import { FileObject } from 'mui-file-dropzone'
 import { AudioType } from '@shared/Resource'
 import { UploadRequest } from '@shared/UploadRequest'
 import { SongPartitionUpload } from './SongPartitionUpload'
@@ -78,7 +76,13 @@ export const ResourceUpload = ({ uploadResource }: ResourceUploadProps) => {
     closeEditMode()
   }
 
-  const onSubmitOrchestralPartition = (title: string, fileToUpload: FileObject, composers: string[], arrangers: string[], instruments: string[]) => {
+  const onSubmitOrchestralPartition = (
+    title: string,
+    fileToUpload: FileObject,
+    composers: string[],
+    arrangers: string[],
+    instruments: string[],
+  ) => {
     uploadResource({
       name: fileToUpload.file.name,
       type: fileToUpload.file.type,
@@ -131,7 +135,13 @@ type ResourceUploadDisplayProps = {
     audioType: AudioType,
   ) => void;
   onSubmitSongPartition: (title: string, file: FileObject, authors: string[]) => void;
-  onSubmitOrchestralPartition: (title: string, file: FileObject, composers: string[], arrangers: string[], instruments: string[]) => void;
+  onSubmitOrchestralPartition: (
+    title: string,
+    file: FileObject,
+    composers: string[],
+    arrangers: string[],
+    instruments: string[],
+  ) => void;
 }
 const ResourceUploadDisplay = ({
                                  displayAddImage,
@@ -182,7 +192,8 @@ const ResourceUploadDisplay = ({
       <MenuItem onClick={displayAddVideo} data-add-video-resource>Video</MenuItem>
       <MenuItem onClick={displayAddAudio} data-add-audio-resource>Audio</MenuItem>
       <MenuItem onClick={displayAddSongPartition} data-add-song-partition-resource>Song Partition</MenuItem>
-      <MenuItem onClick={displayAddOrchestralPartition} data-add-orchestral-partition-resource>Orchestral Partition</MenuItem>
+      <MenuItem onClick={displayAddOrchestralPartition} data-add-orchestral-partition-resource>Orchestral
+        Partition</MenuItem>
     </Menu>
     {dropAreaImage}
     {dropAreaVideo}

@@ -1,10 +1,6 @@
-import CardHeader from '@material-ui/core/CardHeader'
-import CardMedia from '@material-ui/core/CardMedia'
-import Card from '@material-ui/core/Card'
 import React from 'react'
 import Resource from '@shared/Resource'
-import { CardContent } from '@material-ui/core'
-import Typography from '@material-ui/core/Typography'
+import { CardContent, Card, CardMedia, CardHeader, Typography } from '@mui/material'
 import { DeleteButton } from './DeleteButton'
 
 export const AudioCard = ({ resource, onDeleteClick }: { resource: Resource, onDeleteClick: Function }) => {

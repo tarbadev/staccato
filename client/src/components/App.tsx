@@ -1,6 +1,6 @@
 import React from 'react'
-import makeStyles from '@material-ui/core/styles/makeStyles'
-import Container from '@material-ui/core/Container'
+import { makeStyles } from '@mui/styles'
+import { Container } from '@mui/material'
 import { Content } from './Content'
 import { Header } from './Header'
 

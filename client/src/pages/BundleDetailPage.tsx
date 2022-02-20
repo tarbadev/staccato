@@ -1,13 +1,7 @@
 import React, { useEffect, useState } from 'react'
-import { Typography } from '@material-ui/core'
 import { useParams } from 'react-router-dom'
 import Bundle from '@shared/Bundle'
 import { request } from '../Utils'
-import IconButton from '@material-ui/core/IconButton'
-import EditIcon from '@material-ui/icons/Edit'
-import TextField from '@material-ui/core/TextField'
-import Button from '@material-ui/core/Button'
-import Grid from '@material-ui/core/Grid'
 import { ImageCard } from '../components/ImageCard'
 import { VideoCard } from '../components/VideoCard'
 import { AudioCard } from '../components/AudioCard'
@@ -15,6 +9,8 @@ import { UploadRequest } from '@shared/UploadRequest'
 import { ResourceUpload } from '../components/ResourceUpload'
 import { SongPartitionCard } from '../components/SongPartitionCard'
 import { OrchestralPartitionCard } from '../components/OrchestralPartitionCard'
+import { Button, Grid, IconButton, TextField, Typography } from '@mui/material'
+import EditIcon from '@mui/icons-material/Edit'
 
 export const BundleDetailPage = () => {
   const [bundle, setBundle] = useState<Bundle>({ id: 0, name: '', driveUrl: '', resources: [] })
@@ -103,7 +99,7 @@ const BundleDetailPageDisplay = ({
       <Grid
         container
         direction='row'
-        justify='flex-start'
+        justifyContent='flex-start'
         alignItems='center'
       >
         <Typography variant='h3' data-bundle-name={bundle.name}>{bundle.name}</Typography>

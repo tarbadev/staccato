@@ -1,10 +1,6 @@
-import CardHeader from '@material-ui/core/CardHeader'
-import CardMedia from '@material-ui/core/CardMedia'
-import Card from '@material-ui/core/Card'
 import React from 'react'
+import { Card, CardContent, CardHeader, CardMedia, Typography } from '@mui/material'
 import Resource from '@shared/Resource'
-import { CardContent } from '@material-ui/core'
-import Typography from '@material-ui/core/Typography'
 import { Link } from 'react-router-dom'
 import { DeleteButton } from './DeleteButton'
 

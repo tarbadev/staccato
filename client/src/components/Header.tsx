@@ -1,10 +1,7 @@
-import { AppBar } from '@material-ui/core'
-import Toolbar from '@material-ui/core/Toolbar'
 import React from 'react'
-import Typography from '@material-ui/core/Typography'
-import IconButton from '@material-ui/core/IconButton'
-import SettingsIcon from '@material-ui/icons/Settings'
-import makeStyles from '@material-ui/core/styles/makeStyles'
+import { AppBar, IconButton, Toolbar, Typography } from '@mui/material'
+import SettingsIcon from '@mui/icons-material/Settings'
+import { makeStyles } from '@mui/styles'
 import { useNavigate } from 'react-router-dom'
 
 const useStyles = makeStyles((theme) => ({
@@ -21,12 +18,12 @@ export const Header = () => {
   const classes = useStyles()
   const navigate = useNavigate()
 
-  return <AppBar position="static" className={classes.root}>
+  return <AppBar position='static' className={classes.root}>
     <Toolbar>
-      <Typography variant="h6" className={classes.title} onClick={() => navigate('/')}>
+      <Typography variant='h6' className={classes.title} onClick={() => navigate('/')}>
         Staccato
       </Typography>
-      <IconButton color="inherit" onClick={() => navigate('/settings')} data-menu-settings>
+      <IconButton color='inherit' onClick={() => navigate('/settings')} data-menu-settings>
         <SettingsIcon />
       </IconButton>
     </Toolbar>

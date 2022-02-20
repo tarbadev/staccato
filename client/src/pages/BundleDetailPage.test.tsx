@@ -129,7 +129,6 @@ describe('BundleDetailPage', () => {
       const someFileContent = 'Some File Content'
       const file = new File([someFileContent], fileName, { type: mimeType })
       userEvent.upload(input, file)
-      fireEvent.drop(input)
 
       await waitFor(() => {
         const input = screen.getByRole('textbox', { name: /title/i }) as HTMLInputElement
@@ -219,7 +218,7 @@ describe('BundleDetailPage', () => {
               name: fileName,
               title,
               type: mimeType,
-              data: `data:${mimeType};base64,${btoa(someFileContent)}`,
+              data: `data:${mimeType};base64,${Buffer.from(someFileContent).toString('base64')}`,
               ...otherFields,
             },
           },

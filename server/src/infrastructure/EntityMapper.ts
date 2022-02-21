@@ -7,7 +7,7 @@ import { ComposerEntity } from './entity/ComposerEntity'
 import { ArrangerEntity } from './entity/ArrangerEntity'
 import { InstrumentEntity } from './entity/InstrumentEntity'
 
-const mapResourceEntity = (resourceEntity: ResourceEntity): Resource => {
+const mapFromResourceEntity = (resourceEntity: ResourceEntity): Resource => {
   return new Resource(
     resourceEntity.id,
     resourceEntity.title,
@@ -24,38 +24,41 @@ const mapResourceEntity = (resourceEntity: ResourceEntity): Resource => {
   )
 }
 
-export const mapFromEntity = (bundleEntity: BundleEntity): Bundle => {
+export const mapFromBundleEntity = (bundleEntity: BundleEntity): Bundle => {
   return new Bundle(
     bundleEntity.id,
     bundleEntity.name,
     bundleEntity.googleDriveId,
-    bundleEntity.resources?.map(mapResourceEntity),
+    bundleEntity.resources?.map(mapFromResourceEntity),
   )
 }
 
-const mapResource = (resource: Resource): ResourceEntity => {
+const mapToResourceEntity = (bundleEntity: BundleEntity, resource: Resource): ResourceEntity => {
   return new ResourceEntity(
     resource.id,
     resource.title,
     resource.type,
     resource.googleDriveId,
     resource.googleDriveLink,
+    bundleEntity,
     resource.source,
     resource.authors ? resource.authors.map(author => new AuthorEntity(0, author)) : [],
     resource.album,
     resource.audioType,
-    undefined,
     resource.composers ? resource.composers.map(composer => new ComposerEntity(0, composer)) : [],
     resource.arrangers ? resource.arrangers.map(arranger => new ArrangerEntity(0, arranger)) : [],
     resource.instruments ? resource.instruments.map(instrument => new InstrumentEntity(0, instrument)) : [],
   )
 }
 
-export const mapToEntity = (bundle: Bundle): BundleEntity => {
-  return new BundleEntity(
+export const mapToBundleEntity = (bundle: Bundle): BundleEntity => {
+  const bundleEntity = new BundleEntity(
     bundle.id,
     bundle.name,
     bundle.googleDriveId,
-    bundle.resources?.map(mapResource),
+    [],
   )
+  bundleEntity.resources = bundle.resources?.map(resource => mapToResourceEntity(bundleEntity, resource))
+
+  return bundleEntity
 }

@@ -1,5 +1,5 @@
 import { BundleEntity } from './entity/BundleEntity'
-import { mapFromEntity, mapToEntity } from './EntityMapper'
+import { mapFromBundleEntity, mapToBundleEntity } from './EntityMapper'
 import Bundle from '../domain/Bundle'
 import Resource from '../domain/Resource'
 import { ResourceEntity } from './entity/ResourceEntity'
@@ -27,33 +27,35 @@ describe('BundleEntity', () => {
     ['Piano', 'Violin', 'Trumpet'],
   )
   const expectedBundle = new Bundle(32, 'Some super bundle', 'SuperDriveId', [expectedResource])
+  const bundleEntity = new BundleEntity(
+    expectedBundle.id,
+    expectedBundle.name,
+    expectedBundle.googleDriveId,
+    []
+  )
   const resourceEntity = new ResourceEntity(
     expectedResource.id,
     expectedResource.title,
     expectedResource.type,
     expectedResource.googleDriveId,
     expectedResource.googleDriveLink,
+    bundleEntity,
     expectedResource.source,
     expectedResource.authors?.map(author => new AuthorEntity(0, author)),
     expectedResource.album,
     expectedResource.audioType,
-    undefined,
     expectedResource.composers?.map(composer => new ComposerEntity(0, composer)),
     expectedResource.arrangers?.map(arranger => new ArrangerEntity(0, arranger)),
     expectedResource.instruments?.map(instrument => new InstrumentEntity(0, instrument)),
   )
-  const bundleEntity = new BundleEntity(
-    expectedBundle.id,
-    expectedBundle.name,
-    expectedBundle.googleDriveId,
-    [resourceEntity]
-  )
+
+  bundleEntity.resources = [resourceEntity]
 
   describe('toDomain', () => {
     it('should return the domain object with resources', () => {
       bundleEntity.resources = [resourceEntity]
 
-      expect(mapFromEntity(bundleEntity)).toEqual(expectedBundle)
+      expect(mapFromBundleEntity(bundleEntity)).toEqual(expectedBundle)
     })
 
     it('should return the domain object without resources', () => {
@@ -64,13 +66,13 @@ describe('BundleEntity', () => {
         expectedBundle.googleDriveId,
       )
 
-      expect(mapFromEntity(bundleEntity)).toEqual(expectedBundle)
+      expect(mapFromBundleEntity(bundleEntity)).toEqual(expectedBundle)
     })
   })
 
   describe('toEntity', () => {
     it('should return the entity object with resources', () => {
-      expect(mapToEntity(expectedBundle)).toEqual(bundleEntity)
+      expect(mapToBundleEntity(expectedBundle)).toEqual(bundleEntity)
     })
   })
 })

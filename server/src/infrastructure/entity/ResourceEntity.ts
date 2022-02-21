@@ -25,7 +25,7 @@ export class ResourceEntity {
   @Column({ type: 'varchar' })
   audioType?: AudioType
   @ManyToOne(() => BundleEntity, bundle => bundle.resources)
-  bundle?: BundleEntity
+  bundle: BundleEntity
   @ManyToMany(() => AuthorEntity, author => author.resources, { cascade: true, eager: true })
   @JoinTable({ name: 'resource_author' })
   authors?: AuthorEntity[]
@@ -45,11 +45,11 @@ export class ResourceEntity {
     type: ResourceType,
     googleDriveId: string,
     googleDriveLink: string,
+    bundle: BundleEntity,
     source?: string,
     authors?: AuthorEntity[],
     album?: string,
     audioType?: AudioType,
-    bundle?: BundleEntity,
     composers?: ComposerEntity[],
     arrangers?: ArrangerEntity[],
     instruments?: InstrumentEntity[],

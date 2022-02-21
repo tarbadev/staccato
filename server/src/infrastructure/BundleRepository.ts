@@ -1,6 +1,6 @@
 import { getManager } from 'typeorm'
 import { BundleEntity } from './entity/BundleEntity'
-import { mapFromEntity, mapToEntity } from './EntityMapper'
+import { mapFromBundleEntity, mapToBundleEntity } from './EntityMapper'
 import Bundle from '../domain/Bundle'
 import { AuthorEntity } from './entity/AuthorEntity'
 import { ComposerEntity } from './entity/ComposerEntity'
@@ -10,21 +10,21 @@ import { InstrumentEntity } from './entity/InstrumentEntity'
 export default class BundleRepository {
   static async findAll(): Promise<Bundle[]> {
     const bundleEntities = await getManager().getRepository(BundleEntity).find()
-    return bundleEntities.map(mapFromEntity)
+    return bundleEntities.map(mapFromBundleEntity)
   }
 
   static async findOne(id: number): Promise<Bundle> {
     const bundleEntity = await getManager().getRepository(BundleEntity).findOne(id)
 
     if (bundleEntity) {
-      return mapFromEntity(bundleEntity)
+      return mapFromBundleEntity(bundleEntity)
     } else {
       throw new Error(`Bundle with id ${id} was not found`)
     }
   }
 
   static async save(bundle: Bundle): Promise<Bundle> {
-    const bundleEntity = mapToEntity(bundle)
+    const bundleEntity = mapToBundleEntity(bundle)
 
     if (bundleEntity.resources && bundleEntity.resources.length > 0) {
       const authorRepository = getManager().getRepository(AuthorEntity)
@@ -98,6 +98,6 @@ export default class BundleRepository {
       }
     }
     const storedEntity = await getManager().getRepository(BundleEntity).save(bundleEntity)
-    return mapFromEntity(storedEntity)
+    return mapFromBundleEntity(storedEntity)
   }
 }

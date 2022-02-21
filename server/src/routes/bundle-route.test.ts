@@ -4,38 +4,13 @@ import { configureApp } from '../configuration'
 import BundleService from '../domain/BundleService'
 import * as Utils from '../utils'
 import Bundle from '../domain/Bundle'
-import Resource from '../domain/Resource'
 import BundleResponse from '@shared/Bundle'
-import ResourceResponse, { AudioType } from '@shared/Resource'
+import { AudioType } from '@shared/Resource'
+import { ResourceFactory, ResourceResponseFactory } from '../testFactory'
 
 describe('BundleRouter', () => {
-  const resource = new Resource(
-    89,
-    'My title rocks!',
-    'image',
-    'DriveId',
-    '/path/to/resource/file',
-    'https://example.com',
-    ['First Author', 'Second Author'],
-    'Some Super Hit Album',
-    'song',
-    ['First Composer', 'Second Composer'],
-    ['First Arranger', 'Second Arranger'],
-    ['Piano', 'Violin', 'Trumpet'],
-  )
-  const resourceResponse: ResourceResponse = {
-    id: 89,
-    title: 'My title rocks!',
-    url: '/path/to/resource/file',
-    type: 'image',
-    source: 'https://example.com',
-    authors: ['First Author', 'Second Author'],
-    album: 'Some Super Hit Album',
-    audioType: 'song',
-    composers: ['First Composer', 'Second Composer'],
-    arrangers: ['First Arranger', 'Second Arranger'],
-    instruments: ['Piano', 'Violin', 'Trumpet'],
-  }
+  const resource = ResourceFactory({ id: 89 })
+  const resourceResponse = ResourceResponseFactory({ id: 89 })
   const bundle = new Bundle(32, 'Some super bundle', 'SuperDriveId', [resource])
   const bundleResponse: BundleResponse = {
     id: 32,

@@ -1,5 +1,5 @@
 import Resource from './domain/Resource'
-import { AudioType, ResourceType } from '@shared/Resource'
+import ResourceResponse, { AudioType, ResourceType } from '@shared/Resource'
 import { ResourceEntity } from './infrastructure/entity/ResourceEntity'
 import { BundleEntity } from './infrastructure/entity/BundleEntity'
 import { AuthorEntity } from './infrastructure/entity/AuthorEntity'
@@ -25,13 +25,13 @@ type ResourceFactoryArguments =
 export const ResourceFactory = (
   {
     id = 0,
-    title = 'SomeResource',
+    title = 'My title rocks!',
     type = 'video',
     googleDriveId = 'someResourceDriveId',
-    googleDriveLink = '/path/to/resource',
-    source = 'http://example.com',
+    googleDriveLink = '/path/to/resource/file',
+    source = 'https://example.com',
     authors = ['First Author', 'Second Author'],
-    album = 'My Super Album',
+    album = 'Some Super Hit Album',
     audioType = 'song',
     composers = ['First Composer', 'Second Composer'],
     arrangers = ['First Arranger', 'Second Arranger'],
@@ -73,14 +73,14 @@ type ResourceEntityFactoryArguments =
 export const ResourceEntityFactory = (
   {
     id = 0,
-    title = 'SomeResource',
+    title = 'My title rocks!',
     type = 'video',
     googleDriveId = 'someResourceDriveId',
-    googleDriveLink = '/path/to/resource',
+    googleDriveLink = '/path/to/resource/file',
     bundle = BundleEntityFactory(),
-    source = 'http://example.com',
+    source = 'https://example.com',
     authors = [AuthorEntityFactory()],
-    album = 'My Super Album',
+    album = 'Some Super Hit Album',
     audioType = 'song',
     composers = [ComposerEntityFactory()],
     arrangers = [ArrangerEntityFactory()],
@@ -176,3 +176,44 @@ const InstrumentEntityFactory = (
   id,
   name,
 )
+
+type ResourceResponseFactoryArguments = {
+  id?: number;
+  title?: string;
+  url?: string;
+  type?: ResourceType;
+  source?: string;
+  authors?: string[];
+  composers?: string[];
+  arrangers?: string[];
+  instruments?: string[];
+  album?: string;
+  audioType?: AudioType;
+}
+export const ResourceResponseFactory = (
+  {
+    id = 89,
+    title = 'My title rocks!',
+    url = '/path/to/resource/file',
+    type = 'video',
+    source = 'https://example.com',
+    authors = ['First Author', 'Second Author'],
+    album = 'Some Super Hit Album',
+    audioType = 'song',
+    composers = ['First Composer', 'Second Composer'],
+    arrangers = ['First Arranger', 'Second Arranger'],
+    instruments = ['Piano', 'Violin', 'Trumpet'],
+  }: ResourceResponseFactoryArguments = {},
+): ResourceResponse => ({
+  id,
+  title,
+  url,
+  type,
+  source,
+  authors,
+  album,
+  audioType,
+  composers,
+  arrangers,
+  instruments,
+})

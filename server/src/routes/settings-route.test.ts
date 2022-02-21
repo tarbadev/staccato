@@ -1,7 +1,7 @@
 import request from 'supertest'
 import express, { Express } from 'express'
 import { configureApp } from '../configuration'
-import SettingsService from '../application/SettingsService'
+import SettingsService from '../domain/SettingsService'
 
 describe('SettingsRouter', () => {
   const authorizedUser = { email: 'test@example.com' }

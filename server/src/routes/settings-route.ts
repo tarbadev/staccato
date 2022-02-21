@@ -1,5 +1,5 @@
 import express, { Request, Response } from 'express'
-import SettingsService from '../application/SettingsService'
+import SettingsService from '../domain/SettingsService'
 
 const settingsRouter = express.Router()
 

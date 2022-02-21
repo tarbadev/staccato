@@ -1,8 +1,8 @@
 import express, { Request, Response } from 'express'
-import BundleService, { UploadParams } from '../application/BundleService'
+import BundleService, { UploadParams } from '../domain/BundleService'
 import { createTempFileFromBase64 } from '../utils'
 import BundleResponse from '@shared/Bundle'
-import Bundle from '../application/Bundle'
+import Bundle from '../domain/Bundle'
 
 const bundleRouter = express.Router()
 

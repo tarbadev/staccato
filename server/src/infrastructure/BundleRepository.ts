@@ -1,7 +1,7 @@
 import { getManager } from 'typeorm'
 import { BundleEntity } from './entity/BundleEntity'
 import { mapFromEntity, mapToEntity } from './EntityMapper'
-import Bundle from '../application/Bundle'
+import Bundle from '../domain/Bundle'
 import { AuthorEntity } from './entity/AuthorEntity'
 import { ComposerEntity } from './entity/ComposerEntity'
 import { ArrangerEntity } from './entity/ArrangerEntity'

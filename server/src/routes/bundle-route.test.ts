@@ -1,10 +1,10 @@
 import request from 'supertest'
 import express, { Express } from 'express'
 import { configureApp } from '../configuration'
-import BundleService from '../application/BundleService'
+import BundleService from '../domain/BundleService'
 import * as Utils from '../utils'
-import Bundle from '../application/Bundle'
-import Resource from '../application/Resource'
+import Bundle from '../domain/Bundle'
+import Resource from '../domain/Resource'
 import BundleResponse from '@shared/Bundle'
 import ResourceResponse, { AudioType } from '@shared/Resource'
 

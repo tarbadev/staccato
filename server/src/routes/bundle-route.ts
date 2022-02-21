@@ -3,10 +3,12 @@ import BundleService, { UploadParams } from '../domain/BundleService'
 import { createTempFileFromBase64 } from '../utils'
 import BundleResponse from '@shared/Bundle'
 import { mapBundleToResponse } from './route-mapper'
+import ResourceService from '../domain/ResourceService'
 
 const bundleRouter = express.Router()
 
 const bundleService = new BundleService()
+const resourceService = new ResourceService()
 
 bundleRouter.get('/', async (req: Request, res: Response<BundleResponse[]>) => {
   const bundles = await bundleService.list()
@@ -48,7 +50,7 @@ bundleRouter.post('/:id/resources', async (req: Request, res: Response<BundleRes
 bundleRouter.delete('/:id/resources/:resourceId', async (req: Request, res: Response<BundleResponse>) => {
   const bundleId = Number(req.params.id)
 
-  await bundleService.deleteResource(bundleId, Number(req.params.resourceId))
+  await resourceService.delete(Number(req.params.resourceId))
 
   const bundle = await bundleService.get(bundleId)
 

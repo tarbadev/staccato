@@ -61,11 +61,4 @@ export default class BundleService {
     })
     return BundleRepository.save(newBundle)
   }
-
-  async deleteResource(bundleId: number, resourceId: number): Promise<void> {
-    const resource = await ResourceRepository.findOne(resourceId)
-
-    await ResourceRepository.delete(resource.id)
-    await GoogleDrive.getInstance().deleteFile(resource.googleDriveId)
-  }
 }

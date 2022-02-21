@@ -7,6 +7,7 @@ import Bundle from '../domain/Bundle'
 import Resource from '../domain/Resource'
 import BundleResponse from '@shared/Bundle'
 import ResourceResponse, { AudioType } from '@shared/Resource'
+import ResourceService from '../domain/ResourceService'
 
 describe('BundleRouter', () => {
   const resource = new Resource(
@@ -187,16 +188,16 @@ describe('BundleRouter', () => {
     const bundleId = 43
     const resourceId = 980
 
-    const deleteSpy = jest.spyOn(BundleService.prototype, 'deleteResource')
-    const getSpy = jest.spyOn(BundleService.prototype, 'get')
-    deleteSpy.mockResolvedValueOnce()
-    getSpy.mockResolvedValueOnce(bundle)
+    const deleteResourceSpy = jest.spyOn(ResourceService.prototype, 'delete')
+    const getBundleSpy = jest.spyOn(BundleService.prototype, 'get')
+    deleteResourceSpy.mockResolvedValueOnce()
+    getBundleSpy.mockResolvedValueOnce(bundle)
 
     const res = await request(app)
       .delete(`/api/bundles/${bundleId}/resources/${resourceId}`)
 
-    expect(deleteSpy).toHaveBeenCalledWith(bundleId, resourceId)
-    expect(getSpy).toHaveBeenCalledWith(bundleId)
+    expect(deleteResourceSpy).toHaveBeenCalledWith(bundleId, resourceId)
+    expect(getBundleSpy).toHaveBeenCalledWith(bundleId)
 
     expect(res.status).toEqual(200)
     expect(res.body).toEqual(bundleResponse)

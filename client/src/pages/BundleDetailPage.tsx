@@ -11,6 +11,7 @@ import { SongPartitionCard } from '../components/SongPartitionCard'
 import { OrchestralPartitionCard } from '../components/OrchestralPartitionCard'
 import { Button, Grid, IconButton, TextField, Typography } from '@mui/material'
 import EditIcon from '@mui/icons-material/Edit'
+import Resource from '@shared/Resource'
 
 export const BundleDetailPage = () => {
   const [bundle, setBundle] = useState<Bundle>({ id: 0, name: '', driveUrl: '', resources: [] })
@@ -40,7 +41,10 @@ export const BundleDetailPage = () => {
       method: 'POST',
       body: uploadRequest,
     })
-      .then((bundle: Bundle) => setBundle(bundle))
+      .then((resource: Resource) => {
+        bundle.resources.push(resource)
+        setBundle({ ...bundle })
+      })
       .catch(err => console.error('An error happened while uploading resources', err))
   }
 

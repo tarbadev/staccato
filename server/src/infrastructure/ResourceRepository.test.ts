@@ -2,7 +2,8 @@ import ResourceRepository from './ResourceRepository'
 import connection from '@shared/DbHelperUnit'
 import { ResourceEntity } from './entity/ResourceEntity'
 import { mapFromResourceEntity } from './EntityMapper'
-import { ResourceEntityFactory } from '../testFactory'
+import { ResourceEntityFactory, ResourceFactory } from '../testFactory'
+import { BundleEntity } from './entity/BundleEntity'
 
 describe('ResourceRepository', () => {
   beforeAll(() => connection.create())
@@ -82,6 +83,131 @@ describe('ResourceRepository', () => {
 
     it('should throw if not found', async () => {
       await expect(ResourceRepository.findOne(90)).rejects.toThrow(new Error('Resource with id 90 was not found'))
+    })
+  })
+
+  describe('save', () => {
+    it('should save the resource', async () => {
+      const bundle = await connection.store('BundleEntity', { name: 'Some New Bundle', googleDriveId: 'SuperId' })
+      bundle.resources = []
+
+      expect(await connection.getAllAuthors()).toHaveLength(0)
+
+      const resource = ResourceFactory()
+
+      const storedResource = await ResourceRepository.save(bundle, resource)
+      resource.id = storedResource.id
+
+      expect(storedResource).toEqual(resource)
+
+      expect(await connection.getAllAuthors()).toHaveLength(2)
+      expect(await connection.getAllComposers()).toHaveLength(2)
+      expect(await connection.getAllArrangers()).toHaveLength(2)
+      expect(await connection.getAllInstruments()).toHaveLength(3)
+    })
+
+    it('should retrieve the authors before storing the resource', async () => {
+      await connection.store('AuthorEntity', { name: 'First Author' })
+      const bundle = await connection.store('BundleEntity', { name: 'Some New Bundle', googleDriveId: 'SuperId' })
+      bundle.resources = []
+
+      expect(await connection.getAllAuthors()).toHaveLength(1)
+
+      const resource = ResourceFactory(
+        {
+          authors: ['First Author', 'Second Author'],
+          album: undefined,
+          audioType: undefined,
+          composers: [],
+          arrangers: [],
+          instruments: [],
+        },
+      )
+
+      const storedResource = await ResourceRepository.save(bundle, resource)
+      resource.id = storedResource.id
+
+      expect(storedResource).toEqual(resource)
+
+      expect(await connection.getAllAuthors()).toHaveLength(2)
+    })
+
+    it('should retrieve the composers before storing the resource', async () => {
+      await connection.store('ComposerEntity', { name: 'First Composer' })
+      const bundle = await connection.store('BundleEntity', { name: 'Some New Bundle', googleDriveId: 'SuperId' })
+      bundle.resources = []
+
+      expect(await connection.getAllComposers()).toHaveLength(1)
+
+      const resource = ResourceFactory(
+        {
+          authors: [],
+          album: undefined,
+          audioType: undefined,
+          composers: ['First Composer', 'Second Composer'],
+          arrangers: [],
+          instruments: [],
+        },
+      )
+
+      const storedResource = await ResourceRepository.save(bundle, resource)
+      resource.id = storedResource.id
+
+      expect(storedResource).toEqual(resource)
+
+      expect(await connection.getAllComposers()).toHaveLength(2)
+    })
+
+    it('should retrieve the arrangers before storing the resource', async () => {
+      await connection.store('ArrangerEntity', { name: 'First Arranger' })
+      const bundle = await connection.store('BundleEntity', { name: 'Some New Bundle', googleDriveId: 'SuperId' })
+      bundle.resources = []
+
+      expect(await connection.getAllArrangers()).toHaveLength(1)
+
+      const resource = ResourceFactory(
+        {
+          authors: [],
+          album: undefined,
+          audioType: undefined,
+          composers: [],
+          arrangers: ['First Arranger', 'Second Arranger'],
+          instruments: [],
+        },
+      )
+
+      const storedResource = await ResourceRepository.save(bundle, resource)
+      resource.id = storedResource.id
+
+      expect(storedResource).toEqual(resource)
+
+      expect(await connection.getAllArrangers()).toHaveLength(2)
+    })
+
+    it('should retrieve the instruments before storing the resource', async () => {
+      await connection.store('InstrumentEntity', { name: 'Violin' })
+      const bundle = await connection.store('BundleEntity', { name: 'Some New Bundle', googleDriveId: 'SuperId' })
+      bundle.resources = []
+
+      expect(await connection.getAllInstruments()).toHaveLength(1)
+
+      const resource = ResourceFactory(
+        {
+          authors: [],
+          album: undefined,
+          audioType: undefined,
+          composers: [],
+          arrangers: [],
+          instruments: ['Piano', 'Violin', 'Trumpet'],
+        },
+      )
+
+      const storedResource = await ResourceRepository.save(bundle, resource)
+      resource.id = storedResource.id
+
+      expect(storedResource).toEqual(resource)
+
+      expect(await connection.getAllInstruments()).toHaveLength(3)
     })
   })
 })

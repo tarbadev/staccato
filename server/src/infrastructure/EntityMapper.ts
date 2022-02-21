@@ -33,7 +33,7 @@ export const mapFromBundleEntity = (bundleEntity: BundleEntity): Bundle => {
   )
 }
 
-const mapToResourceEntity = (bundleEntity: BundleEntity, resource: Resource): ResourceEntity => {
+export const mapToResourceEntity = (bundleEntity: BundleEntity, resource: Resource): ResourceEntity => {
   return new ResourceEntity(
     resource.id,
     resource.title,

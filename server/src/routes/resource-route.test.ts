@@ -50,10 +50,13 @@ describe('ResourceRouter', () => {
     const testUpload = async (fileName: string, mimeType: string, options: UploadTestOptions): Promise<void> => {
       const filePath = '/path/to/temp/file'
       const someFileContent = 'Some File Content'
-      const uploadSpy = jest.spyOn(BundleService.prototype, 'upload')
-      uploadSpy.mockResolvedValueOnce(bundle)
 
+      const getBundleSpy = jest.spyOn(BundleService.prototype, 'get')
+      const uploadResourceSpy = jest.spyOn(ResourceService.prototype, 'upload')
       const createTempFileFromBase64Spy = jest.spyOn(Utils, 'createTempFileFromBase64')
+
+      getBundleSpy.mockResolvedValueOnce(bundle)
+      uploadResourceSpy.mockResolvedValueOnce(resource)
       createTempFileFromBase64Spy.mockReturnValueOnce(filePath)
 
       const base64Data = `data:${mimeType};base64,${Buffer.from(someFileContent).toString('base64')}`
@@ -62,10 +65,10 @@ describe('ResourceRouter', () => {
         .send({ name: fileName, type: mimeType, data: base64Data, ...options })
 
       expect(res.status).toEqual(200)
-      expect(res.body).toEqual(bundleResponse)
+      expect(res.body).toEqual(resourceResponse)
       expect(createTempFileFromBase64Spy).toHaveBeenCalledWith(base64Data, fileName)
-      expect(uploadSpy)
-        .toHaveBeenCalledWith(bundle.id, { name: fileName, type: mimeType, filePath, ...options })
+      expect(getBundleSpy).toHaveBeenCalledWith(bundle.id)
+      expect(uploadResourceSpy).toHaveBeenCalledWith(bundle, { name: fileName, type: mimeType, filePath, ...options })
     }
 
     it('should call the BundleService on upload image', async () => {

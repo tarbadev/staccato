@@ -34,7 +34,7 @@ export default class BundleService {
   }
 
   async edit(id: number, name: string): Promise<Bundle> {
-    const bundle = await BundleRepository.findOne(id)
+    const bundle = await this.get(id)
     await GoogleDrive.getInstance().renameFile(bundle.googleDriveId, name)
     bundle.name = name
 
@@ -42,7 +42,7 @@ export default class BundleService {
   }
 
   async upload(id: number, uploadParams: UploadParams): Promise<Bundle> {
-    const bundle = await BundleRepository.findOne(id)
+    const bundle = await this.get(id)
     const driveResource = await GoogleDrive.getInstance()
       .uploadFile(bundle.googleDriveId, uploadParams.name, uploadParams.type, uploadParams.filePath)
     const tempType = uploadParams.type.split('/')[0]
@@ -63,7 +63,7 @@ export default class BundleService {
   }
 
   async deleteResource(bundleId: number, resourceId: number): Promise<Bundle> {
-    const bundle = await BundleRepository.findOne(bundleId)
+    const bundle = await this.get(bundleId)
     const resource = bundle.resources.find(res => res.id == resourceId)
 
     if (resource == null) {
@@ -73,6 +73,6 @@ export default class BundleService {
     await ResourceRepository.delete(resource.id)
     await GoogleDrive.getInstance().deleteFile(resource.googleDriveId)
 
-    return await BundleRepository.findOne(bundleId)
+    return await this.get(bundleId)
   }
 }

@@ -2,12 +2,32 @@ import express, { Request, Response } from 'express'
 import BundleResponse from '@shared/Bundle'
 import { mapBundleToResponse } from './route-mapper'
 import ResourceService from '../domain/ResourceService'
-import BundleService from '../domain/BundleService'
+import BundleService, { UploadParams } from '../domain/BundleService'
+import { createTempFileFromBase64 } from '../utils'
 
 const resourceRouter = express.Router({ mergeParams: true })
 
 const bundleService = new BundleService()
 const resourceService = new ResourceService()
+
+resourceRouter.post('/', async (req: Request, res: Response<BundleResponse>) => {
+  const filePath = createTempFileFromBase64(req.body.data, req.body.name)
+  const uploadParams: UploadParams = {
+    filePath,
+    name: req.body.name,
+    type: req.body.type,
+    title: req.body.title,
+    source: req.body.source,
+    authors: req.body.authors,
+    composers: req.body.composers,
+    arrangers: req.body.arrangers,
+    instruments: req.body.instruments,
+    album: req.body.album,
+    audioType: req.body.audioType,
+  }
+  const bundle = await bundleService.upload(Number(req.params.bundleId), uploadParams)
+  res.json(mapBundleToResponse(bundle))
+})
 
 resourceRouter.delete('/:resourceId', async (req: Request, res: Response<BundleResponse>) => {
   await resourceService.delete(Number(req.params.resourceId))

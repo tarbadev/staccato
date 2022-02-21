@@ -7,6 +7,7 @@ import bodyParser from 'body-parser'
 import { DATA, expressCspHeader, INLINE, NONE, SELF } from 'express-csp-header'
 import path from 'path'
 import bundleRouter from './routes/bundle-route'
+import resourceRouter from './routes/resource-route'
 import settingsRouter from './routes/settings-route'
 import history from 'connect-history-api-fallback'
 import { Connection, createConnection } from 'typeorm'
@@ -40,6 +41,7 @@ export const configureApp = (app: Express): { port: number; address: string } =>
   }))
 
   app.use('/api/bundles', bundleRouter)
+  app.use('/api/bundles/:bundleId/resources', resourceRouter)
   app.use('/api/settings', settingsRouter)
 
   if (process.env.NODE_ENV && process.env.NODE_ENV !== 'development') {

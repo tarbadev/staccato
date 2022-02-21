@@ -218,67 +218,23 @@ describe('BundleService', () => {
     expect(returnedBundle).toEqual(editedBundle)
   })
 
+
   it('should delete the resource and google file on deleteResource', async () => {
+    const driveId = 'GoogleDriveFileId'
     const bundleId = 432
     const resourceId = 987
-    const driveId = 'GoogleDriveFileId'
-    const bundleWithResource = new Bundle(
-      32,
-      'Some super bundle',
-      'SuperDriveId',
-      [new Resource(resourceId, undefined, 'image', driveId, '')],
-    )
-    const bundleWithoutResource = new Bundle(
-      32,
-      'Some super bundle',
-      'SuperDriveId',
-      [],
-    )
-
     const mockDeleteFile = jest.fn()
-    // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+
     // @ts-ignore
     jest.spyOn(GoogleDrive, 'getInstance').mockReturnValueOnce({ deleteFile: mockDeleteFile })
+    const resource = new Resource(resourceId, undefined, 'image', driveId, '')
 
-    let callCount = 0
-    BundleRepository.findOne = jest.fn(() => {
-      if (callCount++ == 0) {
-        return Promise.resolve(bundleWithResource)
-      } else {
-        return Promise.resolve(bundleWithoutResource)
-      }
-    })
     ResourceRepository.delete = jest.fn()
+    ResourceRepository.findOne = jest.fn(() => Promise.resolve(resource))
 
     await bundleService.deleteResource(bundleId, resourceId)
 
-    expect(BundleRepository.findOne).toHaveBeenCalledTimes(2)
-    expect(BundleRepository.findOne).toHaveBeenCalledWith(bundleId)
     expect(ResourceRepository.delete).toHaveBeenCalledWith(resourceId)
     expect(mockDeleteFile).toHaveBeenCalledWith(driveId)
-  })
-
-  it('should throw an error when the resource does not exist', async () => {
-    const bundleId = 432
-    const resourceId = 987
-    const bundleWithoutResource = new Bundle(
-      32,
-      'Some super bundle',
-      'SuperDriveId',
-      [],
-    )
-
-    const mockDeleteFile = jest.fn()
-    // @ts-ignore
-    jest.spyOn(GoogleDrive, 'getInstance').mockReturnValueOnce({ deleteFile: mockDeleteFile })
-
-    BundleRepository.findOne = jest.fn(() => Promise.resolve(bundleWithoutResource))
-    ResourceRepository.delete = jest.fn()
-
-    await expect(bundleService.deleteResource(bundleId, resourceId)).rejects.toThrow('Resource not found')
-
-    expect(BundleRepository.findOne).toHaveBeenCalledWith(bundleId)
-    expect(ResourceRepository.delete).not.toHaveBeenCalled()
-    expect(mockDeleteFile).not.toHaveBeenCalled()
   })
 })

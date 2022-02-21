@@ -188,12 +188,15 @@ describe('BundleRouter', () => {
     const resourceId = 980
 
     const deleteSpy = jest.spyOn(BundleService.prototype, 'deleteResource')
-    deleteSpy.mockResolvedValueOnce(bundle)
+    const getSpy = jest.spyOn(BundleService.prototype, 'get')
+    deleteSpy.mockResolvedValueOnce()
+    getSpy.mockResolvedValueOnce(bundle)
 
     const res = await request(app)
       .delete(`/api/bundles/${bundleId}/resources/${resourceId}`)
 
     expect(deleteSpy).toHaveBeenCalledWith(bundleId, resourceId)
+    expect(getSpy).toHaveBeenCalledWith(bundleId)
 
     expect(res.status).toEqual(200)
     expect(res.body).toEqual(bundleResponse)

@@ -62,17 +62,10 @@ export default class BundleService {
     return BundleRepository.save(newBundle)
   }
 
-  async deleteResource(bundleId: number, resourceId: number): Promise<Bundle> {
-    const bundle = await this.get(bundleId)
-    const resource = bundle.resources.find(res => res.id == resourceId)
-
-    if (resource == null) {
-      throw new Error('Resource not found')
-    }
+  async deleteResource(bundleId: number, resourceId: number): Promise<void> {
+    const resource = await ResourceRepository.findOne(resourceId)
 
     await ResourceRepository.delete(resource.id)
     await GoogleDrive.getInstance().deleteFile(resource.googleDriveId)
-
-    return await this.get(bundleId)
   }
 }

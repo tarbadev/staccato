@@ -7,7 +7,7 @@ import { ComposerEntity } from './entity/ComposerEntity'
 import { ArrangerEntity } from './entity/ArrangerEntity'
 import { InstrumentEntity } from './entity/InstrumentEntity'
 
-const mapFromResourceEntity = (resourceEntity: ResourceEntity): Resource => {
+export const mapFromResourceEntity = (resourceEntity: ResourceEntity): Resource => {
   return new Resource(
     resourceEntity.id,
     resourceEntity.title,

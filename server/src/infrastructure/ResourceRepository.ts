@@ -1,7 +1,19 @@
 import { getManager } from 'typeorm'
 import { ResourceEntity } from './entity/ResourceEntity'
+import Resource from '../domain/Resource'
+import { mapFromResourceEntity } from './EntityMapper'
 
 export default class ResourceRepository {
+  static async findOne(id: number): Promise<Resource> {
+    const resourceEntity = await getManager().getRepository(ResourceEntity).findOne(id)
+
+    if (resourceEntity) {
+      return mapFromResourceEntity(resourceEntity)
+    } else {
+      throw new Error(`Resource with id ${id} was not found`)
+    }
+  }
+
   static async delete(id: number): Promise<void> {
     const resourceRepository = getManager().getRepository(ResourceEntity)
     const resource = await resourceRepository.findOne(id)

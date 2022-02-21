@@ -2,32 +2,11 @@ import express, { Request, Response } from 'express'
 import BundleService, { UploadParams } from '../domain/BundleService'
 import { createTempFileFromBase64 } from '../utils'
 import BundleResponse from '@shared/Bundle'
-import Bundle from '../domain/Bundle'
+import { mapBundleToResponse } from './route-mapper'
 
 const bundleRouter = express.Router()
 
 const bundleService = new BundleService()
-
-const mapBundleToResponse = (bundle: Bundle): BundleResponse => {
-  return {
-    id: bundle.id,
-    name: bundle.name,
-    driveUrl: `https://drive.google.com/drive/folders/${bundle.googleDriveId}`,
-    resources: bundle.resources.map(resource => ({
-      id: resource.id,
-      title: resource.title,
-      url: resource.googleDriveLink,
-      type: resource.type,
-      source: resource.source,
-      authors: resource.authors,
-      album: resource.album,
-      audioType: resource.audioType,
-      composers: resource.composers,
-      arrangers: resource.arrangers,
-      instruments: resource.instruments,
-    })),
-  }
-}
 
 bundleRouter.get('/', async (req: Request, res: Response<BundleResponse[]>) => {
   const bundles = await bundleService.list()
